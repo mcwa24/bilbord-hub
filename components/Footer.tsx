@@ -36,6 +36,9 @@ export default function Footer() {
                         <Link href="/uslovi" className="text-gray-600 hover:text-gray-800">
                             Uslovi Poslovanja
                         </Link>
+                        <Link href="https://bilbord.rs/kontakt/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-800">
+                            Kontakt
+                        </Link>
                     </div>
 
                     <button
