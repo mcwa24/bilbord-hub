@@ -96,3 +96,31 @@ CREATE TRIGGER update_pr_releases_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+-- Storage buckets za fajlove i slike
+-- Napomena: Ovo se mora uraditi ručno u Supabase Dashboard -> Storage
+-- 1. Kreiraj bucket "pr-images" (public)
+-- 2. Kreiraj bucket "pr-documents" (public)
+-- 3. Postavi RLS policies:
+
+-- Policy za pr-images: Authenticated users can upload
+-- CREATE POLICY "Authenticated users can upload images" ON storage.objects
+--   FOR INSERT WITH CHECK (
+--     bucket_id = 'pr-images' AND
+--     auth.role() = 'authenticated'
+--   );
+
+-- Policy za pr-images: Anyone can read
+-- CREATE POLICY "Anyone can read images" ON storage.objects
+--   FOR SELECT USING (bucket_id = 'pr-images');
+
+-- Policy za pr-documents: Authenticated users can upload
+-- CREATE POLICY "Authenticated users can upload documents" ON storage.objects
+--   FOR INSERT WITH CHECK (
+--     bucket_id = 'pr-documents' AND
+--     auth.role() = 'authenticated'
+--   );
+
+-- Policy za pr-documents: Anyone can read
+-- CREATE POLICY "Anyone can read documents" ON storage.objects
+--   FOR SELECT USING (bucket_id = 'pr-documents');
+
