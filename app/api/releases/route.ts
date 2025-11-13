@@ -17,16 +17,45 @@ export async function GET(request: NextRequest) {
     }
 
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined
+    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
+    const itemsPerPage = limit || 10
+    const from = (page - 1) * itemsPerPage
+    const to = from + itemsPerPage - 1
+
+    // Prvo dobijamo ukupan broj za paginaciju
+    let countQuery = supabase
+      .from('pr_releases')
+      .select('*', { count: 'exact', head: true })
+      .not('published_at', 'is', null)
+
+    if (filters.search) {
+      countQuery = countQuery.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
+    }
+
+    if (filters.company) {
+      countQuery = countQuery.ilike('company_name', `%${filters.company}%`)
+    }
+
+    if (filters.industry) {
+      countQuery = countQuery.ilike('industry', `%${filters.industry}%`)
+    }
+
+    if (filters.date_from) {
+      countQuery = countQuery.gte('published_at', filters.date_from)
+    }
+
+    if (filters.date_to) {
+      countQuery = countQuery.lte('published_at', filters.date_to)
+    }
+
+    const { count } = await countQuery
 
     let query = supabase
       .from('pr_releases')
       .select('*')
       .not('published_at', 'is', null)
       .order('published_at', { ascending: false })
-
-    if (limit) {
-      query = query.limit(limit)
-    }
+      .range(from, to)
 
     if (filters.search) {
       query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
@@ -52,15 +81,55 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
-    // Filter by tags if provided
+    // Filter by tags if provided (tags se filtriraju nakon što dobijemo podatke jer su u JSON polju)
     let releases = data || []
+    let filteredCount = count || 0
+    
     if (filters.tags && filters.tags.length > 0) {
+      // Prvo filtriramo podatke
       releases = releases.filter((release: any) =>
         filters.tags!.some((tag) => release.tags?.includes(tag))
       )
+      
+      // Zatim dobijamo tačan count za tag filtrirane rezultate
+      const allReleasesQuery = supabase
+        .from('pr_releases')
+        .select('*')
+        .not('published_at', 'is', null)
+      
+      if (filters.search) {
+        allReleasesQuery.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
+      }
+      if (filters.company) {
+        allReleasesQuery.ilike('company_name', `%${filters.company}%`)
+      }
+      if (filters.industry) {
+        allReleasesQuery.ilike('industry', `%${filters.industry}%`)
+      }
+      if (filters.date_from) {
+        allReleasesQuery.gte('published_at', filters.date_from)
+      }
+      if (filters.date_to) {
+        allReleasesQuery.lte('published_at', filters.date_to)
+      }
+      
+      const { data: allData } = await allReleasesQuery
+      filteredCount = (allData || []).filter((release: any) =>
+        filters.tags!.some((tag) => release.tags?.includes(tag))
+      ).length
     }
 
-    return NextResponse.json({ releases })
+    const totalPages = Math.ceil((filteredCount || 0) / itemsPerPage)
+
+    return NextResponse.json({ 
+      releases,
+      pagination: {
+        page,
+        totalPages,
+        totalItems: filteredCount || 0,
+        itemsPerPage
+      }
+    })
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message },

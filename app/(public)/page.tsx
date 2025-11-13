@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from "next/link";
+import Image from "next/image";
 import { Search } from "lucide-react";
+import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PRReleaseList from "@/components/PRReleaseList";
@@ -30,18 +32,25 @@ export default function Home() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [adminLoggedIn, setAdminLoggedIn] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
     setAdminLoggedIn(isAdmin())
   }, [])
 
   useEffect(() => {
-    fetchReleases()
+    setCurrentPage(1) // Resetuj stranicu kada se promeni filter ili pretraga
   }, [selectedTag, searchQuery])
 
+  useEffect(() => {
+    fetchReleases()
+  }, [selectedTag, searchQuery, currentPage])
+
   const fetchReleases = async () => {
+    setLoading(true)
     try {
-      let url = '/api/releases?limit=10'
+      let url = `/api/releases?limit=10&page=${currentPage}`
       if (selectedTag) {
         url += `&tags=${encodeURIComponent(selectedTag)}`
       }
@@ -51,6 +60,7 @@ export default function Home() {
       const res = await fetch(url)
       const data = await res.json()
       setReleases(data.releases || [])
+      setTotalPages(data.pagination?.totalPages || 1)
     } catch (error) {
       console.error('Error fetching releases:', error)
     } finally {
@@ -65,6 +75,44 @@ export default function Home() {
   const handleReset = () => {
     setSelectedTag(null)
     setSearchQuery('')
+    setCurrentPage(1)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const getVisiblePages = () => {
+    const maxVisible = 10
+    const pages: (number | string)[] = []
+    
+    if (totalPages <= maxVisible) {
+      // Ako ima 10 ili manje stranica, prikaži sve
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      // Ako ima više od 10 stranica
+      if (currentPage <= 5) {
+        // Početak: prikaži prve 10 stranica
+        for (let i = 1; i <= maxVisible; i++) {
+          pages.push(i)
+        }
+      } else if (currentPage >= totalPages - 4) {
+        // Kraj: prikaži poslednjih 10 stranica
+        for (let i = totalPages - maxVisible + 1; i <= totalPages; i++) {
+          pages.push(i)
+        }
+      } else {
+        // Sredina: prikaži 5 pre i 5 posle trenutne stranice
+        for (let i = currentPage - 5; i <= currentPage + 4; i++) {
+          pages.push(i)
+        }
+      }
+    }
+    
+    return pages
   }
 
   const handleDelete = async (id: string) => {
@@ -106,14 +154,31 @@ export default function Home() {
               Bilbord Hub
             </h1>
             <p className="text-gray-500 text-base mb-6">
-              Centralizovana PR platforma za agencije i medije.
+              Centralizovani hub za najnovija PR saopštenja.
             </p>
             <p className="text-base md:text-lg text-[#4a4a4a] max-w-xl mb-6">
-              PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih 
-              preuzimaju. Pretraga, filtriranje i organizovano listanje svih PR objava 
-              na jednom mestu.
+              Preuzmite poslednja PR saopštenja sa jednog mesta. Pretraga, filtriranje 
+              i organizovano listanje svih PR objava na jednom mestu.
             </p>
           </div>
+          
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex-1 basis-1/2 flex items-center justify-center md:justify-end"
+          >
+            <div className="relative w-full max-w-md">
+              <Image
+                src="/98shots_so.png"
+                alt="Bilbord Hub"
+                width={600}
+                height={600}
+                className="w-full h-auto object-contain"
+                priority
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -149,7 +214,45 @@ export default function Home() {
                   <p className="text-gray-600">Učitavanje...</p>
                 </div>
               ) : (
-                <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} searchQuery={searchQuery} />
+                <>
+                  <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} searchQuery={searchQuery} />
+                  
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
+                      {currentPage > 1 && (
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
+                        >
+                          Prethodna
+                        </button>
+                      )}
+                      
+                      {getVisiblePages().map((pageNum, index) => (
+                        <button
+                          key={index}
+                          onClick={() => typeof pageNum === 'number' && handlePageChange(pageNum)}
+                          className={`px-4 py-2 rounded-lg transition font-medium ${
+                            currentPage === pageNum
+                              ? 'bg-[#f9c344] text-[#1d1d1f] font-bold'
+                              : 'bg-gray-200 text-[#1d1d1f] hover:bg-gray-300'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+                      
+                      {currentPage < totalPages && (
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
+                        >
+                          Sledeća
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
         </div>
       </section>
@@ -165,10 +268,10 @@ export default function Home() {
                 <span className="text-2xl font-bold text-[#1d1d1f]">1</span>
               </div>
               <h3 className="text-xl font-bold text-[#1d1d1f] mb-2">
-                PR agencije postavljaju
+                Pregledaj najnovija saopštenja
               </h3>
               <p className="text-gray-600">
-                Kreirajte saopštenja sa naslovom, opisom, tagovima i linkovima ka materijalima.
+                Pronađite poslednja PR saopštenja sa naslovom, opisom, tagovima i materijalima.
               </p>
             </div>
             <div className="text-center">
@@ -176,10 +279,10 @@ export default function Home() {
                 <span className="text-2xl font-bold text-[#1d1d1f]">2</span>
               </div>
               <h3 className="text-xl font-bold text-[#1d1d1f] mb-2">
-                Mediji pretražuju
+                Pretražuj i filtriraj
               </h3>
               <p className="text-gray-600">
-                Pretražujte po firmi, industriji, datumu i tagovima. Pronađite relevantna saopštenja.
+                Pretražujte po naslovu, tagovima ili datumu. Pronađite relevantna saopštenja brzo i lako.
               </p>
             </div>
             <div className="text-center">
@@ -187,10 +290,10 @@ export default function Home() {
                 <span className="text-2xl font-bold text-[#1d1d1f]">3</span>
               </div>
               <h3 className="text-xl font-bold text-[#1d1d1f] mb-2">
-                Preuzimaju i objavljuju
+                Preuzmi i koristi
               </h3>
               <p className="text-gray-600">
-                Kopirajte ready-to-publish HTML kod i objavite direktno na vašem sajtu.
+                Preuzmite dokumente i slike direktno sa platforme. Sve što vam treba na jednom mestu.
               </p>
             </div>
           </div>

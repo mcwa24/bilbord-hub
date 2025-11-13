@@ -25,41 +25,28 @@ export default function Footer() {
                         </Link>
                     </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-[auto_auto_auto_auto] justify-between gap-x-12 gap-y-10 text-left text-[#1d1d1f] text-sm">
-                    <div>
-                        <h4 className="font-semibold mb-3 text-[#1d1d1f]">Info</h4>
-                        <ul className="space-y-2">
-                            <li><Link href="/" className="text-gray-600 hover:text-gray-800">Početna</Link></li>
-                            <li><Link href="/pretraga" className="text-gray-600 hover:text-gray-800">Pretraga</Link></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-3 text-[#1d1d1f]">PR Portal</h4>
-                        <ul className="space-y-2">
-                            <li><Link href="/dashboard" className="text-gray-600 hover:text-gray-800">Dashboard</Link></li>
-                            <li><Link href="/dashboard/novo" className="text-gray-600 hover:text-gray-800">Novo saopštenje</Link></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-3 text-[#1d1d1f]">Pravno</h4>
-                        <ul className="space-y-2">
-                            <li><Link href="/uslovi" className="text-gray-600 hover:text-gray-800">Uslovi korišćenja</Link></li>
-                            <li><Link href="/pravila-privatnosti" className="text-gray-600 hover:text-gray-800">Pravila privatnosti</Link></li>
-                            <li><Link href="/copyright" className="text-gray-600 hover:text-gray-800">Copyright</Link></li>
-                        </ul>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+                    <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
+                        <Link href="/cookie-policy" className="text-gray-600 hover:text-gray-800">
+                            Cookie Policy
+                        </Link>
+                        <Link href="/pravila-privatnosti" className="text-gray-600 hover:text-gray-800">
+                            Privacy Policy
+                        </Link>
+                        <Link href="/uslovi" className="text-gray-600 hover:text-gray-800">
+                            Uslovi Poslovanja
+                        </Link>
                     </div>
 
-                    <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-end text-right">
-                        <button
-                            aria-label="Nazad na vrh"
-                            onClick={handleScrollTop}
-                            className="mt-4 p-2 rounded-full border border-gray-200 hover:bg-gray-100 transition shadow-sm flex items-center justify-center"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width={32} height={32} fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-600">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                            </svg>
-                        </button>
-                    </div>
+                    <button
+                        aria-label="Nazad na vrh"
+                        onClick={handleScrollTop}
+                        className="p-2 rounded-full border border-gray-200 hover:bg-gray-100 transition shadow-sm flex items-center justify-center"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width={32} height={32} fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-600">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                    </button>
                 </div>
 
                 <div className="mt-10 text-center text-xs text-gray-500 px-8 flex items-center justify-center gap-2 flex-wrap">
