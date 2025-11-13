@@ -13,7 +13,22 @@ export default function EditPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    content: string;
+    company_name: string;
+    industry: string;
+    tags: string;
+    thumbnail_url: string;
+    seo_meta_description: string;
+    material_links: Array<{
+      type: 'google_drive' | 'dropbox' | 'wetransfer' | 'press_room' | 'other';
+      url: string;
+      label: string;
+    }>;
+    alt_texts: Array<{ image_url: string; alt_text: string }>;
+  }>({
     title: '',
     description: '',
     content: '',
@@ -22,7 +37,7 @@ export default function EditPage() {
     tags: '',
     thumbnail_url: '',
     seo_meta_description: '',
-    material_links: [{ type: 'google_drive' as const, url: '', label: '' }],
+    material_links: [{ type: 'google_drive', url: '', label: '' }],
     alt_texts: [{ image_url: '', alt_text: '' }],
   })
 
@@ -46,8 +61,12 @@ export default function EditPage() {
         thumbnail_url: release.thumbnail_url || '',
         seo_meta_description: release.seo_meta_description,
         material_links: release.material_links.length > 0 
-          ? release.material_links 
-          : [{ type: 'google_drive', url: '', label: '' }],
+          ? release.material_links.map(link => ({
+              type: link.type as 'google_drive' | 'dropbox' | 'wetransfer' | 'press_room' | 'other',
+              url: link.url,
+              label: link.label
+            }))
+          : [{ type: 'google_drive' as const, url: '', label: '' }],
         alt_texts: release.alt_texts.length > 0 
           ? release.alt_texts 
           : [{ image_url: '', alt_text: '' }],
