@@ -15,6 +15,7 @@ export default function Header() {
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
   const isDashboard = pathname?.startsWith('/dashboard');
+  const isLoginPage = pathname === '/dashboard/login';
 
   useEffect(() => {
     setAdminLoggedIn(isAdmin());
@@ -28,7 +29,7 @@ export default function Header() {
   };
 
   return (
-    <header className={`w-full ${isDashboard ? 'bg-white border-b border-gray-200' : 'bg-transparent absolute top-0 left-0 right-0'} z-50`}>
+    <header className={`w-full ${isLoginPage ? 'bg-white border-b border-gray-200' : isDashboard ? 'bg-white border-b border-gray-200' : 'bg-transparent absolute top-0 left-0 right-0'} z-50`}>
       <div className="w-full">
         <div className="w-full px-4 md:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center">
@@ -47,114 +48,57 @@ export default function Header() {
           </div>
 
           <nav className="hidden xl:flex items-center gap-6 text-sm md:text-base relative">
-            {!isDashboard && (
-              <>
-                <Link
-                  href="/"
-                  className={`${pathname === "/" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  Početna
-                </Link>
-                <Link
-                  href="/sva-saopstenja"
-                  className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  PR Saopštenja
-                </Link>
-                <Link
-                  href="https://bilbord.rs/pretplate/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#1d1d1f] hover:underline transition"
-                >
-                  Cene
-                </Link>
-                <Link
-                  href="https://bilbord.rs/kontakt/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#1d1d1f] hover:underline transition"
-                >
-                  Kontakt
-                </Link>
-                {adminLoggedIn && (
-                  <Link
-                    href="/dashboard/admin"
-                    className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                  >
-                    Upload saopštenja
-                  </Link>
-                )}
-              </>
+            <Link
+              href="/"
+              className={`${pathname === "/" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+            >
+              Početna
+            </Link>
+            <Link
+              href="/sva-saopstenja"
+              className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+            >
+              PR Saopštenja
+            </Link>
+            <Link
+              href="https://bilbord.rs/pretplate/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#1d1d1f] hover:underline transition"
+            >
+              Cene
+            </Link>
+            <Link
+              href="https://bilbord.rs/kontakt/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#1d1d1f] hover:underline transition"
+            >
+              Kontakt
+            </Link>
+            {adminLoggedIn && (
+              <Link
+                href="/dashboard/admin"
+                className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+              >
+                Upload saopštenja
+              </Link>
             )}
             
-            {isDashboard ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className={`${pathname === "/dashboard" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  Moja saopštenja
-                </Link>
-                <Link
-                  href="/dashboard/novo"
-                  className={`${pathname === "/dashboard/novo" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  Novo saopštenje
-                </Link>
-                {adminLoggedIn && (
-                  <Link
-                    href="/dashboard/admin"
-                    className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                  >
-                    Upload saopštenja
-                  </Link>
-                )}
-                <Link
-                  href="/dashboard/statistika"
-                  className={`${pathname === "/dashboard/statistika" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  Statistika
-                </Link>
-                <Link
-                  href="https://bilbord.rs/pretplate/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#1d1d1f] hover:underline transition"
-                >
-                  Cene
-                </Link>
-                <Link
-                  href="https://bilbord.rs/kontakt/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#1d1d1f] hover:underline transition"
-                >
-                  Kontakt
-                </Link>
-                <Link
-                  href="/api/auth/logout"
-                  className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
-                >
-                  Odjavi se
-                </Link>
-              </>
+            {adminLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
+              >
+                Odjava
+              </button>
             ) : (
-              adminLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
-                >
-                  Odjava
-                </button>
-              ) : (
-                <Link
-                  href="/dashboard/login"
-                  className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
-                >
-                  Prijava
-                </Link>
-              )
+              <Link
+                href="/dashboard/login"
+                className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
+              >
+                Prijava
+              </Link>
             )}
           </nav>
 
@@ -195,130 +139,66 @@ export default function Header() {
                   </div>
 
                   <div className="space-y-0.5">
-                    {!isDashboard && (
-                      <>
-                        <Link
-                          href="/"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          Početna
-                        </Link>
-                        <Link
-                          href="/sva-saopstenja"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          PR Saopštenja
-                        </Link>
-                        <Link
-                          href="https://bilbord.rs/pretplate/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
-                        >
-                          Cene
-                        </Link>
-                        <Link
-                          href="https://bilbord.rs/kontakt/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
-                        >
-                          Kontakt
-                        </Link>
-                        {adminLoggedIn && (
-                          <Link
-                            href="/dashboard/admin"
-                            onClick={() => setIsMenuOpen(false)}
-                            className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                          >
-                            Upload saopštenja
-                          </Link>
-                        )}
-                      </>
+                    <Link
+                      href="/"
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`${pathname === "/" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                    >
+                      Početna
+                    </Link>
+                    <Link
+                      href="/sva-saopstenja"
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                    >
+                      PR Saopštenja
+                    </Link>
+                    <Link
+                      href="https://bilbord.rs/pretplate/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
+                    >
+                      Cene
+                    </Link>
+                    <Link
+                      href="https://bilbord.rs/kontakt/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
+                    >
+                      Kontakt
+                    </Link>
+                    {adminLoggedIn && (
+                      <Link
+                        href="/dashboard/admin"
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                      >
+                        Upload saopštenja
+                      </Link>
                     )}
                     
-                    {isDashboard ? (
-                      <>
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/dashboard" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          Moja saopštenja
-                        </Link>
-                        <Link
-                          href="/dashboard/novo"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/dashboard/novo" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          Novo saopštenje
-                        </Link>
-                        {adminLoggedIn && (
-                          <Link
-                            href="/dashboard/admin"
-                            onClick={() => setIsMenuOpen(false)}
-                            className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                          >
-                            Upload saopštenja
-                          </Link>
-                        )}
-                        <Link
-                          href="/dashboard/statistika"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/dashboard/statistika" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          Statistika
-                        </Link>
-                        <Link
-                          href="https://bilbord.rs/pretplate/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
-                        >
-                          Cene
-                        </Link>
-                        <Link
-                          href="https://bilbord.rs/kontakt/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
-                        >
-                          Kontakt
-                        </Link>
-                        <Link
-                          href="/api/auth/logout"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
-                        >
-                          Odjavi se
-                        </Link>
-                      </>
+                    {adminLoggedIn ? (
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition w-full text-left"
+                      >
+                        Odjava
+                      </button>
                     ) : (
-                      adminLoggedIn ? (
-                        <button
-                          onClick={() => {
-                            setIsMenuOpen(false);
-                            handleLogout();
-                          }}
-                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition w-full text-left"
-                        >
-                          Odjava
-                        </button>
-                      ) : (
-                        <Link
-                          href="/dashboard/login"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
-                        >
-                          Prijava
-                        </Link>
-                      )
+                      <Link
+                        href="/dashboard/login"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
+                      >
+                        Prijava
+                      </Link>
                     )}
                   </div>
                 </div>

@@ -175,11 +175,11 @@ export default function Home() {
           >
             <div className="relative w-full max-w-md">
               <Image
-                src="/98shots_so.png"
+                src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
                 alt="Bilbord Hub"
                 width={600}
                 height={600}
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain rounded-2xl"
                 priority
               />
             </div>
