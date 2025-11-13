@@ -62,6 +62,14 @@ export default function Header() {
                   PR Saopštenja
                 </Link>
                 <Link
+                  href="https://bilbord.rs/pretplate/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#1d1d1f] hover:underline transition"
+                >
+                  Cene
+                </Link>
+                <Link
                   href="https://bilbord.rs/kontakt/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -107,6 +115,14 @@ export default function Header() {
                   className={`${pathname === "/dashboard/statistika" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
                 >
                   Statistika
+                </Link>
+                <Link
+                  href="https://bilbord.rs/pretplate/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#1d1d1f] hover:underline transition"
+                >
+                  Cene
                 </Link>
                 <Link
                   href="https://bilbord.rs/kontakt/"
@@ -196,6 +212,15 @@ export default function Header() {
                           PR Saopštenja
                         </Link>
                         <Link
+                          href="https://bilbord.rs/pretplate/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
+                        >
+                          Cene
+                        </Link>
+                        <Link
                           href="https://bilbord.rs/kontakt/"
                           target="_blank"
                           rel="noopener noreferrer"
@@ -247,6 +272,15 @@ export default function Header() {
                           className={`${pathname === "/dashboard/statistika" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
                         >
                           Statistika
+                        </Link>
+                        <Link
+                          href="https://bilbord.rs/pretplate/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
+                        >
+                          Cene
                         </Link>
                         <Link
                           href="https://bilbord.rs/kontakt/"

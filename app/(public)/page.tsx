@@ -160,6 +160,11 @@ export default function Home() {
               Preuzmite poslednja PR saopštenja sa jednog mesta. Pretraga, filtriranje 
               i organizovano listanje svih PR objava na jednom mestu.
             </p>
+            <Link href="#najnovija-saopstenja">
+              <Button>
+                Saopštenja
+              </Button>
+            </Link>
           </div>
           
           <motion.div
@@ -182,7 +187,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section-padding bg-white">
+      <section id="najnovija-saopstenja" className="section-padding bg-white scroll-mt-32">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8 gap-4">
             <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f]">
