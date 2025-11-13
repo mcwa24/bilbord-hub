@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import toast from 'react-hot-toast'
@@ -19,26 +18,10 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const supabase = createClient()
-      
-      if (isMagicLink) {
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-          },
-        })
-        if (error) throw error
-        toast.success('Proverite email za magic link!')
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-        if (error) throw error
-        router.push('/dashboard')
-        router.refresh()
-      }
+      // Za sada samo redirect na dashboard bez autentikacije
+      toast.success('Prijavljeni ste (testno)')
+      router.push('/dashboard')
+      router.refresh()
     } catch (error: any) {
       toast.error(error.message || 'Greška pri prijavljivanju')
     } finally {

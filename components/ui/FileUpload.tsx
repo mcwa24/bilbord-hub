@@ -12,6 +12,7 @@ interface FileUploadProps {
   onUpload: (files: File[]) => Promise<void>
   label?: string
   type?: 'image' | 'document'
+  allowZip?: boolean // Allow ZIP archives for images
 }
 
 export default function FileUpload({
@@ -21,6 +22,7 @@ export default function FileUpload({
   onUpload,
   label,
   type = 'document',
+  allowZip = false,
 }: FileUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
@@ -54,7 +56,7 @@ export default function FileUpload({
     }
   }
 
-  const handleFiles = (newFiles: File[]) => {
+  const handleFiles = async (newFiles: File[]) => {
     const validFiles: File[] = []
     const maxSizeBytes = maxSize * 1024 * 1024
 
@@ -64,8 +66,14 @@ export default function FileUpload({
         return
       }
 
+      // Ako je ZIP fajl i dozvoljen za slike
+      if (type === 'image' && allowZip && file.name.toLowerCase().endsWith('.zip')) {
+        validFiles.push(file)
+        return
+      }
+
       if (type === 'image' && !file.type.startsWith('image/')) {
-        toast.error(`Fajl ${file.name} nije slika`)
+        toast.error(`Fajl ${file.name} nije slika ili ZIP arhiva`)
         return
       }
 
@@ -77,27 +85,13 @@ export default function FileUpload({
       validFiles.push(file)
     })
 
-    if (multiple) {
-      setFiles((prev) => [...prev, ...validFiles])
-    } else {
-      setFiles(validFiles.slice(0, 1))
-    }
-  }
+    if (validFiles.length === 0) return
 
-  const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index))
-  }
-
-  const handleUpload = async () => {
-    if (files.length === 0) {
-      toast.error('Izaberi fajlove za upload')
-      return
-    }
-
+    // Automatski upload čim se doda fajl
     setUploading(true)
     try {
-      await onUpload(files)
-      toast.success(`Uspešno upload-ovano ${files.length} fajlova`)
+      await onUpload(validFiles)
+      toast.success(`Uspešno upload-ovano ${validFiles.length} ${validFiles.length === 1 ? 'fajl' : 'fajlova'}`)
       setFiles([])
       if (inputRef.current) {
         inputRef.current.value = ''
@@ -108,6 +102,7 @@ export default function FileUpload({
       setUploading(false)
     }
   }
+
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes'
@@ -139,7 +134,7 @@ export default function FileUpload({
         <input
           ref={inputRef}
           type="file"
-          accept={accept || (type === 'image' ? 'image/*' : '.pdf,.doc,.docx')}
+          accept={accept || (type === 'image' ? (allowZip ? 'image/*,.zip' : 'image/*') : '.pdf,.doc,.docx')}
           multiple={multiple}
           onChange={handleChange}
           className="hidden"
@@ -164,67 +159,19 @@ export default function FileUpload({
             </p>
             <p className="text-sm text-gray-500">
               {type === 'image'
-                ? 'Slike (JPG, PNG, GIF) - max {maxSize}MB'
-                : 'PDF ili Word dokumenti - max {maxSize}MB'}
+                ? allowZip
+                  ? `Slike (JPG, PNG, GIF) ili ZIP arhiva - max ${maxSize}MB`
+                  : `Slike (JPG, PNG, GIF) - max ${maxSize}MB`
+                : `PDF ili Word dokumenti - max ${maxSize}MB`}
             </p>
           </div>
         </div>
       </div>
 
-      {files.length > 0 && (
-        <div className="mt-4 space-y-2">
-          {files.map((file, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {type === 'image' ? (
-                  <ImageIcon size={20} className="text-gray-600 flex-shrink-0" />
-                ) : (
-                  <File size={20} className="text-gray-600 flex-shrink-0" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#1d1d1f] truncate">
-                    {file.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formatFileSize(file.size)}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => removeFile(index)}
-                className="p-1 hover:bg-gray-200 rounded transition"
-              >
-                <X size={16} className="text-gray-600" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {files.length > 0 && (
-        <div className="mt-4">
-          <Button
-            type="button"
-            onClick={handleUpload}
-            disabled={uploading}
-            className="w-full"
-          >
-            {uploading ? (
-              <>
-                <Loader2 size={18} className="animate-spin mr-2" />
-                Upload-ujem...
-              </>
-            ) : (
-              <>
-                <Upload size={18} className="mr-2" />
-                Upload-uj fajlove
-              </>
-            )}
-          </Button>
+      {uploading && (
+        <div className="mt-4 flex items-center justify-center gap-2 text-gray-600">
+          <Loader2 size={20} className="animate-spin" />
+          <span>Upload-ujem fajlove...</span>
         </div>
       )}
     </div>

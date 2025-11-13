@@ -1,8 +1,59 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from "next/link";
 import { Search } from "lucide-react";
 import Button from "@/components/ui/Button";
+import PRReleaseList from "@/components/PRReleaseList";
+
+interface PRRelease {
+  id: string
+  title: string
+  company_name: string
+  published_at: string | null
+  created_at: string
+  tags?: string[]
+  material_links: Array<{
+    type: string
+    url: string
+    label: string
+  }>
+  thumbnail_url: string | null
+}
 
 export default function Home() {
+  const [releases, setReleases] = useState<PRRelease[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchReleases()
+  }, [selectedTag])
+
+  const fetchReleases = async () => {
+    try {
+      let url = '/api/releases?limit=10'
+      if (selectedTag) {
+        url += `&tags=${encodeURIComponent(selectedTag)}`
+      }
+      const res = await fetch(url)
+      const data = await res.json()
+      setReleases(data.releases || [])
+    } catch (error) {
+      console.error('Error fetching releases:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag)
+  }
+
+  const handleReset = () => {
+    setSelectedTag(null)
+  }
+
   return (
     <>
       <section
@@ -44,6 +95,31 @@ export default function Home() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="section-padding bg-white">
+        <div className="container-custom">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f]">
+              {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : 'Najnovija saopštenja'}
+            </h2>
+            {selectedTag && (
+              <button
+                onClick={handleReset}
+                className="px-6 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
+              >
+                Resetuj
+              </button>
+            )}
+          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Učitavanje...</p>
+            </div>
+          ) : (
+            <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} />
+          )}
         </div>
       </section>
 

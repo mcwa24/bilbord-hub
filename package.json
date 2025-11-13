@@ -18,7 +18,8 @@
     "react-dom": "^18.3.0",
     "react-hot-toast": "^2.4.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4"
+    "tailwind-merge": "^2.5.4",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

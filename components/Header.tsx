@@ -37,6 +37,18 @@ export default function Header() {
                 >
                   Pretraga
                 </Link>
+                <Link
+                  href="/sva-saopstenja"
+                  className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+                >
+                  PR Saopštenja
+                </Link>
+                <Link
+                  href="/dashboard/admin"
+                  className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+                >
+                  Upload fajlova
+                </Link>
               </>
             )}
             
@@ -135,6 +147,20 @@ export default function Header() {
                           className={`${pathname === "/pretraga" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
                         >
                           Pretraga
+                        </Link>
+                        <Link
+                          href="/sva-saopstenja"
+                          onClick={() => setIsMenuOpen(false)}
+                          className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                        >
+                          PR Saopštenja
+                        </Link>
+                        <Link
+                          href="/dashboard/admin"
+                          onClick={() => setIsMenuOpen(false)}
+                          className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                        >
+                          Upload fajlova
                         </Link>
                       </>
                     )}

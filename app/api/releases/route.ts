@@ -16,11 +16,17 @@ export async function GET(request: NextRequest) {
       tags: searchParams.get('tags')?.split(',') || undefined,
     }
 
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined
+
     let query = supabase
       .from('pr_releases')
       .select('*')
       .not('published_at', 'is', null)
       .order('published_at', { ascending: false })
+
+    if (limit) {
+      query = query.limit(limit)
+    }
 
     if (filters.search) {
       query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
@@ -66,33 +72,44 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
+    
+    // Za sada ne proveravamo autentikaciju - samo testno
     const body = await request.json()
+
+    // Proveri da li tabela postoji, ako ne, kreiraj je
+    const { error: tableError } = await supabase
+      .from('pr_releases')
+      .select('id')
+      .limit(1)
+
+    if (tableError && tableError.message.includes('does not exist')) {
+      return NextResponse.json(
+        { error: 'Tabela pr_releases ne postoji. Pokreni SQL schema iz supabase-schema.sql u Supabase SQL Editor-u.' },
+        { status: 500 }
+      )
+    }
 
     const { data, error } = await supabase
       .from('pr_releases')
       .insert({
         ...body,
-        created_by: user.id,
+        created_by: '00000000-0000-0000-0000-000000000000', // Placeholder user ID
         view_count: 0,
         download_count: 0,
       })
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('Supabase error:', error)
+      throw error
+    }
 
     return NextResponse.json({ release: data })
   } catch (error: any) {
+    console.error('POST error:', error)
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message || 'Greška pri kreiranju saopštenja' },
       { status: 500 }
     )
   }

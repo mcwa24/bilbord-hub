@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, Filter } from 'lucide-react'
 import { PRRelease, FilterParams } from '@/types'
-import ReleaseCard from '@/components/ReleaseCard'
+import PRReleaseList from '@/components/PRReleaseList'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 
@@ -13,10 +13,11 @@ export default function PretragaPage() {
   const [filters, setFilters] = useState<FilterParams>({})
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
 
   useEffect(() => {
     fetchReleases()
-  }, [filters])
+  }, [filters, selectedTag])
 
   const fetchReleases = async () => {
     setLoading(true)
@@ -27,7 +28,11 @@ export default function PretragaPage() {
       if (filters.industry) params.append('industry', filters.industry)
       if (filters.date_from) params.append('date_from', filters.date_from)
       if (filters.date_to) params.append('date_to', filters.date_to)
-      if (filters.tags?.length) params.append('tags', filters.tags.join(','))
+      if (selectedTag) {
+        params.append('tags', selectedTag)
+      } else if (filters.tags?.length) {
+        params.append('tags', filters.tags.join(','))
+      }
 
       const res = await fetch(`/api/releases?${params.toString()}`)
       const data = await res.json()
@@ -48,12 +53,32 @@ export default function PretragaPage() {
     setFilters({ ...filters, [key]: value })
   }
 
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag)
+  }
+
+  const handleReset = () => {
+    setSelectedTag(null)
+    setFilters({})
+    setSearchQuery('')
+  }
+
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-8">
-          Pretraga saopštenja
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f]">
+            {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : 'Pretraga saopštenja'}
+          </h1>
+          {selectedTag && (
+            <button
+              onClick={handleReset}
+              className="px-6 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
+            >
+              Resetuj
+            </button>
+          )}
+        </div>
 
         <form onSubmit={handleSearch} className="mb-6">
           <div className="flex gap-4">
@@ -149,11 +174,7 @@ export default function PretragaPage() {
             <p className="text-gray-600">Nema pronađenih saopštenja.</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {releases.map((release) => (
-              <ReleaseCard key={release.id} release={release} />
-            ))}
-          </div>
+          <PRReleaseList releases={releases} showAll={true} onTagClick={handleTagClick} />
         )}
       </div>
     </div>

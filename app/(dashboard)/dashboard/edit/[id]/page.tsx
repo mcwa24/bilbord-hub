@@ -2,44 +2,37 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { Image as ImageIcon, FileText, Save } from 'lucide-react'
+import FileUpload from '@/components/ui/FileUpload'
+import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
-import Textarea from '@/components/ui/Textarea'
 import Button from '@/components/ui/Button'
+import TagInput from '@/components/ui/TagInput'
+import { uploadImage, uploadDocument, getImageUrl, getDocumentUrl } from '@/lib/supabase/storage'
 import { PRRelease } from '@/types'
 import toast from 'react-hot-toast'
+
+interface UploadedFile {
+  name: string
+  url: string
+  type: 'image' | 'document'
+  path: string
+  size: number
+}
 
 export default function EditPage() {
   const params = useParams()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [formData, setFormData] = useState<{
-    title: string;
-    description: string;
-    content: string;
-    company_name: string;
-    industry: string;
-    tags: string;
-    thumbnail_url: string;
-    seo_meta_description: string;
-    material_links: Array<{
-      type: 'google_drive' | 'dropbox' | 'wetransfer' | 'press_room' | 'other';
-      url: string;
-      label: string;
-    }>;
-    alt_texts: Array<{ image_url: string; alt_text: string }>;
-  }>({
-    title: '',
-    description: '',
-    content: '',
-    company_name: '',
-    industry: '',
-    tags: '',
-    thumbnail_url: '',
-    seo_meta_description: '',
-    material_links: [{ type: 'google_drive', url: '', label: '' }],
-    alt_texts: [{ image_url: '', alt_text: '' }],
-  })
+  const [releaseName, setReleaseName] = useState('')
+  const [tags, setTags] = useState<string[]>([])
+  const [documentFile, setDocumentFile] = useState<File | null>(null)
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [uploadedDocument, setUploadedDocument] = useState<UploadedFile | null>(null)
+  const [uploadedZip, setUploadedZip] = useState<UploadedFile | null>(null)
+  const [existingDocument, setExistingDocument] = useState<UploadedFile | null>(null)
+  const [existingZip, setExistingZip] = useState<UploadedFile | null>(null)
 
   useEffect(() => {
     fetchRelease()
@@ -51,26 +44,38 @@ export default function EditPage() {
       const data = await res.json()
       const release: PRRelease = data.release
 
-      setFormData({
-        title: release.title,
-        description: release.description,
-        content: release.content,
-        company_name: release.company_name,
-        industry: release.industry,
-        tags: release.tags.join(', '),
-        thumbnail_url: release.thumbnail_url || '',
-        seo_meta_description: release.seo_meta_description,
-        material_links: release.material_links.length > 0 
-          ? release.material_links.map(link => ({
-              type: link.type as 'google_drive' | 'dropbox' | 'wetransfer' | 'press_room' | 'other',
-              url: link.url,
-              label: link.label
-            }))
-          : [{ type: 'google_drive' as const, url: '', label: '' }],
-        alt_texts: release.alt_texts.length > 0 
-          ? release.alt_texts 
-          : [{ image_url: '', alt_text: '' }],
-      })
+      setReleaseName(release.title)
+      setTags(release.tags || [])
+
+      // Učitaj postojeće fajlove
+      const zipFiles = release.material_links.filter(
+        (link) => link.url.toLowerCase().endsWith('.zip') || link.label === 'Slike'
+      )
+      const documents = release.material_links.filter(
+        (link) => !link.url.toLowerCase().endsWith('.zip') && link.label !== 'Slike'
+      )
+
+      if (documents.length > 0) {
+        const doc = documents[0]
+        setExistingDocument({
+          name: doc.label,
+          url: doc.url,
+          type: 'document',
+          path: '',
+          size: 0,
+        })
+      }
+
+      if (zipFiles.length > 0) {
+        const zip = zipFiles[0]
+        setExistingZip({
+          name: zip.label === 'Slike' ? 'Slike.zip' : zip.label,
+          url: zip.url,
+          type: 'image',
+          path: '',
+          size: 0,
+        })
+      }
     } catch (error) {
       toast.error('Greška pri učitavanju saopštenja')
     } finally {
@@ -78,77 +83,157 @@ export default function EditPage() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
+  const handleDocumentUpload = async (files: File[]) => {
+    if (files.length === 0) return
+    const file = files[0]
+    setDocumentFile(file)
+
+    const timestamp = Date.now()
+    const fileName = `uploads/${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
 
     try {
-      const tags = formData.tags.split(',').map(t => t.trim()).filter(Boolean)
-      const materialLinks = formData.material_links.filter(l => l.url && l.label)
-      const altTexts = formData.alt_texts.filter(a => a.image_url && a.alt_text)
+      const { data, error } = await uploadDocument(fileName, file)
+      if (error) {
+        console.error('Upload error:', error)
+        throw new Error(error.message || 'Greška pri upload-u dokumenta')
+      }
+
+      const uploaded = {
+        name: file.name,
+        url: getDocumentUrl(data!.path),
+        type: 'document' as const,
+        path: data!.path,
+        size: file.size,
+      }
+      setUploadedDocument(uploaded)
+      setExistingDocument(null)
+      toast.success('Dokument upload-ovan!')
+    } catch (error: any) {
+      console.error('Upload error:', error)
+      toast.error(error.message || 'Greška pri upload-u dokumenta')
+    }
+  }
+
+  const handleImageUpload = async (files: File[]) => {
+    if (files.length === 0) return
+
+    setImageFiles(files)
+
+    try {
+      const JSZip = (await import('jszip')).default
+      const zip = new JSZip()
+
+      files.forEach((file) => {
+        zip.file(file.name, file)
+      })
+
+      const zipBlob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 1 }
+      })
+
+      const timestamp = Date.now()
+      const zipFileName = `slike-${timestamp}.zip`
+      const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
+
+      const fileName = `uploads/${timestamp}-${zipFileName.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+      const { data, error } = await uploadImage(fileName, zipFile)
+
+      if (error) {
+        console.error('Upload error:', error)
+        throw new Error(error.message || 'Greška pri upload-u ZIP arhive')
+      }
+
+      const uploaded = {
+        name: zipFileName,
+        url: getImageUrl(data!.path),
+        type: 'image' as const,
+        path: data!.path,
+        size: zipBlob.size,
+      }
+      setUploadedZip(uploaded)
+      setExistingZip(null)
+      toast.success(`Upload-ovano ${files.length} slika u ZIP arhivi!`)
+    } catch (error: any) {
+      console.error('Upload error:', error)
+      toast.error(error.message || 'Greška pri upload-u slika')
+    }
+  }
+
+  const handleSaveRelease = async () => {
+    if (!releaseName.trim()) {
+      toast.error('Unesite ime saopštenja')
+      return
+    }
+
+    const documentToUse = uploadedDocument || existingDocument
+    const zipToUse = uploadedZip || existingZip
+
+    if (!documentToUse && !zipToUse) {
+      toast.error('Upload-ujte dokument ili slike')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const materialLinks = []
+      if (documentToUse) {
+        materialLinks.push({
+          type: 'other',
+          url: documentToUse.url,
+          label: documentToUse.name,
+        })
+      }
+      if (zipToUse) {
+        materialLinks.push({
+          type: 'other',
+          url: zipToUse.url,
+          label: 'Slike',
+        })
+      }
+
+      const releaseData = {
+        title: releaseName,
+        description: releaseName,
+        content: `<p>${releaseName}</p>`,
+        company_name: 'Admin',
+        industry: 'General',
+        tags: tags,
+        material_links: materialLinks,
+        alt_texts: [],
+        seo_meta_description: releaseName,
+      }
 
       const res = await fetch(`/api/releases/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          tags,
-          material_links: materialLinks,
-          alt_texts: altTexts,
-        }),
+        body: JSON.stringify(releaseData),
       })
+
+      const responseData = await res.json()
 
       if (res.ok) {
         toast.success('Saopštenje ažurirano!')
-        router.push('/dashboard')
+        router.push('/sva-saopstenja')
       } else {
-        throw new Error('Greška pri ažuriranju')
+        console.error('API error:', responseData)
+        throw new Error(responseData.error || 'Greška pri ažuriranju saopštenja')
       }
-    } catch (error) {
-      toast.error('Greška pri ažuriranju saopštenja')
+    } catch (error: any) {
+      console.error('Error saving release:', error)
+      toast.error(error.message || 'Greška pri ažuriranju saopštenja')
     } finally {
       setSaving(false)
     }
   }
 
-  const addMaterialLink = () => {
-    setFormData({
-      ...formData,
-      material_links: [...formData.material_links, { type: 'google_drive', url: '', label: '' }],
-    })
-  }
-
-  const removeMaterialLink = (index: number) => {
-    setFormData({
-      ...formData,
-      material_links: formData.material_links.filter((_, i) => i !== index),
-    })
-  }
-
-  const updateMaterialLink = (index: number, field: string, value: any) => {
-    const updated = [...formData.material_links]
-    updated[index] = { ...updated[index], [field]: value }
-    setFormData({ ...formData, material_links: updated })
-  }
-
-  const addAltText = () => {
-    setFormData({
-      ...formData,
-      alt_texts: [...formData.alt_texts, { image_url: '', alt_text: '' }],
-    })
-  }
-
-  const removeAltText = (index: number) => {
-    setFormData({
-      ...formData,
-      alt_texts: formData.alt_texts.filter((_, i) => i !== index),
-    })
-  }
-
-  const updateAltText = (index: number, field: string, value: string) => {
-    const updated = [...formData.alt_texts]
-    updated[index] = { ...updated[index], [field]: value }
-    setFormData({ ...formData, alt_texts: updated })
+  const formatFileSize = (bytes: number, unit: 'KB' | 'MB' = 'KB'): string => {
+    if (bytes === 0) return '0 Bytes'
+    if (unit === 'MB') {
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
+    }
+    return (bytes / 1024).toFixed(2) + ' KB'
   }
 
   if (loading) {
@@ -161,6 +246,9 @@ export default function EditPage() {
     )
   }
 
+  const documentToUse = uploadedDocument || existingDocument
+  const zipToUse = uploadedZip || existingZip
+
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
@@ -168,195 +256,103 @@ export default function EditPage() {
           Izmeni saopštenje
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
+        <Card className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-              Naslov *
+              Ime saopštenja *
             </label>
             <Input
+              type="text"
+              value={releaseName}
+              onChange={(e) => setReleaseName(e.target.value)}
+              placeholder="Unesite ime saopštenja"
               required
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Naslov saopštenja"
             />
           </div>
-
           <div>
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-              Kratak opis *
+              Tagovi
             </label>
-            <Textarea
-              required
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Kratak opis saopštenja"
-            />
+            <TagInput tags={tags} onChange={setTags} />
           </div>
+        </Card>
 
-          <div>
-            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-              Sadržaj (HTML) *
-            </label>
-            <Textarea
-              required
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="HTML sadržaj saopštenja"
-              className="min-h-[300px] font-mono text-sm"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-                Naziv kompanije *
-              </label>
-              <Input
-                required
-                value={formData.company_name}
-                onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                placeholder="Naziv kompanije"
-              />
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <Card>
+            <div className="flex items-center gap-3 mb-4">
+              <ImageIcon size={24} className="text-[#1d1d1f]" />
+              <h2 className="text-xl font-bold text-[#1d1d1f]">
+                Upload slika
+              </h2>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-                Industrija *
-              </label>
-              <Input
-                required
-                value={formData.industry}
-                onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                placeholder="Tip industrije"
-              />
+            <FileUpload
+              type="image"
+              multiple
+              maxSize={100}
+              allowZip={false}
+              onUpload={handleImageUpload}
+              label="Slike za PR objave (biće pakovane u ZIP)"
+            />
+            {zipToUse && (
+              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-800">
+                  {uploadedZip ? '✓ Nova ZIP arhiva upload-ovana' : '✓ Postojeća ZIP arhiva'}: {zipToUse.name}
+                  {zipToUse.size > 0 && ` (${formatFileSize(zipToUse.size, 'MB')})`}
+                </p>
+              </div>
+            )}
+          </Card>
+
+          <Card>
+            <div className="flex items-center gap-3 mb-4">
+              <FileText size={24} className="text-[#1d1d1f]" />
+              <h2 className="text-xl font-bold text-[#1d1d1f]">
+                Upload dokumenata
+              </h2>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-              Tagovi (odvojeni zarezom)
-            </label>
-            <Input
-              value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="tag1, tag2, tag3"
+            <FileUpload
+              type="document"
+              multiple={false}
+              maxSize={50}
+              onUpload={handleDocumentUpload}
+              label="PDF ili Word dokument"
             />
-          </div>
+            {documentToUse && (
+              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-800">
+                  {uploadedDocument ? '✓ Novi dokument upload-ovan' : '✓ Postojeći dokument'}: {documentToUse.name}
+                  {documentToUse.size > 0 && ` (${formatFileSize(documentToUse.size, 'KB')})`}
+                </p>
+              </div>
+            )}
+          </Card>
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-              Thumbnail URL
-            </label>
-            <Input
-              type="url"
-              value={formData.thumbnail_url}
-              onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
-              placeholder="https://..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-              SEO Meta opis
-            </label>
-            <Textarea
-              value={formData.seo_meta_description}
-              onChange={(e) => setFormData({ ...formData, seo_meta_description: e.target.value })}
-              placeholder="SEO opis za pretraživače"
-            />
-          </div>
-
-          <div>
+        {(documentToUse || zipToUse) && (
+          <Card>
             <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-semibold text-[#1d1d1f]">
-                Linkovi ka materijalima
-              </label>
-              <Button type="button" variant="outline" onClick={addMaterialLink}>
-                + Dodaj link
+              <h2 className="text-2xl font-bold text-[#1d1d1f]">
+                Sačuvaj izmene
+              </h2>
+              <Button
+                onClick={handleSaveRelease}
+                disabled={saving || !releaseName.trim()}
+                className="flex items-center gap-2"
+              >
+                <Save size={18} />
+                {saving ? 'Čuvanje...' : 'Sačuvaj'}
               </Button>
             </div>
-            {formData.material_links.map((link, index) => (
-              <div key={index} className="grid md:grid-cols-4 gap-4 mb-4">
-                <select
-                  value={link.type}
-                  onChange={(e) => updateMaterialLink(index, 'type', e.target.value)}
-                  className="px-4 py-3 border border-gray-300 rounded-lg"
-                >
-                  <option value="google_drive">Google Drive</option>
-                  <option value="dropbox">Dropbox</option>
-                  <option value="wetransfer">WeTransfer</option>
-                  <option value="press_room">Press Room</option>
-                  <option value="other">Ostalo</option>
-                </select>
-                <Input
-                  value={link.url}
-                  onChange={(e) => updateMaterialLink(index, 'url', e.target.value)}
-                  placeholder="URL"
-                />
-                <Input
-                  value={link.label}
-                  onChange={(e) => updateMaterialLink(index, 'label', e.target.value)}
-                  placeholder="Label"
-                />
-                {formData.material_links.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => removeMaterialLink(index)}
-                  >
-                    Obriši
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-semibold text-[#1d1d1f]">
-                Alt tekstovi za slike
-              </label>
-              <Button type="button" variant="outline" onClick={addAltText}>
-                + Dodaj alt tekst
-              </Button>
+            <div className="space-y-2 text-sm text-gray-600">
+              {documentToUse && (
+                <p>✓ Dokument: {documentToUse.name} {documentToUse.size > 0 && `(${formatFileSize(documentToUse.size, 'KB')})`}</p>
+              )}
+              {zipToUse && (
+                <p>✓ Slike (ZIP): {zipToUse.name} {zipToUse.size > 0 && `(${formatFileSize(zipToUse.size, 'MB')})`}</p>
+              )}
             </div>
-            {formData.alt_texts.map((alt, index) => (
-              <div key={index} className="grid md:grid-cols-3 gap-4 mb-4">
-                <Input
-                  value={alt.image_url}
-                  onChange={(e) => updateAltText(index, 'image_url', e.target.value)}
-                  placeholder="URL slike"
-                />
-                <Input
-                  value={alt.alt_text}
-                  onChange={(e) => updateAltText(index, 'alt_text', e.target.value)}
-                  placeholder="Alt tekst"
-                />
-                {formData.alt_texts.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => removeAltText(index)}
-                  >
-                    Obriši
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-4">
-            <Button type="submit" disabled={saving}>
-              {saving ? 'Čuvanje...' : 'Sačuvaj izmene'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-            >
-              Otkaži
-            </Button>
-          </div>
-        </form>
+          </Card>
+        )}
       </div>
     </div>
   )
