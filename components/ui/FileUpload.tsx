@@ -112,61 +112,58 @@ export default function FileUpload({
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
   }
 
-  return (
-    <div className="w-full">
-      {label && (
-        <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-          {label}
-        </label>
-      )}
-
-      <div
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          dragActive
-            ? 'border-[#f9c344] bg-[#f9c344]/10'
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept={accept || (type === 'image' ? (allowZip ? 'image/*,.zip' : 'image/*') : '.pdf,.doc,.docx')}
-          multiple={multiple}
-          onChange={handleChange}
-          className="hidden"
-        />
-
-        <div className="flex flex-col items-center gap-4">
-          {type === 'image' ? (
-            <ImageIcon size={48} className="text-gray-400" />
-          ) : (
-            <File size={48} className="text-gray-400" />
+      return (
+        <div className="w-full">
+          {label && (
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
+              {label}
+            </label>
           )}
-          <div>
-            <p className="text-gray-600 mb-1">
-              Prevuci fajlove ovde ili{' '}
-              <button
-                type="button"
-                onClick={() => inputRef.current?.click()}
-                className="text-[#1d1d1f] font-semibold hover:underline"
-              >
-                izaberi fajlove
-              </button>
-            </p>
-            <p className="text-sm text-gray-500">
-              {type === 'image'
-                ? allowZip
-                  ? `Slike (JPG, PNG, GIF) ili ZIP arhiva - max ${maxSize}MB`
-                  : `Slike (JPG, PNG, GIF) - max ${maxSize}MB`
-                : `PDF ili Word dokumenti - max ${maxSize}MB`}
-            </p>
+
+          <div
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+              dragActive
+                ? 'border-[#f9c344] bg-[#f9c344]/10'
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => inputRef.current?.click()}
+          >
+            <input
+              ref={inputRef}
+              type="file"
+              accept={accept || (type === 'image' ? (allowZip ? 'image/*,.zip' : 'image/*') : '.pdf,.doc,.docx')}
+              multiple={multiple}
+              onChange={handleChange}
+              className="hidden"
+            />
+
+            <div className="flex flex-col items-center gap-4 pointer-events-none">
+              {type === 'image' ? (
+                <ImageIcon size={48} className="text-gray-400" />
+              ) : (
+                <File size={48} className="text-gray-400" />
+              )}
+              <div>
+                <p className="text-gray-600 mb-1">
+                  Prevuci fajlove ovde ili{' '}
+                  <span className="text-[#1d1d1f] font-semibold underline">
+                    izaberi fajlove
+                  </span>
+                </p>
+                <p className="text-sm text-gray-500">
+                  {type === 'image'
+                    ? allowZip
+                      ? `Slike (JPG, PNG, GIF) ili ZIP arhiva - max ${maxSize}MB`
+                      : `Slike (JPG, PNG, GIF) - max ${maxSize}MB`
+                    : `PDF ili Word dokumenti - max ${maxSize}MB`}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
       {uploading && (
         <div className="mt-4 flex items-center justify-center gap-2 text-gray-600">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,7 +33,16 @@ export default function Header() {
         <div className="w-full px-4 md:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/">
-              <span className="text-2xl font-bold text-[#1d1d1f]">Bilbord Hub</span>
+              <Image
+                src="/FINAL LOGO BILBORD-06.png"
+                alt="Bilbord Hub Logo"
+                width={180}
+                height={61}
+                className="object-contain h-[40px] md:h-[45px] w-auto"
+                quality={100}
+                priority
+                unoptimized
+              />
             </Link>
           </div>
 
@@ -44,12 +54,6 @@ export default function Header() {
                   className={`${pathname === "/" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
                 >
                   Početna
-                </Link>
-                <Link
-                  href="/pretraga"
-                  className={`${pathname === "/pretraga" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  Pretraga
                 </Link>
                 <Link
                   href="/sva-saopstenja"
@@ -167,13 +171,6 @@ export default function Header() {
                           className={`${pathname === "/" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
                         >
                           Početna
-                        </Link>
-                        <Link
-                          href="/pretraga"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/pretraga" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          Pretraga
                         </Link>
                         <Link
                           href="/sva-saopstenja"

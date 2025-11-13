@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCallback } from 'react'
 
 export default function Footer() {
@@ -12,11 +13,17 @@ export default function Footer() {
         <footer className="w-full border-t border-gray-200 bg-white py-12">
             <div className="max-w-6xl mx-auto px-8">
 
-                <div className="mb-10 flex items-center justify-between">
-                    <Link href="/">
-                        <span className="text-xl font-bold text-[#1d1d1f]">Bilbord Hub</span>
-                    </Link>
-                </div>
+                    <div className="mb-10 flex items-center justify-between">
+                        <Link href="/">
+                            <Image
+                                src="/FINAL LOGO BILBORD-06.png"
+                                alt="Bilbord Hub Logo"
+                                width={160}
+                                height={56}
+                                className="object-contain h-[35px] md:h-[40px] w-auto"
+                            />
+                        </Link>
+                    </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-[auto_auto_auto_auto] justify-between gap-x-12 gap-y-10 text-left text-[#1d1d1f] text-sm">
                     <div>

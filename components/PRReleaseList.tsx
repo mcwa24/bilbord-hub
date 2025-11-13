@@ -27,6 +27,25 @@ interface PRReleaseListProps {
   onTagClick?: (tag: string) => void
   showEdit?: boolean
   onDelete?: (id: string) => void
+  searchQuery?: string
+}
+
+function highlightSearchTerm(text: string, searchQuery: string): React.ReactNode {
+  if (!searchQuery || !searchQuery.trim()) {
+    return text
+  }
+
+  const query = searchQuery.trim()
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+  const parts = text.split(regex)
+
+  return parts.map((part, index) => 
+    regex.test(part) ? (
+      <strong key={index} className="font-bold bg-[#f9c344]/30">{part}</strong>
+    ) : (
+      part
+    )
+  )
 }
 
 function formatFileSize(bytes: number, unit: 'KB' | 'MB' = 'KB'): string {
@@ -46,7 +65,7 @@ async function getFileSize(url: string): Promise<number> {
   }
 }
 
-export default function PRReleaseList({ releases, showAll = false, onTagClick, showEdit = false, onDelete }: PRReleaseListProps) {
+export default function PRReleaseList({ releases, showAll = false, onTagClick, showEdit = false, onDelete, searchQuery = '' }: PRReleaseListProps) {
   const [fileSizes, setFileSizes] = useState<Record<string, { doc: number; zip: number }>>({})
 
   useEffect(() => {
@@ -172,7 +191,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                           download={documents[0].label || release.title}
                           className="hover:underline"
                         >
-                          {release.title}
+                          {highlightSearchTerm(release.title, searchQuery)}
                           {sizes.doc > 0 && (
                             <span className="text-gray-500 font-normal">
                               {' '}({formatFileSize(sizes.doc, 'KB')})
@@ -203,7 +222,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                       </span>
                     ) : (
                       <span className="text-[#1d1d1f] font-semibold break-words">
-                        {release.title}
+                        {highlightSearchTerm(release.title, searchQuery)}
                         {/* Edit i Delete ikone odmah posle imena */}
                         {showEdit && (
                           <>

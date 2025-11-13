@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   title: "Bilbord Hub | Centralizovana PR platforma",
   description: "Bilbord Hub je centralizovana PR platforma na kojoj PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih preuzimaju.",
   keywords: "PR platforma, PR saopštenja, mediji, press release, PR agencije",
+  icons: {
+    icon: '/21150324_764549870419530_5822848782914038843_n.png',
+    shortcut: '/21150324_764549870419530_5822848782914038843_n.png',
+    apple: '/21150324_764549870419530_5822848782914038843_n.png',
+  },
 };
 
 export default function RootLayout({

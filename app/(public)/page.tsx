@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from "next/link";
 import { Search } from "lucide-react";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import PRReleaseList from "@/components/PRReleaseList";
 import { isAdmin } from '@/lib/admin';
 import toast from 'react-hot-toast';
@@ -28,6 +29,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [adminLoggedIn, setAdminLoggedIn] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     setAdminLoggedIn(isAdmin())
@@ -35,13 +37,16 @@ export default function Home() {
 
   useEffect(() => {
     fetchReleases()
-  }, [selectedTag])
+  }, [selectedTag, searchQuery])
 
   const fetchReleases = async () => {
     try {
       let url = '/api/releases?limit=10'
       if (selectedTag) {
         url += `&tags=${encodeURIComponent(selectedTag)}`
+      }
+      if (searchQuery.trim()) {
+        url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
       const res = await fetch(url)
       const data = await res.json()
@@ -59,6 +64,7 @@ export default function Home() {
 
   const handleReset = () => {
     setSelectedTag(null)
+    setSearchQuery('')
   }
 
   const handleDelete = async (id: string) => {
@@ -107,44 +113,43 @@ export default function Home() {
               preuzimaju. Pretraga, filtriranje i organizovano listanje svih PR objava 
               na jednom mestu.
             </p>
-            <div className="flex flex-row gap-4 w-full md:w-auto">
-              <Link href="/pretraga">
-                <Button className="flex items-center gap-2">
-                  <Search size={20} />
-                  Pretraži saopštenja
-                </Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button variant="outline">
-                  PR Portal
-                </Button>
-              </Link>
-            </div>
           </div>
         </div>
       </section>
 
       <section className="section-padding bg-white">
         <div className="container-custom">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 gap-4">
             <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f]">
-              {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : 'Najnovija saopštenja'}
+              {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : searchQuery ? `Rezultati pretrage: "${searchQuery}"` : 'Najnovija saopštenja'}
             </h2>
-            {selectedTag && (
-              <button
-                onClick={handleReset}
-                className="px-6 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
-              >
-                Resetuj
-              </button>
-            )}
+            <div className="flex items-center gap-2 flex-1 max-w-md justify-end">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input
+                  type="text"
+                  placeholder="Pretraži naslove..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {(selectedTag || searchQuery) && (
+                <button
+                  onClick={handleReset}
+                  className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium whitespace-nowrap"
+                >
+                  Resetuj
+                </button>
+              )}
+            </div>
           </div>
               {loading ? (
                 <div className="text-center py-12">
                   <p className="text-gray-600">Učitavanje...</p>
                 </div>
               ) : (
-                <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} />
+                <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} searchQuery={searchQuery} />
               )}
         </div>
       </section>
