@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Calendar, FileText, Image as ImageIcon, Download } from 'lucide-react'
+import { Calendar, FileText, Download } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -251,25 +251,24 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                     )}
                   </div>
 
-                  {/* Fiksno mesto za Foto */}
-                  {zipFiles.length > 0 && (
-                    <div className="flex items-center gap-2 flex-shrink-0 text-gray-600">
-                      <ImageIcon size={16} className="text-gray-500" />
-                      <a
-                        href={zipFiles[0].url}
-                        download={zipFiles[0].label === 'Slike' ? `slike-${release.id}.zip` : zipFiles[0].label}
-                        className="text-[#1d1d1f] hover:underline flex items-center gap-1 whitespace-nowrap"
-                      >
-                        <Download size={14} />
-                        Foto
-                        {sizes.zip > 0 && (
-                          <span className="text-gray-500">
-                            {' '}({formatFileSize(sizes.zip, 'MB')})
-                          </span>
-                        )}
-                      </a>
-                    </div>
-                  )}
+                      {/* Fiksno mesto za Foto */}
+                      {zipFiles.length > 0 && (
+                        <div className="flex items-center gap-2 flex-shrink-0 text-gray-600">
+                          <a
+                            href={zipFiles[0].url}
+                            download={zipFiles[0].label === 'Slike' ? `slike-${release.id}.zip` : zipFiles[0].label}
+                            className="text-[#1d1d1f] hover:underline flex items-center gap-1 whitespace-nowrap"
+                          >
+                            <Download size={14} />
+                            Foto
+                            {sizes.zip > 0 && (
+                              <span className="text-gray-500">
+                                {' '}({formatFileSize(sizes.zip, 'MB')})
+                              </span>
+                            )}
+                          </a>
+                        </div>
+                      )}
                 </div>
               </div>
 
