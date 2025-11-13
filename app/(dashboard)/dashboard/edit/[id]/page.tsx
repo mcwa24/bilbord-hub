@@ -157,7 +157,6 @@ export default function EditPage() {
       })
 
       // Postavi komentar na ZIP fajl
-      zip.comment = 'Bilbord Hub'
 
       const zipBlob = await zip.generateAsync({
         type: 'blob',

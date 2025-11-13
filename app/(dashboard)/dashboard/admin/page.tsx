@@ -100,9 +100,6 @@ export default function AdminPage() {
         zip.file(fileName, file)
       })
 
-      // Postavi komentar na ZIP fajl
-      zip.comment = 'Bilbord Hub'
-
       const zipBlob = await zip.generateAsync({ 
         type: 'blob',
         compression: 'DEFLATE',
