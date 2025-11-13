@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import Button from "@/components/ui/Button";
 import PRReleaseList from "@/components/PRReleaseList";
+import { isAdmin } from '@/lib/admin';
+import toast from 'react-hot-toast';
 
 interface PRRelease {
   id: string
@@ -25,6 +27,11 @@ export default function Home() {
   const [releases, setReleases] = useState<PRRelease[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false)
+
+  useEffect(() => {
+    setAdminLoggedIn(isAdmin())
+  }, [])
 
   useEffect(() => {
     fetchReleases()
@@ -52,6 +59,25 @@ export default function Home() {
 
   const handleReset = () => {
     setSelectedTag(null)
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/releases/${id}`, {
+        method: 'DELETE',
+      })
+      
+      if (res.ok) {
+        toast.success('Saopštenje obrisano!')
+        // Ukloni iz liste bez refresh-a
+        setReleases(releases.filter(r => r.id !== id))
+      } else {
+        const error = await res.json()
+        throw new Error(error.error || 'Greška pri brisanju')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Greška pri brisanju saopštenja')
+    }
   }
 
   return (
@@ -113,13 +139,13 @@ export default function Home() {
               </button>
             )}
           </div>
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Učitavanje...</p>
-            </div>
-          ) : (
-            <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} />
-          )}
+              {loading ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-600">Učitavanje...</p>
+                </div>
+              ) : (
+                <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} />
+              )}
         </div>
       </section>
 

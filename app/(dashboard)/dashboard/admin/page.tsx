@@ -1,6 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { isAdmin } from '@/lib/admin'
+import Link from 'next/link'
 import { Image as ImageIcon, FileText, Link as LinkIcon, Save } from 'lucide-react'
 import FileUpload from '@/components/ui/FileUpload'
 import Card from '@/components/ui/Card'
@@ -19,31 +22,54 @@ interface UploadedFile {
 }
 
 export default function AdminPage() {
+  const router = useRouter()
+  
+  // Postavi današnji datum kao default
+  const getTodayDate = () => {
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   const [releaseName, setReleaseName] = useState('')
   const [tags, setTags] = useState<string[]>([])
+  const [publishedDate, setPublishedDate] = useState<string>(getTodayDate())
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploadedDocument, setUploadedDocument] = useState<UploadedFile | null>(null)
   const [uploadedZip, setUploadedZip] = useState<UploadedFile | null>(null)
 
+  useEffect(() => {
+    if (!isAdmin()) {
+      router.push('/dashboard/login')
+    }
+  }, [router])
+
   const handleDocumentUpload = async (files: File[]) => {
     if (files.length === 0) return
     const file = files[0] // Uzmi prvi fajl
     setDocumentFile(file)
     
+    // Zadrži originalno ime fajla, samo dodaj timestamp na kraju za jedinstvenost
     const timestamp = Date.now()
-    const fileName = `uploads/${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.'))
+    const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.'))
+    // Čisti ime fajla od nevalidnih karaktera za storage, ali zadrži originalno za download
+    const cleanFileName = fileNameWithoutExt.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const storagePath = `uploads/${cleanFileName}-${timestamp}${fileExtension}`
     
     try {
-      const { data, error } = await uploadDocument(fileName, file)
+      const { data, error } = await uploadDocument(storagePath, file)
       if (error) {
         console.error('Upload error:', error)
         throw new Error(error.message || 'Greška pri upload-u dokumenta')
       }
 
       const uploaded = {
-        name: file.name,
+        name: file.name, // Originalno ime za download
         url: getDocumentUrl(data!.path),
         type: 'document' as const,
         path: data!.path,
@@ -67,23 +93,31 @@ export default function AdminPage() {
       const JSZip = (await import('jszip')).default
       const zip = new JSZip()
 
+      // Dodaj slike sa originalnim nazivima (bez meta podataka)
       files.forEach((file) => {
-        zip.file(file.name, file)
+        // Koristi samo ime fajla bez putanje
+        const fileName = file.name.split('/').pop() || file.name
+        zip.file(fileName, file)
       })
+
+      // Postavi komentar na ZIP fajl
+      zip.comment = 'Bilbord Hub'
 
       const zipBlob = await zip.generateAsync({ 
         type: 'blob',
         compression: 'DEFLATE',
-        compressionOptions: { level: 1 } // Niska kompresija za zadržavanje kvaliteta
+        compressionOptions: { level: 1 }, // Niska kompresija za zadržavanje kvaliteta
+        comment: 'Bilbord Hub' // Meta podatak za ZIP
       })
       
       const timestamp = Date.now()
+      // Koristi originalno ime ako postoji, inače generiši ime
       const zipFileName = `slike-${timestamp}.zip`
       const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
 
-      // Upload-uj ZIP fajl
-      const fileName = `uploads/${timestamp}-${zipFileName.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-      const { data, error } = await uploadImage(fileName, zipFile)
+      // Upload-uj ZIP fajl sa originalnim imenom (samo timestamp za jedinstvenost)
+      const storagePath = `uploads/slike-${timestamp}.zip`
+      const { data, error } = await uploadImage(storagePath, zipFile)
       
       if (error) {
         console.error('Upload error:', error)
@@ -134,6 +168,11 @@ export default function AdminPage() {
         })
       }
 
+      // Konvertuj datum u ISO format
+      const publishedAt = publishedDate 
+        ? new Date(publishedDate + 'T00:00:00').toISOString()
+        : new Date().toISOString()
+
       const releaseData = {
         title: releaseName,
         description: releaseName,
@@ -144,7 +183,7 @@ export default function AdminPage() {
         material_links: materialLinks,
         alt_texts: [],
         seo_meta_description: releaseName,
-        published_at: new Date().toISOString(),
+        published_at: publishedAt,
       }
 
       const res = await fetch('/api/releases', {
@@ -160,6 +199,7 @@ export default function AdminPage() {
         // Reset forme
         setReleaseName('')
         setTags([])
+        setPublishedDate(getTodayDate())
         setDocumentFile(null)
         setImageFiles([])
         setUploadedDocument(null)
@@ -203,11 +243,29 @@ export default function AdminPage() {
               required
             />
           </div>
-          <div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
+              Datum *
+            </label>
+            <Input
+              type="date"
+              value={publishedDate}
+              onChange={(e) => setPublishedDate(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
               Tagovi
             </label>
             <TagInput tags={tags} onChange={setTags} />
+          </div>
+          <div className="pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-600">
+              ⚠️ Upload-ovanjem materijala potvrđujete da posedujete sva autorska prava ili dozvole 
+              za distribuciju. Materijali će biti dostupni medijima za redakcijsku upotrebu. 
+              <Link href="/copyright" className="text-[#1d1d1f] hover:underline ml-1">Saznaj više</Link>
+            </p>
           </div>
         </Card>
 

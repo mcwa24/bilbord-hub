@@ -18,7 +18,7 @@ export default function Footer() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-[auto_auto_auto] justify-between gap-x-12 gap-y-10 text-left text-[#1d1d1f] text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-[auto_auto_auto_auto] justify-between gap-x-12 gap-y-10 text-left text-[#1d1d1f] text-sm">
                     <div>
                         <h4 className="font-semibold mb-3 text-[#1d1d1f]">Info</h4>
                         <ul className="space-y-2">
@@ -31,6 +31,14 @@ export default function Footer() {
                         <ul className="space-y-2">
                             <li><Link href="/dashboard" className="text-gray-600 hover:text-gray-800">Dashboard</Link></li>
                             <li><Link href="/dashboard/novo" className="text-gray-600 hover:text-gray-800">Novo saopštenje</Link></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-3 text-[#1d1d1f]">Pravno</h4>
+                        <ul className="space-y-2">
+                            <li><Link href="/uslovi" className="text-gray-600 hover:text-gray-800">Uslovi korišćenja</Link></li>
+                            <li><Link href="/pravila-privatnosti" className="text-gray-600 hover:text-gray-800">Pravila privatnosti</Link></li>
+                            <li><Link href="/copyright" className="text-gray-600 hover:text-gray-800">Copyright</Link></li>
                         </ul>
                     </div>
 

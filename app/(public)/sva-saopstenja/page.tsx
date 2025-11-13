@@ -1,19 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { PRRelease } from '@/types'
 import PRReleaseList from '@/components/PRReleaseList'
+import { isAdmin } from '@/lib/admin'
+import toast from 'react-hot-toast'
 
 export default function SvaSaopstenjaPage() {
   const [releases, setReleases] = useState<PRRelease[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false)
 
-  useEffect(() => {
-    fetchReleases()
-  }, [selectedTag])
-
-  const fetchReleases = async () => {
+  const fetchReleases = useCallback(async () => {
     setLoading(true)
     try {
       let url = '/api/releases'
@@ -28,7 +27,15 @@ export default function SvaSaopstenjaPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedTag])
+
+  useEffect(() => {
+    setAdminLoggedIn(isAdmin())
+  }, [])
+
+  useEffect(() => {
+    fetchReleases()
+  }, [fetchReleases])
 
   const handleTagClick = (tag: string) => {
     setSelectedTag(tag)
@@ -36,6 +43,25 @@ export default function SvaSaopstenjaPage() {
 
   const handleReset = () => {
     setSelectedTag(null)
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/releases/${id}`, {
+        method: 'DELETE',
+      })
+      
+      if (res.ok) {
+        toast.success('Saopštenje obrisano!')
+        // Ukloni iz liste bez refresh-a
+        setReleases(releases.filter(r => r.id !== id))
+      } else {
+        const error = await res.json()
+        throw new Error(error.error || 'Greška pri brisanju')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Greška pri brisanju saopštenja')
+    }
   }
 
   return (
@@ -64,7 +90,7 @@ export default function SvaSaopstenjaPage() {
             <p className="text-gray-600">Nema saopštenja za prikaz.</p>
           </div>
         ) : (
-          <PRReleaseList releases={releases} showAll={true} onTagClick={handleTagClick} showEdit={true} />
+          <PRReleaseList releases={releases} showAll={true} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} />
         )}
       </div>
     </div>

@@ -1,16 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { isAdmin, logoutAdmin } from "@/lib/admin";
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
   const isDashboard = pathname?.startsWith('/dashboard');
+
+  useEffect(() => {
+    setAdminLoggedIn(isAdmin());
+  }, [pathname]);
+
+  const handleLogout = () => {
+    logoutAdmin();
+    setAdminLoggedIn(false);
+    router.push('/');
+    router.refresh();
+  };
 
   return (
     <header className={`w-full ${isDashboard ? 'bg-white border-b border-gray-200' : 'bg-transparent absolute top-0 left-0 right-0'} z-50`}>
@@ -43,12 +57,14 @@ export default function Header() {
                 >
                   PR Saopštenja
                 </Link>
-                <Link
-                  href="/dashboard/admin"
-                  className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  Upload fajlova
-                </Link>
+                {adminLoggedIn && (
+                  <Link
+                    href="/dashboard/admin"
+                    className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+                  >
+                    Upload saopštenja
+                  </Link>
+                )}
               </>
             )}
             
@@ -66,12 +82,14 @@ export default function Header() {
                 >
                   Novo saopštenje
                 </Link>
-                <Link
-                  href="/dashboard/admin"
-                  className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-                >
-                  Upload fajlova
-                </Link>
+                {adminLoggedIn && (
+                  <Link
+                    href="/dashboard/admin"
+                    className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+                  >
+                    Upload saopštenja
+                  </Link>
+                )}
                 <Link
                   href="/dashboard/statistika"
                   className={`${pathname === "/dashboard/statistika" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
@@ -86,12 +104,21 @@ export default function Header() {
                 </Link>
               </>
             ) : (
-              <Link
-                href="/dashboard"
-                className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
-              >
-                PR Portal
-              </Link>
+              adminLoggedIn ? (
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
+                >
+                  Odjava
+                </button>
+              ) : (
+                <Link
+                  href="/dashboard/login"
+                  className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
+                >
+                  Prijava
+                </Link>
+              )
             )}
           </nav>
 
@@ -155,13 +182,15 @@ export default function Header() {
                         >
                           PR Saopštenja
                         </Link>
-                        <Link
-                          href="/dashboard/admin"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          Upload fajlova
-                        </Link>
+                        {adminLoggedIn && (
+                          <Link
+                            href="/dashboard/admin"
+                            onClick={() => setIsMenuOpen(false)}
+                            className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                          >
+                            Upload saopštenja
+                          </Link>
+                        )}
                       </>
                     )}
                     
@@ -181,13 +210,15 @@ export default function Header() {
                         >
                           Novo saopštenje
                         </Link>
-                        <Link
-                          href="/dashboard/admin"
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                        >
-                          Upload fajlova
-                        </Link>
+                        {adminLoggedIn && (
+                          <Link
+                            href="/dashboard/admin"
+                            onClick={() => setIsMenuOpen(false)}
+                            className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                          >
+                            Upload saopštenja
+                          </Link>
+                        )}
                         <Link
                           href="/dashboard/statistika"
                           onClick={() => setIsMenuOpen(false)}
@@ -204,13 +235,25 @@ export default function Header() {
                         </Link>
                       </>
                     ) : (
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
-                      >
-                        PR Portal
-                      </Link>
+                      adminLoggedIn ? (
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition w-full text-left"
+                        >
+                          Odjava
+                        </button>
+                      ) : (
+                        <Link
+                          href="/dashboard/login"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
+                        >
+                          Prijava
+                        </Link>
+                      )
                     )}
                   </div>
                 </div>

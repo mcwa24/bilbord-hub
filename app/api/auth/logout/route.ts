@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 
 export async function GET() {
-  const supabase = await createClient()
-  await supabase.auth.signOut()
+  // Admin logout se sada radi kroz client-side funkciju u Header komponenti
   return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'))
 }
 

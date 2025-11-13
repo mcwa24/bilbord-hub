@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { isAdmin } from '@/lib/admin'
 import { Image as ImageIcon, FileText, Save } from 'lucide-react'
 import FileUpload from '@/components/ui/FileUpload'
 import Card from '@/components/ui/Card'
@@ -27,6 +28,7 @@ export default function EditPage() {
   const [saving, setSaving] = useState(false)
   const [releaseName, setReleaseName] = useState('')
   const [tags, setTags] = useState<string[]>([])
+  const [publishedDate, setPublishedDate] = useState<string>('')
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [uploadedDocument, setUploadedDocument] = useState<UploadedFile | null>(null)
@@ -35,8 +37,12 @@ export default function EditPage() {
   const [existingZip, setExistingZip] = useState<UploadedFile | null>(null)
 
   useEffect(() => {
+    if (!isAdmin()) {
+      router.push('/dashboard/login')
+      return
+    }
     fetchRelease()
-  }, [params.id])
+  }, [params.id, router])
 
   const fetchRelease = async () => {
     try {
@@ -46,6 +52,21 @@ export default function EditPage() {
 
       setReleaseName(release.title)
       setTags(release.tags || [])
+      
+      // Učitaj datum - konvertuj iz ISO stringa u format za input (YYYY-MM-DD)
+      if (release.published_at) {
+        const date = new Date(release.published_at)
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        setPublishedDate(`${year}-${month}-${day}`)
+      } else if (release.created_at) {
+        const date = new Date(release.created_at)
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        setPublishedDate(`${year}-${month}-${day}`)
+      }
 
       // Učitaj postojeće fajlove
       const zipFiles = release.material_links.filter(
@@ -88,18 +109,23 @@ export default function EditPage() {
     const file = files[0]
     setDocumentFile(file)
 
+    // Zadrži originalno ime fajla, samo dodaj timestamp na kraju za jedinstvenost
     const timestamp = Date.now()
-    const fileName = `uploads/${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.'))
+    const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.'))
+    // Čisti ime fajla od nevalidnih karaktera za storage, ali zadrži originalno za download
+    const cleanFileName = fileNameWithoutExt.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const storagePath = `uploads/${cleanFileName}-${timestamp}${fileExtension}`
 
     try {
-      const { data, error } = await uploadDocument(fileName, file)
+      const { data, error } = await uploadDocument(storagePath, file)
       if (error) {
         console.error('Upload error:', error)
         throw new Error(error.message || 'Greška pri upload-u dokumenta')
       }
 
       const uploaded = {
-        name: file.name,
+        name: file.name, // Originalno ime za download
         url: getDocumentUrl(data!.path),
         type: 'document' as const,
         path: data!.path,
@@ -123,22 +149,30 @@ export default function EditPage() {
       const JSZip = (await import('jszip')).default
       const zip = new JSZip()
 
+      // Dodaj slike sa originalnim nazivima (bez meta podataka)
       files.forEach((file) => {
-        zip.file(file.name, file)
+        // Koristi samo ime fajla bez putanje
+        const fileName = file.name.split('/').pop() || file.name
+        zip.file(fileName, file)
       })
+
+      // Postavi komentar na ZIP fajl
+      zip.comment = 'Bilbord Hub'
 
       const zipBlob = await zip.generateAsync({
         type: 'blob',
         compression: 'DEFLATE',
-        compressionOptions: { level: 1 }
+        compressionOptions: { level: 1 },
+        comment: 'Bilbord Hub' // Meta podatak za ZIP
       })
 
       const timestamp = Date.now()
       const zipFileName = `slike-${timestamp}.zip`
       const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
 
-      const fileName = `uploads/${timestamp}-${zipFileName.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-      const { data, error } = await uploadImage(fileName, zipFile)
+      // Upload-uj ZIP fajl sa originalnim imenom
+      const storagePath = `uploads/slike-${timestamp}.zip`
+      const { data, error } = await uploadImage(storagePath, zipFile)
 
       if (error) {
         console.error('Upload error:', error)
@@ -193,6 +227,11 @@ export default function EditPage() {
         })
       }
 
+      // Konvertuj datum u ISO format
+      const publishedAt = publishedDate 
+        ? new Date(publishedDate + 'T00:00:00').toISOString()
+        : new Date().toISOString()
+
       const releaseData = {
         title: releaseName,
         description: releaseName,
@@ -203,6 +242,7 @@ export default function EditPage() {
         material_links: materialLinks,
         alt_texts: [],
         seo_meta_description: releaseName,
+        published_at: publishedAt,
       }
 
       const res = await fetch(`/api/releases/${params.id}`, {
@@ -266,6 +306,17 @@ export default function EditPage() {
               value={releaseName}
               onChange={(e) => setReleaseName(e.target.value)}
               placeholder="Unesite ime saopštenja"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
+              Datum *
+            </label>
+            <Input
+              type="date"
+              value={publishedDate}
+              onChange={(e) => setPublishedDate(e.target.value)}
               required
             />
           </div>
