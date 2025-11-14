@@ -29,6 +29,13 @@ export default function NovoPage() {
 
     try {
       const tags = formData.tags.split(',').map(t => t.trim()).filter(Boolean)
+      
+      if (tags.length === 0) {
+        toast.error('Morate dodati barem jedan tag')
+        setLoading(false)
+        return
+      }
+      
       const materialLinks = formData.material_links.filter(l => l.url && l.label)
       const altTexts = formData.alt_texts.filter(a => a.image_url && a.alt_text)
 
@@ -169,9 +176,10 @@ export default function NovoPage() {
 
           <div>
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
-              Tagovi (odvojeni zarezom)
+              Tagovi (odvojeni zarezom) *
             </label>
             <Input
+              required
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
               placeholder="tag1, tag2, tag3"

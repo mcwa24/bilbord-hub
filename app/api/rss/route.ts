@@ -32,12 +32,12 @@ export async function GET() {
       const itemContent = match[1]
       
       // Pokušaj da parsiraš title sa CDATA ili bez
-      const titleMatch = itemContent.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/is)
+      const titleMatch = itemContent.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>|<title>([\s\S]*?)<\/title>/i)
       // Pokušaj da parsiraš link (može biti u <link> tagu ili <guid>)
-      const linkMatch = itemContent.match(/<link>(.*?)<\/link>|<guid[^>]*>(.*?)<\/guid>/is)
+      const linkMatch = itemContent.match(/<link>([\s\S]*?)<\/link>|<guid[^>]*>([\s\S]*?)<\/guid>/i)
       // Pokušaj da parsiraš datum (može biti pubDate ili date)
-      const pubDateMatch = itemContent.match(/<pubDate>(.*?)<\/pubDate>|<date>(.*?)<\/date>/is)
-      const descriptionMatch = itemContent.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/is)
+      const pubDateMatch = itemContent.match(/<pubDate>([\s\S]*?)<\/pubDate>|<date>([\s\S]*?)<\/date>/i)
+      const descriptionMatch = itemContent.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/i)
 
       if (titleMatch && linkMatch) {
         const title = (titleMatch[1] || titleMatch[2] || '').replace(/<[^>]*>/g, '').trim()
