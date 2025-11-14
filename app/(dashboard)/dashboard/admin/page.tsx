@@ -201,6 +201,8 @@ export default function AdminPage() {
         setImageFiles([])
         setUploadedDocument(null)
         setUploadedZip(null)
+        // Redirect na naslovnu stranicu u sekciju "Najnovija saopštenja"
+        window.location.href = '/#najnovija-saopstenja'
       } else {
         console.error('API error:', responseData)
         throw new Error(responseData.error || 'Greška pri kreiranju saopštenja')

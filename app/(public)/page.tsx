@@ -224,7 +224,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-start justify-between gap-12 relative z-10">
           <div className="flex-1 basis-1/2 min-w-0 text-left">
             <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-100 to-pink-100 drop-shadow-2xl">
-              Bilbord Hub
+              PR Hub
             </h1>
             <p className="text-white/90 text-base mb-6 font-medium drop-shadow-lg">
               Centralizovani hub za najnovija PR saopštenja.

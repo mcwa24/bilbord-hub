@@ -55,12 +55,6 @@ export default function Header() {
               Početna
             </Link>
             <Link
-              href="/sva-saopstenja"
-              className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
-            >
-              PR Saopštenja
-            </Link>
-            <Link
               href="https://bilbord.rs/pretplate/"
               target="_blank"
               rel="noopener noreferrer"
@@ -145,13 +139,6 @@ export default function Header() {
                       className={`${pathname === "/" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
                     >
                       Početna
-                    </Link>
-                    <Link
-                      href="/sva-saopstenja"
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`${pathname === "/sva-saopstenja" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
-                    >
-                      PR Saopštenja
                     </Link>
                     <Link
                       href="https://bilbord.rs/pretplate/"

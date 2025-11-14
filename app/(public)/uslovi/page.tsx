@@ -8,95 +8,123 @@ export default function UsloviPage() {
 
         <div className="prose prose-lg max-w-none text-[#1d1d1f] space-y-8">
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              📝 Prihvatljivost materijala
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Prihvatljivost materijala
             </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>PR saopštenja koja se šalju moraju biti relevantna za tematiku portala.</li>
-              <li>Sadržaj mora biti originalan i ne sme biti kopija već objavljenih radova.</li>
-              <li>Pravila objavljivanja se u svakom trenutku moraju ispoštovati.</li>
-            </ul>
+            <p className="mb-2">
+              PR saopštenja koja se dostavljaju moraju biti relevantna za tematiku portala.
+            </p>
+            <p className="mb-2">
+              Sadržaj mora biti originalan i ne sme predstavljati kopiju već objavljenih radova. Sva pravila objavljivanja moraju biti ispoštovana u svakom trenutku.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              ✨ Kvalitet sadržaja
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Kvalitet sadržaja
             </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Tekst PR saopštenja treba biti jasan, gramatički ispravan i relevantan za čitaoce Bilbord Magazine-a.</li>
-              <li>Saopštenja mogu sadržati fotografije ili multimedijalne sadržaje uz obavezno poštovanje autorskih prava.</li>
-            </ul>
+            <p className="mb-2">
+              Tekst PR saopštenja treba da bude jasan, gramatički ispravan i prilagođen čitaocima Bilbord Magazine-a. Saopštenja mogu sadržati fotografije i multimedijalne materijale uz obavezno poštovanje autorskih i licencnih prava.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              👥 Korisnički sadržaj
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Korisnički sadržaj i licenciranje
             </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Objavljivanjem sadržaja na našem portalu, korisnici nam daju neograničenu, globalnu, neopozivu, trajnu, sublicencibilnu licencu za korišćenje, reprodukciju, modifikaciju, distribuciju, prikazivanje i izvođenje sadržaja.</li>
-              <li>Korisnici se slažu da nemaju pravo da zahtevaju uklanjanje ili brisanje sadržaja koji su objavili, osim ako to nije drugačije navedeno u našim pravilima ili ako se portal odluči da ukloni sadržaj iz bilo kog razloga.</li>
-            </ul>
+            <p className="mb-2">
+              Slanjem sadržaja na objavu korisnik daje portalu Bilbord Magazine neograničenu, globalnu, neopozivu, trajnu i sublicencibilnu licencu za korišćenje, reprodukciju, modifikaciju, distribuciju, prikazivanje i izvođenje sadržaja.
+            </p>
+            <p className="mb-2">
+              Korisnik se slaže da nema pravo da zahteva uklanjanje ili brisanje već objavljenog sadržaja, osim ako je to unapred definisano pravilima portala ili ako portal sam odluči da sadržaj ukloni.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              🚫 Pravo na odbijanje
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Bilbord Hub platforma
             </h2>
-            <p>Zadržavamo pravo da odbijemo objavu PR saopštenja ukoliko smatramo da ne odgovara tonu ili interesima našeg portala.</p>
+            <p className="mb-2">
+              Slanjem PR saopštenja putem e-pošte ili formulara za objavu, korisnik se saglašava da portal Bilbord Magazine može taj sadržaj automatski postaviti i na platformu Bilbord Hub, bez obzira na to da li korisnik ima aktivnu pretplatu na Bilbord Portalu ili ne.
+            </p>
+            <p className="mb-2">
+              Bilbord Magazine zadržava pravo da ukloni ili arhivira sadržaj sa Bilbord Hub platforme u bilo kom trenutku, kao i da primenjuje ista pravila zadržavanja sadržaja kao i na glavnom portalu (minimalno 6 meseci za plaćene objave).
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              ⏰ Rokovi i vreme objave / 🗑️ Brisanje
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Pravo na odbijanje objave
             </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>PR saopštenja se objavljuju u skladu s rasporedom redakcije.</li>
-              <li>Rokovi za podnošenje materijala su podložni promeni i biće određeni u komunikaciji sa uredništvom.</li>
-              <li>Plaćeni sadržaj se čuva i ostaje na portalu najmanje 6 meseci od dana objavljivanja.</li>
-              <li>Portal Bilbord Magazine zadržava pravo da nakon određenog vremenskog perioda ukloni, arhivira ili optimizuje sadržaj radi tehničke efikasnosti, poboljšanja korisničkog iskustva, SEO optimizacije ili reorganizacije baze podataka.</li>
-              <li>Takve izmene ne utiču na prethodno stečena prava korisnika.</li>
-            </ul>
+            <p className="mb-2">
+              Redakcija zadržava pravo da odbije objavu PR saopštenja ukoliko proceni da sadržaj nije usklađen sa uređivačkom politikom ili interesima portala.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              ✍️ Redakcijske izmene i 🔍 SEO optimizacija
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Rokovi, vreme objave i brisanje
             </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Bilbord Magazine zadržava pravo da izvrši uređivačke, gramatičke, stilske i strukturalne izmene dostavljenog materijala radi poboljšanja čitljivosti i usklađenosti sa uređivačkim standardima portala, bez menjanja suštine i značenja poruke.</li>
-              <li>Portal takođe zadržava pravo da prilagodi naslov, podnaslove, ključne reči i druge elemente sadržaja radi SEO optimizacije, uz očuvanje autentičnog konteksta i namere autora.</li>
-            </ul>
+            <p className="mb-2">
+              Objave se realizuju u skladu sa rasporedom redakcije.
+            </p>
+            <p className="mb-2">
+              Rokovi za dostavljanje materijala mogu biti promenjeni i biće definisani u komunikaciji sa uredništvom.
+            </p>
+            <p className="mb-2">
+              Plaćeni sadržaj se čuva i ostaje vidljiv na portalu najmanje šest meseci od datuma objavljivanja.
+            </p>
+            <p className="mb-2">
+              Portal zadržava pravo da nakon proteka minimalnog perioda ukloni, arhivira ili optimizuje sadržaj radi tehničke efikasnosti, SEO optimizacije ili reorganizacije baze.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              🎯 Promocije i ponude
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Redakcijske izmene i SEO optimizacija
             </h2>
-            <p>Bilbord Magazine zadržava pravo izmena ili prekida promocija, promotivnih cena i ostalih ponuda u bilo kom trenutku.</p>
+            <p className="mb-2">
+              Bilbord Magazine zadržava pravo da izvrši uređivačke, gramatičke, stilske i strukturalne izmene dostavljenog materijala, bez menjanja suštine poruke. Portal takođe može prilagoditi naslove, podnaslove, ključne reči i druge elemente radi SEO optimizacije, uz očuvanje autentičnog konteksta i namere autora.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              ⚖️ Odricanje od odgovornosti
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Promocije i komercijalne ponude
             </h2>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Bilbord Magazine ne snosi odgovornost za tačnost informacija ili tvrdnji navedenih u PR saopštenjima.</li>
-              <li>Odgovornost za istinitost i verodostojnost podnetog sadržaja snosi podnosilac saopštenja.</li>
-            </ul>
+            <p className="mb-2">
+              Portal zadržava pravo da menja ili ukida promotivne akcije, cene i dodatne ponude u bilo kom trenutku.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              🔄 Pravo na izmenu uslova
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Odricanje od odgovornosti
             </h2>
-            <p>Zadržavamo pravo da izmenimo ove uslove poslovanja bez prethodne najave. Molimo Vas da redovno proveravate eventualne promene.</p>
+            <p className="mb-2">
+              Bilbord Magazine ne snosi odgovornost za tačnost informacija i tvrdnji iznetih u PR saopštenjima. Odgovornost za istinitost i verodostojnost dostavljenog sadržaja snosi isključivo podnosilac saopštenja.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4 flex items-center gap-2">
-              📬 Kontakt
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Pravo na izmenu uslova
             </h2>
-            <p>Za sve dodatne informacije ili pitanja u vezi sa objavom PR saopštenja, molimo Vas da nas kontaktirate putem e-pošte ili formulara na portalu.</p>
+            <p className="mb-2">
+              Portal zadržava pravo da izmeni ove uslove bez prethodne najave.
+            </p>
+            <p className="mb-2">
+              Preporučuje se redovno proveravanje eventualnih izmena.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Kontakt
+            </h2>
+            <p className="mb-2">
+              Za sva pitanja i dodatne informacije u vezi sa objavom PR saopštenja, korisnici mogu kontaktirati redakciju putem e-pošte ili formulara na portalu.
+            </p>
           </section>
         </div>
       </div>
