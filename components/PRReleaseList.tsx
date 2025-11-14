@@ -137,8 +137,8 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
           >
             <div className="flex flex-col md:flex-row items-start justify-between gap-4">
               <div className="flex-1 min-w-0 w-full">
-                {/* Excel-like tabela: Datum | Tag | Naslov (KB) | Slike (MB) */}
-                <div className="grid grid-cols-[100px_60px_1fr_120px] gap-x-1 gap-y-2 items-center text-sm">
+                {/* Desktop: Excel-like tabela | Mobile: Više redova */}
+                <div className="hidden md:grid grid-cols-[100px_60px_1fr_120px_auto] gap-x-1 gap-y-2 items-center text-sm">
                   {/* Datum */}
                   <div className="text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis pr-0">
                     {formatDate(release.published_at || release.created_at)}
@@ -209,7 +209,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                     )}
                   </div>
                   
-                  {/* Edit i Delete ikone */}
+                  {/* Edit i Delete ikone - Desktop */}
                   <div className="flex items-center gap-2 justify-end">
                     {showEdit && (
                       <>
@@ -234,6 +234,98 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                       </>
                     )}
                   </div>
+                </div>
+                
+                {/* Mobile: Više redova */}
+                <div className="md:hidden flex flex-col gap-2 text-sm">
+                  {/* Prvi red: Datum i Tag */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600 whitespace-nowrap">
+                      {formatDate(release.published_at || release.created_at)}
+                    </span>
+                    {release.tags && release.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {release.tags.map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => onTagClick?.(tag)}
+                            className="text-xs font-medium hover:opacity-80 hover:underline transition"
+                            style={{ color: getTagColor(tag) }}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Drugi red: Naslov (KB) */}
+                  <div className="min-w-0 w-full">
+                    {documents.length > 0 ? (
+                      <div className="flex items-start gap-1 min-w-0">
+                        <a
+                          href={documents[0].url}
+                          download={documents[0].label || release.title}
+                          className="text-[#1d1d1f] hover:underline flex items-start gap-1 min-w-0 flex-1"
+                          title={release.title}
+                        >
+                          <Download size={14} className="flex-shrink-0 mt-0.5" />
+                          <span className="font-semibold break-words">
+                            {highlightSearchTerm(release.title, searchQuery)}
+                          </span>
+                        </a>
+                        <span className="text-gray-500 font-normal whitespace-nowrap flex-shrink-0">
+                          {sizes.doc > 0 ? `(${formatFileSize(sizes.doc, 'KB')})` : '(---)'}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[#1d1d1f] font-semibold break-words block" title={release.title}>
+                        {highlightSearchTerm(release.title, searchQuery)}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Treći red: Slike (MB) */}
+                  {zipFiles.length > 0 && (
+                    <div className="whitespace-nowrap">
+                      <a
+                        href={zipFiles[0].url}
+                        download={zipFiles[0].label === 'Slike' ? `slike-${release.id}.zip` : zipFiles[0].label}
+                        className="text-[#1d1d1f] hover:underline inline-flex items-center gap-1"
+                      >
+                        <Download size={14} className="flex-shrink-0" />
+                        <span>Slike</span>
+                        <span className="text-gray-500">
+                          {sizes.zip > 0 ? `(${formatFileSize(sizes.zip, 'MB')})` : '(---)'}
+                        </span>
+                      </a>
+                    </div>
+                  )}
+                  
+                  {/* Edit i Delete ikone - Mobile */}
+                  {showEdit && (
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/dashboard/edit/${release.id}`}
+                        className="inline hover:opacity-70 transition cursor-pointer no-underline flex-shrink-0"
+                        title="Izmeni saopštenje"
+                      >
+                        📝
+                      </Link>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleDelete()
+                        }}
+                        className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
+                        title="Obriši saopštenje"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 

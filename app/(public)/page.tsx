@@ -189,29 +189,53 @@ export default function Home() {
 
       <section id="najnovija-saopstenja" className="section-padding bg-white scroll-mt-32">
         <div className="container-custom">
-          <div className="flex items-center justify-between mb-8 gap-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f]">
+          <div className="mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4 md:mb-0">
               {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : searchQuery ? `Rezultati pretrage: "${searchQuery}"` : 'Najnovija saopštenja'}
             </h2>
-            <div className="flex items-center gap-2 flex-1 max-w-md justify-end">
-              <div className="relative flex-1">
+            {/* Mobile: Search ispod naslova */}
+            <div className="md:hidden flex flex-col gap-2 w-full">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                 <Input
                   type="text"
                   placeholder="Pretraži naslove..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 w-full"
                 />
               </div>
               {(selectedTag || searchQuery) && (
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium whitespace-nowrap"
+                  className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium whitespace-nowrap w-full"
                 >
                   Resetuj
                 </button>
               )}
+            </div>
+            {/* Desktop: Search pored naslova */}
+            <div className="hidden md:flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2 flex-1 max-w-md justify-end">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <Input
+                    type="text"
+                    placeholder="Pretraži naslove..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                {(selectedTag || searchQuery) && (
+                  <button
+                    onClick={handleReset}
+                    className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium whitespace-nowrap"
+                  >
+                    Resetuj
+                  </button>
+                )}
+              </div>
             </div>
           </div>
               {loading ? (
