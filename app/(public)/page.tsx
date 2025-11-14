@@ -88,7 +88,7 @@ export default function Home() {
     }
     
     try {
-      let url = `/api/releases?limit=10&page=${currentPage}`
+      let url = `/api/releases?limit=20&page=${currentPage}`
       if (selectedTag) {
         url += `&tags=${encodeURIComponent(selectedTag)}`
       }
@@ -194,33 +194,54 @@ export default function Home() {
   return (
     <>
       <section
-        className="relative w-full bg-white pb-16 overflow-hidden pt-32 md:pt-40"
+        className="relative w-full pb-16 overflow-hidden pt-32 md:pt-40"
         style={{
           width: '100vw',
           position: 'relative',
           left: '50%',
           marginLeft: '-50vw',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%)',
+          backgroundSize: '400% 400%',
+          animation: 'gradient 15s ease infinite',
         }}
       >
-        <div className="absolute top-20 right-20 w-40 h-40 bg-[#1d1d1f] rounded-full opacity-5"></div>
-        <div className="absolute bottom-10 left-10 w-1 h-32 bg-[#1d1d1f] opacity-10"></div>
+        <style jsx>{`
+          @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}</style>
+        
+        {/* Animated gradient orbs */}
+        <div className="absolute top-20 right-20 w-72 h-72 bg-purple-400 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400 rounded-full opacity-20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-400 rounded-full opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        
+        {/* Glassmorphism overlay */}
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
         
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-start justify-between gap-12 relative z-10">
           <div className="flex-1 basis-1/2 min-w-0 text-left">
-            <h1 className="text-5xl md:text-6xl font-extrabold text-[#1d1d1f] leading-tight mb-2">
+            <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-100 to-pink-100 drop-shadow-2xl">
               Bilbord Hub
             </h1>
-            <p className="text-gray-500 text-base mb-6">
+            <p className="text-white/90 text-base mb-6 font-medium drop-shadow-lg">
               Centralizovani hub za najnovija PR saopštenja.
             </p>
-            <p className="text-base md:text-lg text-[#4a4a4a] max-w-xl mb-6">
+            <p className="text-base md:text-lg text-white/80 max-w-xl mb-6 leading-relaxed drop-shadow-md">
               Preuzmite poslednja PR saopštenja sa jednog mesta. Pretraga, filtriranje 
               i organizovano listanje svih PR objava na jednom mestu.
             </p>
             <Link href="#najnovija-saopstenja">
-              <Button>
-                Saopštenja
-              </Button>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button className="shadow-xl hover:shadow-2xl transition-all duration-300">
+                  Saopštenja
+                </Button>
+              </motion.div>
             </Link>
           </div>
           
@@ -230,24 +251,27 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex-1 basis-1/2 flex items-center justify-center md:justify-end"
           >
-            <div className="relative w-full max-w-md">
-              <Image
-                src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
-                alt="Bilbord Hub"
-                width={600}
-                height={600}
-                className="w-full h-auto object-contain rounded-2xl"
-                priority
-              />
+            <div className="relative w-full max-w-2xl">
+              <div className="absolute inset-0 bg-white/20 backdrop-blur-xl rounded-3xl shadow-2xl transform rotate-3"></div>
+              <div className="relative">
+                <Image
+                  src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
+                  alt="Bilbord Hub"
+                  width={800}
+                  height={800}
+                  className="w-full h-auto object-contain rounded-3xl shadow-2xl border-4 border-white/30"
+                  priority
+                />
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      <section id="najnovija-saopstenja" className="section-padding bg-white scroll-mt-32">
+      <section id="najnovija-saopstenja" className="section-padding bg-gradient-to-b from-gray-50 via-white to-gray-50 scroll-mt-32">
         <div className="container-custom">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f]">
+            <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
               {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : searchQuery ? `Rezultati pretrage: "${searchQuery}"` : 'Najnovija saopštenja'}
             </h2>
             {/* Mobile: Search ispod naslova */}
@@ -259,13 +283,13 @@ export default function Home() {
                   placeholder="Pretraži naslove..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full"
+                  className="pl-10 w-full bg-white border-gray-300 focus:border-gray-400 focus:ring-gray-400 text-[#1d1d1f] placeholder:text-gray-500 shadow-md rounded-full"
                 />
               </div>
               {(selectedTag || searchQuery) && (
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium whitespace-nowrap w-full"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium whitespace-nowrap w-full shadow-lg hover:shadow-xl"
                 >
                   Resetuj
                 </button>
@@ -280,13 +304,13 @@ export default function Home() {
                   placeholder="Pretraži naslove..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white border-gray-300 focus:border-gray-400 focus:ring-gray-400 text-[#1d1d1f] placeholder:text-gray-500 shadow-md rounded-full"
                 />
               </div>
               {(selectedTag || searchQuery) && (
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium whitespace-nowrap"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium whitespace-nowrap shadow-lg hover:shadow-xl"
                 >
                   Resetuj
                 </button>
@@ -295,7 +319,8 @@ export default function Home() {
           </div>
               {loading && releases.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-600">Učitavanje...</p>
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+                  <p className="text-gray-600 mt-4">Učitavanje...</p>
                 </div>
               ) : releases.length > 0 ? (
                 <>
@@ -306,7 +331,7 @@ export default function Home() {
                       {currentPage > 1 && (
                         <button
                           onClick={() => handlePageChange(currentPage - 1)}
-                          className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
+                          className="px-4 py-2 rounded-lg text-base font-medium transition bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]"
                         >
                           Prethodna
                         </button>
@@ -316,10 +341,10 @@ export default function Home() {
                         <button
                           key={index}
                           onClick={() => typeof pageNum === 'number' && handlePageChange(pageNum)}
-                          className={`px-4 py-2 rounded-lg transition font-medium ${
+                          className={`px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
                             currentPage === pageNum
-                              ? 'bg-[#f9c344] text-[#1d1d1f] font-bold'
-                              : 'bg-gray-200 text-[#1d1d1f] hover:bg-gray-300'
+                              ? 'bg-[#1d1d1f] hover:bg-[#000] text-white font-bold'
+                              : 'bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]'
                           }`}
                         >
                           {pageNum}
@@ -329,7 +354,7 @@ export default function Home() {
                       {currentPage < totalPages && (
                         <button
                           onClick={() => handlePageChange(currentPage + 1)}
-                          className="px-4 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
+                          className="px-4 py-2 rounded-lg text-base font-medium transition bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]"
                         >
                           Sledeća
                         </button>
@@ -345,48 +370,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-8 text-center">
-            Kako funkcioniše?
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#f9c344] rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-[#1d1d1f]">1</span>
-              </div>
-              <h3 className="text-xl font-bold text-[#1d1d1f] mb-2">
-                Pregledaj najnovija saopštenja
-              </h3>
-              <p className="text-gray-600">
-                Pronađite poslednja PR saopštenja sa naslovom, opisom, tagovima i materijalima.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#f9c344] rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-[#1d1d1f]">2</span>
-              </div>
-              <h3 className="text-xl font-bold text-[#1d1d1f] mb-2">
-                Pretražuj i filtriraj
-              </h3>
-              <p className="text-gray-600">
-                Pretražujte po naslovu, tagovima ili datumu. Pronađite relevantna saopštenja brzo i lako.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#f9c344] rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-[#1d1d1f]">3</span>
-              </div>
-              <h3 className="text-xl font-bold text-[#1d1d1f] mb-2">
-                Preuzmi i koristi
-              </h3>
-              <p className="text-gray-600">
-                Preuzmite dokumente i slike direktno sa platforme. Sve što vam treba na jednom mestu.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

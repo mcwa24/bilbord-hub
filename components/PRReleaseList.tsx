@@ -91,9 +91,9 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
     )
   }
 
-  // Dodaj prazne elemente da lista uvek ima 10 elemenata (ako je showAll=false)
+  // Dodaj prazne elemente da lista uvek ima 20 elemenata (ako je showAll=false)
   const itemsToShow = showAll ? releases : releases
-  const emptyItemsCount = showAll ? 0 : Math.max(0, 10 - itemsToShow.length)
+  const emptyItemsCount = showAll ? 0 : Math.max(0, 20 - itemsToShow.length)
   
   return (
     <div>
