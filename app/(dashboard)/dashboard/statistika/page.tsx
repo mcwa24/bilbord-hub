@@ -1,27 +1,38 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Eye, Download, TrendingUp } from 'lucide-react'
 import { PRRelease } from '@/types'
+import { isAdmin } from '@/lib/admin'
 import Card from '@/components/ui/Card'
 
 export default function StatistikaPage() {
+  const router = useRouter()
   const [stats, setStats] = useState<{
     totalReleases: number
     totalViews: number
     totalDownloads: number
     releases: Array<PRRelease & { view_count: number; download_count: number }>
+    topDownloads: Array<PRRelease & { view_count: number; download_count: number }>
+    topViews: Array<PRRelease & { view_count: number; download_count: number }>
   }>({
     totalReleases: 0,
     totalViews: 0,
     totalDownloads: 0,
     releases: [],
+    topDownloads: [],
+    topViews: [],
   })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchStats()
-  }, [])
+    if (!isAdmin()) {
+      router.push('/dashboard/login')
+    } else {
+      fetchStats()
+    }
+  }, [router])
 
   const fetchStats = async () => {
     try {
@@ -90,9 +101,82 @@ export default function StatistikaPage() {
           </Card>
         </div>
 
+        {/* Najpopularnija saopštenja po preuzimanjima */}
+        {stats.topDownloads.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Najpopularnija saopštenja po preuzimanjima
+            </h2>
+            <div className="space-y-4">
+              {stats.topDownloads.map((release, index) => (
+                <Card key={release.id}>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-[#f9c344] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-[#1d1d1f]">{index + 1}</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#1d1d1f] mb-1">
+                        {release.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">{release.company_name}</p>
+                    </div>
+                    <div className="flex gap-6">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Pregleda</p>
+                        <p className="text-xl font-bold text-[#1d1d1f]">{release.view_count || 0}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Preuzimanja</p>
+                        <p className="text-xl font-bold text-[#1d1d1f]">{release.download_count || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Najpopularnija saopštenja po pregledima */}
+        {stats.topViews.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              Najpopularnija saopštenja po pregledima
+            </h2>
+            <div className="space-y-4">
+              {stats.topViews.map((release, index) => (
+                <Card key={release.id}>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-[#f9c344] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-[#1d1d1f]">{index + 1}</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#1d1d1f] mb-1">
+                        {release.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">{release.company_name}</p>
+                    </div>
+                    <div className="flex gap-6">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Pregleda</p>
+                        <p className="text-xl font-bold text-[#1d1d1f]">{release.view_count || 0}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Preuzimanja</p>
+                        <p className="text-xl font-bold text-[#1d1d1f]">{release.download_count || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Sva saopštenja */}
         <div>
           <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
-            Statistika po saopštenjima
+            Sva saopštenja
           </h2>
           <div className="space-y-4">
             {stats.releases.map((release) => (
@@ -107,11 +191,11 @@ export default function StatistikaPage() {
                   <div className="flex gap-6">
                     <div className="text-center">
                       <p className="text-sm text-gray-600">Pregleda</p>
-                      <p className="text-xl font-bold text-[#1d1d1f]">{release.view_count}</p>
+                      <p className="text-xl font-bold text-[#1d1d1f]">{release.view_count || 0}</p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-gray-600">Preuzimanja</p>
-                      <p className="text-xl font-bold text-[#1d1d1f]">{release.download_count}</p>
+                      <p className="text-xl font-bold text-[#1d1d1f]">{release.download_count || 0}</p>
                     </div>
                   </div>
                 </div>

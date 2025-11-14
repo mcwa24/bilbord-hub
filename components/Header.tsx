@@ -81,7 +81,7 @@ export default function Header() {
                 href="/dashboard/admin"
                 className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
               >
-                Upload saopštenja
+                Admin
               </Link>
             )}
             
@@ -177,7 +177,7 @@ export default function Header() {
                         onClick={() => setIsMenuOpen(false)}
                         className={`${pathname === "/dashboard/admin" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
                       >
-                        Upload saopštenja
+                        Admin
                       </Link>
                     )}
                     

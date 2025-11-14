@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { isAdmin } from '@/lib/admin'
 import Link from 'next/link'
-import { Image as ImageIcon, FileText, Link as LinkIcon, Save } from 'lucide-react'
+import { Image as ImageIcon, FileText, Link as LinkIcon, Save, BarChart3 } from 'lucide-react'
 import FileUpload from '@/components/ui/FileUpload'
 import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
@@ -223,9 +223,17 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-8">
-          Admin - Upload fajlova
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f]">
+            Admin - Upload fajlova
+          </h1>
+          <Link href="/dashboard/statistika">
+            <Button className="flex items-center gap-2">
+              <BarChart3 size={18} />
+              Statistika
+            </Button>
+          </Link>
+        </div>
 
         <Card className="mb-6">
           <div className="mb-4">
