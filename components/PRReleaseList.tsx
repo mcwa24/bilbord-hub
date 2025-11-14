@@ -91,9 +91,13 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
     )
   }
 
+  // Dodaj prazne elemente da lista uvek ima 10 elemenata (ako je showAll=false)
+  const itemsToShow = showAll ? releases : releases
+  const emptyItemsCount = showAll ? 0 : Math.max(0, 10 - itemsToShow.length)
+  
   return (
     <div>
-      {releases.map((release) => {
+      {itemsToShow.map((release) => {
         // Pronađi ZIP fajlove (slike) i dokumente
         const zipFiles = release.material_links.filter(
           (link) => link.url.toLowerCase().endsWith('.zip') || link.label === 'Slike'
@@ -340,6 +344,16 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
           </div>
         )
       })}
+      
+      {/* Prazni elementi da lista uvek zauzima prostor za 10 elemenata */}
+      {!showAll && emptyItemsCount > 0 && Array.from({ length: emptyItemsCount }).map((_, index) => (
+        <div
+          key={`empty-${index}`}
+          className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0"
+          style={{ visibility: 'hidden', minHeight: '80px' }}
+          aria-hidden="true"
+        />
+      ))}
     </div>
   )
 }

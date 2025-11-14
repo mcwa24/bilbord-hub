@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Eye, Download, TrendingUp, HardDrive, Search } from 'lucide-react'
 import { PRRelease } from '@/types'
@@ -44,6 +44,43 @@ export default function StatistikaPage() {
   const [loading, setLoading] = useState(true)
   const [searchLoading, setSearchLoading] = useState(false)
 
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      setSelectedRelease(null)
+      return
+    }
+
+    setSearchLoading(true)
+    try {
+      const res = await fetch(`/api/releases?search=${encodeURIComponent(searchQuery.trim())}`)
+      const data = await res.json()
+      setSearchResults(data.releases || [])
+      setSelectedRelease(null)
+    } catch (error) {
+      console.error('Error searching releases:', error)
+      setSearchResults([])
+    } finally {
+      setSearchLoading(false)
+    }
+  }, [searchQuery])
+
+  // Automatska pretraga dok korisnik kuca (kao na naslovnoj stranici) sa debounce-om
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      setSelectedRelease(null)
+      return
+    }
+
+    // Debounce pretrage - sačeka 300ms pre nego što pretraži
+    const timeoutId = setTimeout(() => {
+      handleSearch()
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, handleSearch])
+
   useEffect(() => {
     if (!isAdmin()) {
       router.push('/dashboard/login')
@@ -66,26 +103,6 @@ export default function StatistikaPage() {
       console.error('Error fetching stats:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      setSearchResults([])
-      setSelectedRelease(null)
-      return
-    }
-
-    setSearchLoading(true)
-    try {
-      const res = await fetch(`/api/releases?search=${encodeURIComponent(searchQuery.trim())}`)
-      const data = await res.json()
-      setSearchResults(data.releases || [])
-      setSelectedRelease(null)
-    } catch (error) {
-      console.error('Error searching releases:', error)
-    } finally {
-      setSearchLoading(false)
     }
   }
 
@@ -166,28 +183,15 @@ export default function StatistikaPage() {
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
               Pretraži saopštenja
             </label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <Input
-                  type="text"
-                  placeholder="Unesite naziv saopštenja..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSearch()
-                    }
-                  }}
-                  className="pl-10"
-                />
-              </div>
-              <button
-                onClick={handleSearch}
-                className="px-6 py-2 bg-[#f9c344] text-[#1d1d1f] rounded-lg hover:bg-[#f9c344]/90 transition font-medium"
-              >
-                Pretraži
-              </button>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input
+                type="text"
+                placeholder="Pretraži naslove..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
           </div>
 
