@@ -220,42 +220,24 @@ export default function Home() {
   return (
     <>
       <section
-        className="relative w-full pb-16 overflow-hidden pt-32 md:pt-40"
+        className="relative w-full pb-16 overflow-hidden pt-32 md:pt-40 bg-gray-50"
         style={{
           width: '100vw',
           position: 'relative',
           left: '50%',
           marginLeft: '-50vw',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%)',
-          backgroundSize: '400% 400%',
-          animation: 'gradient 15s ease infinite',
         }}
       >
-        <style jsx>{`
-          @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-        `}</style>
-        
-        {/* Animated gradient orbs */}
-        <div className="absolute top-20 right-20 w-72 h-72 bg-purple-400 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400 rounded-full opacity-20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-400 rounded-full opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        
-        {/* Glassmorphism overlay */}
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
         
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-start justify-between gap-12 relative z-10">
           <div className="flex-1 basis-1/2 min-w-0 text-left">
-            <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-100 to-pink-100 drop-shadow-2xl">
+            <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
               PR Hub
             </h1>
-            <p className="text-white/90 text-base mb-6 font-medium drop-shadow-lg">
+            <p className="text-gray-700 text-base mb-6 font-medium">
               Centralizovani hub za najnovija PR saopštenja.
             </p>
-            <p className="text-base md:text-lg text-white/80 max-w-xl mb-6 leading-relaxed drop-shadow-md">
+            <p className="text-base md:text-lg text-gray-600 max-w-xl mb-6 leading-relaxed">
               Preuzmite poslednja PR saopštenja sa jednog mesta. Pretraga, filtriranje 
               i organizovano listanje svih PR objava na jednom mestu.
             </p>
@@ -294,7 +276,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="najnovija-saopstenja" className="section-padding bg-gradient-to-b from-gray-50 via-white to-gray-50 scroll-mt-32">
+      <section id="najnovija-saopstenja" className="section-padding bg-white scroll-mt-32">
         <div className="container-custom">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
@@ -353,24 +335,15 @@ export default function Home() {
                   <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} searchQuery={searchQuery} />
                   
                   {totalPages > 1 && (
-                    <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
-                      {currentPage > 1 && (
-                        <button
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          className="px-4 py-2 rounded-lg text-base font-medium transition bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]"
-                        >
-                          Prethodna
-                        </button>
-                      )}
-                      
+                    <div className="mt-8 flex items-center justify-center gap-2 flex-wrap text-sm">
                       {getVisiblePages().map((pageNum, index) => (
                         <button
                           key={index}
                           onClick={() => typeof pageNum === 'number' && handlePageChange(pageNum)}
-                          className={`px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
+                          className={`transition-all duration-300 ${
                             currentPage === pageNum
-                              ? 'bg-[#1d1d1f] hover:bg-[#000] text-white font-bold'
-                              : 'bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]'
+                              ? 'text-[#1d1d1f] font-bold'
+                              : 'text-gray-600 hover:text-[#1d1d1f]'
                           }`}
                         >
                           {pageNum}
@@ -380,7 +353,7 @@ export default function Home() {
                       {currentPage < totalPages && (
                         <button
                           onClick={() => handlePageChange(currentPage + 1)}
-                          className="px-4 py-2 rounded-lg text-base font-medium transition bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]"
+                          className="text-sm text-gray-600 hover:text-[#1d1d1f] transition ml-2"
                         >
                           Sledeća
                         </button>
@@ -396,7 +369,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section-padding bg-gradient-to-b from-gray-50 via-white to-gray-50 pt-8 md:pt-12">
+      <section className="section-padding bg-white pt-8 md:pt-12">
         <div className="container-custom">
           <div className="border-t border-gray-200 pt-8">
             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-8">
