@@ -142,14 +142,14 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
             <div className="flex flex-col md:flex-row items-start justify-between gap-4">
               <div className="flex-1 min-w-0 w-full">
                 {/* Desktop: Excel-like tabela | Mobile: Više redova */}
-                <div className="hidden md:grid grid-cols-[100px_60px_1fr_120px_auto] gap-x-1 gap-y-2 items-center text-xs">
+                <div className="hidden md:grid grid-cols-[auto_60px_1fr_120px_auto] gap-x-0 gap-y-2 items-center text-xs">
                   {/* Datum */}
-                  <div className="text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis pr-0">
+                  <div className="text-gray-600 whitespace-nowrap pr-3">
                     {formatDate(release.published_at || release.created_at)}
                   </div>
                   
                   {/* Tagovi */}
-                  <div className="overflow-hidden px-0 -ml-1">
+                  <div className="overflow-hidden px-0">
                     {release.tags && release.tags.length > 0 ? (
                       release.tags.map((tag) => (
                         <button

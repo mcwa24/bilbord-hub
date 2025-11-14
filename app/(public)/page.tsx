@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PRReleaseList from "@/components/PRReleaseList";
+import RSSFeedList from "@/components/RSSFeedList";
 import { isAdmin } from '@/lib/admin';
 import toast from 'react-hot-toast';
 
@@ -26,6 +27,13 @@ interface PRRelease {
   thumbnail_url: string | null
 }
 
+interface RSSItem {
+  title: string
+  link: string
+  pubDate: string
+  description?: string
+}
+
 const CACHE_KEY = 'pr_releases_cache'
 const CACHE_TIMESTAMP_KEY = 'pr_releases_cache_timestamp'
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minuta
@@ -38,6 +46,23 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [rssItems, setRssItems] = useState<RSSItem[]>([])
+  const [rssLoading, setRssLoading] = useState(false)
+
+  const fetchRSSFeed = async () => {
+    setRssLoading(true)
+    try {
+      const res = await fetch('/api/rss')
+      const data = await res.json()
+      if (data.items && Array.isArray(data.items)) {
+        setRssItems(data.items)
+      }
+    } catch (error) {
+      console.error('Error fetching RSS feed:', error)
+    } finally {
+      setRssLoading(false)
+    }
+  }
 
   // Učitaj podatke iz cache-a odmah pri inicijalizaciji
   useEffect(() => {
@@ -70,6 +95,7 @@ export default function Home() {
     // Pokušaj da učitamo iz cache-a odmah
     loadCachedData()
     setAdminLoggedIn(isAdmin())
+    fetchRSSFeed()
   }, [])
 
   useEffect(() => {
@@ -367,6 +393,24 @@ export default function Home() {
                   <p className="text-gray-600">Nema saopštenja za prikaz.</p>
                 </div>
               )}
+        </div>
+      </section>
+
+      <section className="section-padding bg-gradient-to-b from-gray-50 via-white to-gray-50 pt-8 md:pt-12">
+        <div className="container-custom">
+          <div className="border-t border-gray-200 pt-8">
+            <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-8">
+              Aktuelno na portalu
+            </h2>
+          {rssLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+              <p className="text-gray-600 mt-4">Učitavanje vesti...</p>
+            </div>
+          ) : (
+            <RSSFeedList items={rssItems} />
+          )}
+          </div>
         </div>
       </section>
 
