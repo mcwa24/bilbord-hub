@@ -289,7 +289,7 @@ export default function Home() {
               {(selectedTag || searchQuery) && (
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium whitespace-nowrap w-full shadow-lg hover:shadow-xl"
+                  className="px-4 py-2 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] rounded-full transition font-medium whitespace-nowrap w-full h-10 shadow-md"
                 >
                   Resetuj
                 </button>
@@ -304,13 +304,13 @@ export default function Home() {
                   placeholder="Pretraži naslove..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white border-gray-300 focus:border-gray-400 focus:ring-gray-400 text-[#1d1d1f] placeholder:text-gray-500 shadow-md rounded-full"
+                  className="pl-10 bg-white border-gray-300 focus:border-gray-400 focus:ring-gray-400 text-[#1d1d1f] placeholder:text-gray-500 shadow-md rounded-full h-10"
                 />
               </div>
               {(selectedTag || searchQuery) && (
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-medium whitespace-nowrap shadow-lg hover:shadow-xl"
+                  className="px-4 py-2 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] rounded-full transition font-medium whitespace-nowrap h-10 shadow-md"
                 >
                   Resetuj
                 </button>
