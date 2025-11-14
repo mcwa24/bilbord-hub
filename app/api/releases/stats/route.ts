@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+async function getFileSize(url: string): Promise<number> {
+  try {
+    const response = await fetch(url, { method: 'HEAD' })
+    const contentLength = response.headers.get('content-length')
+    return contentLength ? parseInt(contentLength) : 0
+  } catch {
+    return 0
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // Vrati sva saopštenja (frontend je već zaštićen admin proverom)
+    // Vrati sva saopštenja sa material_links (frontend je već zaštićen admin proverom)
     const { data: releases, error } = await supabase
       .from('pr_releases')
-      .select('id, title, company_name, view_count, download_count')
+      .select('id, title, company_name, view_count, download_count, material_links')
       .order('download_count', { ascending: false })
 
     if (error) throw error
@@ -16,6 +26,31 @@ export async function GET(request: NextRequest) {
     const totalReleases = releases?.length || 0
     const totalViews = releases?.reduce((sum, r) => sum + (r.view_count || 0), 0) || 0
     const totalDownloads = releases?.reduce((sum, r) => sum + (r.download_count || 0), 0) || 0
+
+    // Izračunaj ukupnu veličinu svih fajlova
+    let totalStorageBytes = 0
+    if (releases && releases.length > 0) {
+      const fileSizePromises = releases.map(async (release: any) => {
+        const materialLinks = release.material_links || []
+        let releaseSize = 0
+
+        for (const link of materialLinks) {
+          if (link.url) {
+            try {
+              const size = await getFileSize(link.url)
+              releaseSize += size
+            } catch {
+              // Ignoriši greške
+            }
+          }
+        }
+
+        return releaseSize
+      })
+
+      const sizes = await Promise.all(fileSizePromises)
+      totalStorageBytes = sizes.reduce((sum, size) => sum + size, 0)
+    }
 
     // Najpopularnija saopštenja (top 10 po download count-u)
     const topDownloads = releases
@@ -32,6 +67,7 @@ export async function GET(request: NextRequest) {
       totalReleases,
       totalViews,
       totalDownloads,
+      totalStorageBytes,
       releases: releases || [],
       topDownloads,
       topViews,

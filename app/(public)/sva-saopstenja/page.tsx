@@ -90,7 +90,7 @@ export default function SvaSaopstenjaPage() {
             <p className="text-gray-600">Nema saopštenja za prikaz.</p>
           </div>
         ) : (
-          <PRReleaseList releases={releases} showAll={true} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} />
+          <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} />
         )}
       </div>
     </div>

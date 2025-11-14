@@ -2,10 +2,28 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, Download, TrendingUp } from 'lucide-react'
+import { Eye, Download, TrendingUp, HardDrive, Search } from 'lucide-react'
 import { PRRelease } from '@/types'
 import { isAdmin } from '@/lib/admin'
 import Card from '@/components/ui/Card'
+import Input from '@/components/ui/Input'
+
+function formatStorageSize(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  
+  const gb = bytes / (1024 * 1024 * 1024)
+  if (gb >= 1) {
+    return `${gb.toFixed(2)} GB`
+  }
+  
+  const mb = bytes / (1024 * 1024)
+  if (mb >= 1) {
+    return `${mb.toFixed(2)} MB`
+  }
+  
+  const kb = bytes / 1024
+  return `${kb.toFixed(2)} KB`
+}
 
 export default function StatistikaPage() {
   const router = useRouter()
@@ -13,18 +31,18 @@ export default function StatistikaPage() {
     totalReleases: number
     totalViews: number
     totalDownloads: number
-    releases: Array<PRRelease & { view_count: number; download_count: number }>
-    topDownloads: Array<PRRelease & { view_count: number; download_count: number }>
-    topViews: Array<PRRelease & { view_count: number; download_count: number }>
+    totalStorageBytes: number
   }>({
     totalReleases: 0,
     totalViews: 0,
     totalDownloads: 0,
-    releases: [],
-    topDownloads: [],
-    topViews: [],
+    totalStorageBytes: 0,
   })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Array<PRRelease & { view_count: number; download_count: number }>>([])
+  const [selectedRelease, setSelectedRelease] = useState<PRRelease & { view_count: number; download_count: number } | null>(null)
   const [loading, setLoading] = useState(true)
+  const [searchLoading, setSearchLoading] = useState(false)
 
   useEffect(() => {
     if (!isAdmin()) {
@@ -38,12 +56,41 @@ export default function StatistikaPage() {
     try {
       const res = await fetch('/api/releases/stats')
       const data = await res.json()
-      setStats(data)
+      setStats({
+        totalReleases: data.totalReleases || 0,
+        totalViews: data.totalViews || 0,
+        totalDownloads: data.totalDownloads || 0,
+        totalStorageBytes: data.totalStorageBytes || 0,
+      })
     } catch (error) {
       console.error('Error fetching stats:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      setSelectedRelease(null)
+      return
+    }
+
+    setSearchLoading(true)
+    try {
+      const res = await fetch(`/api/releases?search=${encodeURIComponent(searchQuery.trim())}`)
+      const data = await res.json()
+      setSearchResults(data.releases || [])
+      setSelectedRelease(null)
+    } catch (error) {
+      console.error('Error searching releases:', error)
+    } finally {
+      setSearchLoading(false)
+    }
+  }
+
+  const handleReleaseClick = (release: PRRelease & { view_count: number; download_count: number }) => {
+    setSelectedRelease(release)
   }
 
   if (loading) {
@@ -63,7 +110,7 @@ export default function StatistikaPage() {
           Statistika
         </h1>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
@@ -99,110 +146,131 @@ export default function StatistikaPage() {
               </div>
             </div>
           </Card>
+
+          <Card>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
+                <HardDrive size={24} className="text-[#1d1d1f]" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Ukupno zauzeto mesta</p>
+                <p className="text-2xl font-bold text-[#1d1d1f]">{formatStorageSize(stats.totalStorageBytes)}</p>
+              </div>
+            </div>
+          </Card>
         </div>
 
-        {/* Najpopularnija saopštenja po preuzimanjima */}
-        {stats.topDownloads.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
-              Najpopularnija saopštenja po preuzimanjima
-            </h2>
-            <div className="space-y-4">
-              {stats.topDownloads.map((release, index) => (
-                <Card key={release.id}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-[#f9c344] rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-bold text-[#1d1d1f]">{index + 1}</span>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-[#1d1d1f] mb-1">
-                        {release.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">{release.company_name}</p>
-                    </div>
-                    <div className="flex gap-6">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Pregleda</p>
-                        <p className="text-xl font-bold text-[#1d1d1f]">{release.view_count || 0}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Preuzimanja</p>
-                        <p className="text-xl font-bold text-[#1d1d1f]">{release.download_count || 0}</p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+        {/* Search za saopštenja */}
+        <Card className="mb-8">
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
+              Pretraži saopštenja
+            </label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input
+                  type="text"
+                  placeholder="Unesite naziv saopštenja..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSearch()
+                    }
+                  }}
+                  className="pl-10"
+                />
+              </div>
+              <button
+                onClick={handleSearch}
+                className="px-6 py-2 bg-[#f9c344] text-[#1d1d1f] rounded-lg hover:bg-[#f9c344]/90 transition font-medium"
+              >
+                Pretraži
+              </button>
             </div>
           </div>
-        )}
 
-        {/* Najpopularnija saopštenja po pregledima */}
-        {stats.topViews.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
-              Najpopularnija saopštenja po pregledima
-            </h2>
-            <div className="space-y-4">
-              {stats.topViews.map((release, index) => (
-                <Card key={release.id}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-[#f9c344] rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-bold text-[#1d1d1f]">{index + 1}</span>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-[#1d1d1f] mb-1">
-                        {release.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">{release.company_name}</p>
-                    </div>
-                    <div className="flex gap-6">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Pregleda</p>
-                        <p className="text-xl font-bold text-[#1d1d1f]">{release.view_count || 0}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600">Preuzimanja</p>
-                        <p className="text-xl font-bold text-[#1d1d1f]">{release.download_count || 0}</p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
+          {/* Rezultati pretrage */}
+          {searchLoading && (
+            <p className="text-gray-600">Pretraga...</p>
+          )}
+          
+          {!searchLoading && searchResults.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600 mb-2">Rezultati pretrage:</p>
+              {searchResults.map((release) => (
+                <button
+                  key={release.id}
+                  onClick={() => handleReleaseClick(release)}
+                  className={`w-full text-left p-3 rounded-lg border transition ${
+                    selectedRelease?.id === release.id
+                      ? 'border-[#f9c344] bg-[#f9c344]/10'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <h3 className="font-semibold text-[#1d1d1f]">{release.title}</h3>
+                  <p className="text-sm text-gray-600">{release.company_name}</p>
+                </button>
               ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Sva saopštenja */}
-        <div>
-          <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
-            Sva saopštenja
-          </h2>
-          <div className="space-y-4">
-            {stats.releases.map((release) => (
-              <Card key={release.id}>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-[#1d1d1f] mb-2">
-                      {release.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{release.company_name}</p>
-                  </div>
-                  <div className="flex gap-6">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600">Pregleda</p>
-                      <p className="text-xl font-bold text-[#1d1d1f]">{release.view_count || 0}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600">Preuzimanja</p>
-                      <p className="text-xl font-bold text-[#1d1d1f]">{release.download_count || 0}</p>
-                    </div>
-                  </div>
+          {!searchLoading && searchQuery.trim() && searchResults.length === 0 && (
+            <p className="text-gray-600">Nema rezultata za pretragu.</p>
+          )}
+        </Card>
+
+        {/* Detaljna statistika za izabrano saopštenje */}
+        {selectedRelease && (
+          <Card className="mb-8">
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-6">
+              Statistika za: {selectedRelease.title}
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
+                  <Eye size={24} className="text-[#1d1d1f]" />
                 </div>
-              </Card>
-            ))}
-          </div>
-        </div>
+                <div>
+                  <p className="text-sm text-gray-600">Ukupno pregleda</p>
+                  <p className="text-2xl font-bold text-[#1d1d1f]">{selectedRelease.view_count || 0}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
+                  <Download size={24} className="text-[#1d1d1f]" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Ukupno preuzimanja</p>
+                  <p className="text-2xl font-bold text-[#1d1d1f]">{selectedRelease.download_count || 0}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h3 className="text-lg font-semibold text-[#1d1d1f] mb-3">Informacije o saopštenju</h3>
+              <div className="space-y-2 text-sm">
+                <p><span className="font-semibold">Kompanija:</span> {selectedRelease.company_name}</p>
+                <p><span className="font-semibold">Industrija:</span> {selectedRelease.industry}</p>
+                {selectedRelease.tags && selectedRelease.tags.length > 0 && (
+                  <div>
+                    <span className="font-semibold">Tagovi: </span>
+                    <span className="flex flex-wrap gap-1 mt-1">
+                      {selectedRelease.tags.map((tag) => (
+                        <span key={tag} className="px-2 py-1 bg-[#f9c344] text-[#1d1d1f] rounded-full text-xs">
+                          {tag}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   )

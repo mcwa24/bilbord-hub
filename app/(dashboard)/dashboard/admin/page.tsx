@@ -249,13 +249,22 @@ export default function AdminPage() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
+            <label 
+              htmlFor="published-date"
+              className="block text-sm font-semibold text-[#1d1d1f] mb-2 cursor-pointer"
+            >
               Datum *
             </label>
             <Input
+              id="published-date"
               type="date"
               value={publishedDate}
               onChange={(e) => setPublishedDate(e.target.value)}
+              onClick={(e) => {
+                // Otvori kalendar kada se klikne na polje
+                const input = e.target as HTMLInputElement
+                input.showPicker?.()
+              }}
               required
             />
           </div>

@@ -78,25 +78,64 @@ export default function TagInput({ tags, onChange, placeholder = 'Dodaj tag...' 
       )
     : []
 
+  const toggleTag = (tag: string) => {
+    if (tags.includes(tag)) {
+      removeTag(tag)
+    } else {
+      onChange([...tags, tag])
+    }
+  }
+
   return (
     <div className="w-full">
-      <div className="flex flex-wrap gap-2 mb-2">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1 px-3 py-1 bg-[#f9c344] text-[#1d1d1f] rounded-full text-sm font-medium"
-          >
-            {tag}
-            <button
-              type="button"
-              onClick={() => removeTag(tag)}
-              className="hover:bg-[#1d1d1f]/10 rounded-full p-0.5"
+      {/* Prikaz selektovanih tagova */}
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 px-3 py-1 bg-[#f9c344] text-[#1d1d1f] rounded-full text-sm font-medium"
             >
-              <X size={14} />
-            </button>
-          </span>
-        ))}
-      </div>
+              {tag}
+              <button
+                type="button"
+                onClick={() => removeTag(tag)}
+                className="hover:bg-[#1d1d1f]/10 rounded-full p-0.5"
+              >
+                <X size={14} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      
+      {/* Prikaz svih postojećih tagova kao klikabilnih dugmića */}
+      {allTags.length > 0 && (
+        <div className="mb-3">
+          <p className="text-xs text-gray-600 mb-2">Kliknite na tag da ga selektujete:</p>
+          <div className="flex flex-wrap gap-2">
+            {allTags.map((tag) => {
+              const isSelected = tags.includes(tag)
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    isSelected
+                      ? 'bg-[#f9c344] text-[#1d1d1f]'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {tag}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+      
+      {/* Input za dodavanje novih tagova */}
       <div className="relative">
         <input
           type="text"

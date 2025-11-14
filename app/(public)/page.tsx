@@ -26,16 +26,49 @@ interface PRRelease {
   thumbnail_url: string | null
 }
 
+const CACHE_KEY = 'pr_releases_cache'
+const CACHE_TIMESTAMP_KEY = 'pr_releases_cache_timestamp'
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minuta
+
 export default function Home() {
   const [releases, setReleases] = useState<PRRelease[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Počinjemo sa false jer učitavamo iz cache-a
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [adminLoggedIn, setAdminLoggedIn] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
+  // Učitaj podatke iz cache-a odmah pri inicijalizaciji
   useEffect(() => {
+    const loadCachedData = () => {
+      try {
+        const cachedData = localStorage.getItem(CACHE_KEY)
+        const cacheTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
+        
+        if (cachedData && cacheTimestamp) {
+          const timestamp = parseInt(cacheTimestamp)
+          const now = Date.now()
+          
+          // Ako je cache stariji od 5 minuta, ignoriši ga
+          if (now - timestamp < CACHE_DURATION) {
+            const parsed = JSON.parse(cachedData)
+            // Cache je uvek za osnovnu stranicu bez filtera
+            if (parsed.releases && Array.isArray(parsed.releases)) {
+              setReleases(parsed.releases)
+              setTotalPages(parsed.totalPages || 1)
+              return true
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading cache:', error)
+      }
+      return false
+    }
+
+    // Pokušaj da učitamo iz cache-a odmah
+    loadCachedData()
     setAdminLoggedIn(isAdmin())
   }, [])
 
@@ -48,7 +81,12 @@ export default function Home() {
   }, [selectedTag, searchQuery, currentPage])
 
   const fetchReleases = async () => {
-    setLoading(true)
+    // Ne prikazuj loading ako već imamo podatke (stale-while-revalidate)
+    const hasData = releases.length > 0
+    if (!hasData) {
+      setLoading(true)
+    }
+    
     try {
       let url = `/api/releases?limit=10&page=${currentPage}`
       if (selectedTag) {
@@ -61,6 +99,19 @@ export default function Home() {
       const data = await res.json()
       setReleases(data.releases || [])
       setTotalPages(data.pagination?.totalPages || 1)
+      
+      // Sačuvaj u cache samo ako nema filtera ili pretrage
+      if (!selectedTag && !searchQuery.trim() && currentPage === 1) {
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({
+            releases: data.releases || [],
+            totalPages: data.pagination?.totalPages || 1
+          }))
+          localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString())
+        } catch (error) {
+          console.error('Error saving cache:', error)
+        }
+      }
     } catch (error) {
       console.error('Error fetching releases:', error)
     } finally {
@@ -80,7 +131,13 @@ export default function Home() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // Scrolluj na vrh sekcije sa saopštenjima umesto na vrh stranice
+    const section = document.getElementById('najnovija-saopstenja')
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   const getVisiblePages = () => {
@@ -236,11 +293,11 @@ export default function Home() {
               )}
             </div>
           </div>
-              {loading ? (
+              {loading && releases.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-600">Učitavanje...</p>
                 </div>
-              ) : (
+              ) : releases.length > 0 ? (
                 <>
                   <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} searchQuery={searchQuery} />
                   
@@ -280,6 +337,10 @@ export default function Home() {
                     </div>
                   )}
                 </>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-600">Nema saopštenja za prikaz.</p>
+                </div>
               )}
         </div>
       </section>
