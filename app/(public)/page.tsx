@@ -280,7 +280,7 @@ export default function Home() {
         <div className="container-custom">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
-              {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : searchQuery ? `Rezultati pretrage: "${searchQuery}"` : 'Najnovija saopštenja'}
+              {selectedTag ? `Saopštenja sa tagom: ${selectedTag}` : searchQuery ? `Rezultati pretrage: "${searchQuery}"` : 'Poslednja saopštenja'}
             </h2>
             {/* Mobile: Search ispod naslova */}
             <div className="md:hidden flex flex-col gap-2 w-full">
@@ -373,7 +373,7 @@ export default function Home() {
         <div className="container-custom">
           <div className="border-t border-gray-200 pt-8">
             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-8">
-              Aktuelno na portalu
+              Poslednje na portalu
             </h2>
           {rssLoading ? (
             <div className="text-center py-12">

@@ -52,21 +52,6 @@ function highlightSearchTerm(text: string, searchQuery: string): React.ReactNode
   )
 }
 
-function getTagColor(tag: string): string {
-  // Generiši hash od taga za konzistentnu boju
-  let hash = 0
-  for (let i = 0; i < tag.length; i++) {
-    hash = tag.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  
-  // Generiši boju na osnovu hash-a
-  const hue = Math.abs(hash % 360)
-  const saturation = 60 + (Math.abs(hash) % 20) // 60-80%
-  const lightness = 50 + (Math.abs(hash) % 15) // 50-65%
-  
-  return `hsl(${hue}, ${saturation}%, ${lightness}%)`
-}
-
 function formatFileSize(bytes: number, unit: 'KB' | 'MB' = 'KB'): string {
   if (unit === 'MB') {
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
@@ -156,8 +141,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                           key={tag}
                           type="button"
                           onClick={() => onTagClick?.(tag)}
-                          className="text-xs font-medium hover:opacity-80 hover:underline transition text-left w-full overflow-hidden text-ellipsis whitespace-nowrap p-0"
-                          style={{ color: getTagColor(tag) }}
+                          className="text-xs font-medium hover:opacity-80 hover:underline transition text-left w-full overflow-hidden text-ellipsis whitespace-nowrap p-0 text-[#1d1d1f]"
                           title={tag}
                         >
                           {tag}
@@ -253,8 +237,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                             key={tag}
                             type="button"
                             onClick={() => onTagClick?.(tag)}
-                            className="text-xs font-medium hover:opacity-80 hover:underline transition"
-                            style={{ color: getTagColor(tag) }}
+                            className="text-xs font-medium hover:opacity-80 hover:underline transition text-[#1d1d1f]"
                           >
                             {tag}
                           </button>
