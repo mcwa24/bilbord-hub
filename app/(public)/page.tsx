@@ -60,8 +60,9 @@ export default function Home() {
       const data = await res.json()
       if (data.items && Array.isArray(data.items)) {
         setRssItems(data.items)
-        // Hero sekcija uzima sledeća 6 starijih postova (indeksi 3, 4, 5, 6, 7, 8)
-        setHeroItems(data.items.slice(3, 9))
+        // Hero sekcija uzima random 6 postova
+        const shuffled = [...data.items].sort(() => Math.random() - 0.5)
+        setHeroItems(shuffled.slice(0, 6))
       }
     } catch (error) {
       console.error('Error fetching RSS feed:', error)
@@ -245,7 +246,7 @@ export default function Home() {
   return (
     <>
       <section
-        className="relative w-full pb-16 overflow-hidden pt-32 md:pt-40 bg-gray-50"
+        className="relative w-full pb-16 overflow-hidden pt-32 md:pt-40 bg-white"
         style={{
           width: '100vw',
           position: 'relative',
@@ -419,7 +420,7 @@ export default function Home() {
                 <p className="text-gray-600 mt-4">Učitavanje vesti...</p>
               </div>
             ) : (
-              <RSSFeedList items={rssItems.slice(9)} />
+              <RSSFeedList items={rssItems.slice(3, 23)} />
             )}
           </div>
           </div>
