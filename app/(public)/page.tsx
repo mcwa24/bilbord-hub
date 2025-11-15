@@ -401,26 +401,53 @@ export default function Home() {
       <section className="section-padding bg-white pt-8 md:pt-12">
         <div className="container-custom">
           {/* Promo baner */}
-          <div className="bg-[#f9c344] rounded-3xl p-8 md:p-10 mb-12 text-[#1d1d1f]">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-3xl md:text-4xl font-bold mb-3">
-                  Postanite naš korisnik
-                </h3>
-                <p className="text-lg md:text-xl mb-2 font-medium">
-                  Distribuirajte vaša PR saopštenja na jednom mestu
-                </p>
-                <p className="text-base md:text-lg opacity-90">
-                  Povećajte vidljivost vaših saopštenja i dostignite širu publiku. 
-                  Naša platforma vam omogućava jednostavno deljenje i distribuciju PR materijala.
-                </p>
+          <div className="mb-12">
+            <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden mb-6">
+              <Image
+                src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
+                alt="Bilbord Portal"
+                fill
+                className="object-cover rounded-3xl"
+                priority
+              />
+              <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
+                <div className="bg-white rounded-2xl p-5 md:p-7 max-w-2xl w-full text-left">
+                  <h3 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-4 md:mb-5 leading-tight">
+                    Postanite naš korisnik
+                  </h3>
+                  <p className="text-base md:text-lg font-medium text-[#1d1d1f]">
+                    Distribuirajte vaša PR saopštenja na jednom mestu
+                  </p>
+                </div>
               </div>
-              <Link
-                href="/o-pr-platformi"
-                className="px-8 py-4 bg-white text-[#1d1d1f] font-semibold rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap shadow-lg text-lg"
-              >
-                Saznajte više
-              </Link>
+            </div>
+            <div className="bg-white rounded-3xl p-6 md:p-8">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-4 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Povećajte vidljivost vaših saopštenja</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Dosegnite širu publiku</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Pretraga i filtriranje po kategorijama</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Centralizovani pristup svim PR materijalima</span>
+                  </div>
+                </div>
+                <Link
+                  href="/o-pr-platformi"
+                  className="px-6 md:px-8 py-2.5 md:py-3 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg shadow-md"
+                >
+                  Saznajte više
+                </Link>
+              </div>
             </div>
           </div>
 
