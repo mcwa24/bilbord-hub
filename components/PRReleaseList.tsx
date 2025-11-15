@@ -52,6 +52,37 @@ function highlightSearchTerm(text: string, searchQuery: string): React.ReactNode
   )
 }
 
+function getTagColor(tag: string): string {
+  // Generiši hash od taga za konzistentnu boju
+  let hash = 0
+  for (let i = 0; i < tag.length; i++) {
+    hash = tag.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  
+  // Lista različitih boja za tagove
+  const colors = [
+    'text-purple-600',
+    'text-blue-600',
+    'text-green-600',
+    'text-red-600',
+    'text-orange-600',
+    'text-pink-600',
+    'text-indigo-600',
+    'text-teal-600',
+    'text-cyan-600',
+    'text-amber-600',
+    'text-emerald-600',
+    'text-violet-600',
+    'text-rose-600',
+    'text-fuchsia-600',
+    'text-sky-600',
+  ]
+  
+  // Koristi hash da odabere boju
+  const index = Math.abs(hash) % colors.length
+  return colors[index]
+}
+
 function formatFileSize(bytes: number, unit: 'KB' | 'MB' = 'KB'): string {
   if (unit === 'MB') {
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
@@ -141,7 +172,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                           key={tag}
                           type="button"
                           onClick={() => onTagClick?.(tag)}
-                          className="text-xs font-medium hover:opacity-80 hover:underline transition text-left w-full overflow-hidden text-ellipsis whitespace-nowrap p-0 text-[#1d1d1f]"
+                          className={`text-xs font-medium hover:opacity-80 hover:underline transition text-left w-full overflow-hidden text-ellipsis whitespace-nowrap p-0 ${getTagColor(tag)}`}
                           title={tag}
                         >
                           {tag}
@@ -237,7 +268,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                             key={tag}
                             type="button"
                             onClick={() => onTagClick?.(tag)}
-                            className="text-xs font-medium hover:opacity-80 hover:underline transition text-[#1d1d1f]"
+                            className={`text-xs font-medium hover:opacity-80 hover:underline transition ${getTagColor(tag)}`}
                           >
                             {tag}
                           </button>
