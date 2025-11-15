@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,6 +28,12 @@ export default function RootLayout({
   return (
     <html lang="sr">
       <body className={inter.className}>
+        <Script
+          defer
+          src="https://indigo-slug.pikapod.net/script.js"
+          data-website-id="f1273d31-c664-463e-8c72-b16f85911138"
+          strategy="afterInteractive"
+        />
         <Header />
         <main>{children}</main>
         <Footer />
