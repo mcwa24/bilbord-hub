@@ -320,7 +320,7 @@ export default function Home() {
                   placeholder="Pretraži naslove..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full bg-white border-gray-300 focus:border-gray-400 focus:ring-gray-400 text-[#1d1d1f] placeholder:text-gray-500 shadow-md rounded-full"
+                  className="pl-10 w-full bg-white border border-gray-300 focus:border-[#f9c344] focus:ring-[#f9c344] text-[#1d1d1f] placeholder:text-gray-500 rounded-full"
                 />
               </div>
               {(selectedTag || searchQuery) && (
@@ -341,7 +341,7 @@ export default function Home() {
                   placeholder="Pretraži naslove..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white border-gray-300 focus:border-gray-400 focus:ring-gray-400 text-[#1d1d1f] placeholder:text-gray-500 shadow-md rounded-full h-10"
+                  className="pl-10 bg-white border border-gray-300 focus:border-[#f9c344] focus:ring-[#f9c344] text-[#1d1d1f] placeholder:text-gray-500 rounded-full h-10"
                 />
               </div>
               {(selectedTag || searchQuery) && (

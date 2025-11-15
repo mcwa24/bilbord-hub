@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import { loginAdmin } from '@/lib/admin'
+import { setAdminSession } from '@/lib/admin'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
@@ -13,18 +13,55 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null)
+  const [locked, setLocked] = useState(false)
+  const [lockoutTime, setLockoutTime] = useState<number | null>(null)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (locked) {
+      toast.error('Previše neuspešnih pokušaja. Pokušajte ponovo kasnije.')
+      return
+    }
+    
     setLoading(true)
+    setRemainingAttempts(null)
 
     try {
-      if (loginAdmin(username, password)) {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      
+      const data = await res.json()
+      
+      if (res.ok && data.success) {
+        setAdminSession(true)
         toast.success('Uspešno prijavljeni kao admin')
-        router.push('/sva-saopstenja')
+        router.push('/dashboard/admin')
         router.refresh()
       } else {
-        toast.error('Pogrešno korisničko ime ili lozinka')
+        if (data.locked) {
+          setLocked(true)
+          const timeMatch = data.error.match(/(\d+)\s+minuta/)
+          if (timeMatch) {
+            setLockoutTime(parseInt(timeMatch[1]))
+          }
+          toast.error(data.error)
+        } else {
+          if (data.remainingAttempts !== undefined) {
+            setRemainingAttempts(data.remainingAttempts)
+            if (data.remainingAttempts > 0) {
+              toast.error(`${data.error}. Preostalo pokušaja: ${data.remainingAttempts}`)
+            } else {
+              toast.error(data.error)
+            }
+          } else {
+            toast.error(data.error || 'Pogrešno korisničko ime ili lozinka')
+          }
+        }
       }
     } catch (error: any) {
       toast.error(error.message || 'Greška pri prijavljivanju')
@@ -87,12 +124,24 @@ export default function LoginPage() {
               />
             </div>
 
+            {locked && lockoutTime && (
+              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                Previše neuspešnih pokušaja. Pokušajte ponovo za {lockoutTime} minuta.
+              </div>
+            )}
+            
+            {remainingAttempts !== null && remainingAttempts > 0 && !locked && (
+              <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
+                Preostalo pokušaja: {remainingAttempts}
+              </div>
+            )}
+
             <Button 
               type="submit" 
               className="w-full bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-lg py-3" 
-              disabled={loading}
+              disabled={loading || locked}
             >
-              {loading ? 'Učitavanje...' : 'Nastavak'}
+              {loading ? 'Učitavanje...' : locked ? 'Zaključano' : 'Nastavak'}
             </Button>
           </form>
         </div>
