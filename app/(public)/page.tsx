@@ -47,20 +47,24 @@ const CACHE_DURATION = 5 * 60 * 1000 // 5 minuta
 
 export default function Home() {
   const [releases, setReleases] = useState<PRRelease[]>([])
-  const [loading, setLoading] = useState(false) // Počinjemo sa false jer učitavamo iz cache-a
+  const [loading, setLoading] = useState(true) // Počinjemo sa true da blokiramo prikaz dok se ne učita
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [adminLoggedIn, setAdminLoggedIn] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [rssItems, setRssItems] = useState<RSSItem[]>([])
-  const [rssLoading, setRssLoading] = useState(false)
+  const [rssLoading, setRssLoading] = useState(true)
   const [heroItems, setHeroItems] = useState<RSSItem[]>([])
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false)
 
   const fetchRSSFeed = async () => {
     setRssLoading(true)
     try {
-      const res = await fetch('/api/rss')
+      const res = await fetch('/api/rss', { 
+        cache: 'force-cache',
+        next: { revalidate: 300 } // Cache 5 minuta
+      })
       const data = await res.json()
       if (data.items && Array.isArray(data.items)) {
         setRssItems(data.items)
@@ -75,72 +79,10 @@ export default function Home() {
     }
   }
 
-
-  // Učitaj podatke iz cache-a odmah pri inicijalizaciji
-  useEffect(() => {
-    const loadCachedData = () => {
-      try {
-        const cachedData = localStorage.getItem(CACHE_KEY)
-        const cacheTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
-        
-        if (cachedData && cacheTimestamp) {
-          const timestamp = parseInt(cacheTimestamp)
-          const now = Date.now()
-          
-          // Ako je cache stariji od 5 minuta, ignoriši ga
-          if (now - timestamp < CACHE_DURATION) {
-            const parsed = JSON.parse(cachedData)
-            // Cache je uvek za osnovnu stranicu bez filtera
-            if (parsed.releases && Array.isArray(parsed.releases)) {
-              setReleases(parsed.releases)
-              setTotalPages(parsed.totalPages || 1)
-              return true
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error loading cache:', error)
-      }
-      return false
-    }
-
-    // Pokušaj da učitamo iz cache-a odmah
-    loadCachedData()
-    setAdminLoggedIn(isAdmin())
-    fetchRSSFeed()
-
-    // Automatsko osvežavanje RSS feed-a svakih 5 minuta
-    const rssInterval = setInterval(() => {
-      fetchRSSFeed()
-    }, 5 * 60 * 1000) // 5 minuta
-
-    // Osvežavanje kada korisnik vrati fokus na tab
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        fetchRSSFeed()
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-
-    // Cleanup
-    return () => {
-      clearInterval(rssInterval)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
-  }, [])
-
-  useEffect(() => {
-    setCurrentPage(1) // Resetuj stranicu kada se promeni filter ili pretraga
-  }, [selectedTag, searchQuery])
-
-  useEffect(() => {
-    fetchReleases()
-  }, [selectedTag, searchQuery, currentPage])
-
   const fetchReleases = async () => {
     // Ne prikazuj loading ako već imamo podatke (stale-while-revalidate)
     const hasData = releases.length > 0
-    if (!hasData) {
+    if (!hasData && !initialLoadComplete) {
       setLoading(true)
     }
     
@@ -152,7 +94,10 @@ export default function Home() {
       if (searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
-      const res = await fetch(url)
+      const res = await fetch(url, {
+        cache: 'force-cache',
+        next: { revalidate: 60 } // Cache 1 minut
+      })
       const data = await res.json()
       setReleases(data.releases || [])
       setTotalPages(data.pagination?.totalPages || 1)
@@ -172,9 +117,100 @@ export default function Home() {
     } catch (error) {
       console.error('Error fetching releases:', error)
     } finally {
-      setLoading(false)
+      if (!initialLoadComplete) {
+        setLoading(false)
+      }
     }
   }
+
+
+  // Učitaj podatke iz cache-a odmah pri inicijalizaciji
+  useEffect(() => {
+    let mounted = true
+    
+    const loadInitialData = async () => {
+      const loadCachedData = () => {
+        try {
+          const cachedData = localStorage.getItem(CACHE_KEY)
+          const cacheTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
+          
+          if (cachedData && cacheTimestamp) {
+            const timestamp = parseInt(cacheTimestamp)
+            const now = Date.now()
+            
+            // Ako je cache stariji od 5 minuta, ignoriši ga
+            if (now - timestamp < CACHE_DURATION) {
+              const parsed = JSON.parse(cachedData)
+              // Cache je uvek za osnovnu stranicu bez filtera
+              if (parsed.releases && Array.isArray(parsed.releases)) {
+                if (mounted) {
+                  setReleases(parsed.releases)
+                  setTotalPages(parsed.totalPages || 1)
+                }
+                return true
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error loading cache:', error)
+        }
+        return false
+      }
+
+      // Pokušaj da učitamo iz cache-a odmah
+      const hasCache = loadCachedData()
+      if (mounted) {
+        setAdminLoggedIn(isAdmin())
+      }
+      
+      // Učitaj RSS feed i PR releases paralelno
+      await Promise.allSettled([
+        fetchRSSFeed(),
+        hasCache ? Promise.resolve() : fetchReleases()
+      ])
+      
+      // Sačekaj da se sve učita pre nego što prikažemo stranicu
+      if (mounted) {
+        setInitialLoadComplete(true)
+        setLoading(false)
+      }
+    }
+
+    loadInitialData()
+
+    // Automatsko osvežavanje RSS feed-a svakih 5 minuta (samo nakon inicijalnog učitavanja)
+    const rssInterval = setInterval(() => {
+      if (initialLoadComplete && mounted) {
+        fetchRSSFeed()
+      }
+    }, 5 * 60 * 1000) // 5 minuta
+
+    // Osvežavanje kada korisnik vrati fokus na tab
+    const handleVisibilityChange = () => {
+      if (!document.hidden && initialLoadComplete && mounted) {
+        fetchRSSFeed()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // Cleanup
+    return () => {
+      mounted = false
+      clearInterval(rssInterval)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    setCurrentPage(1) // Resetuj stranicu kada se promeni filter ili pretraga
+  }, [selectedTag, searchQuery])
+
+  useEffect(() => {
+    if (initialLoadComplete) {
+      fetchReleases()
+    }
+  }, [selectedTag, searchQuery, currentPage, initialLoadComplete])
 
 
   const handleTagClick = (tag: string) => {
@@ -247,6 +283,18 @@ export default function Home() {
     } catch (error: any) {
       toast.error(error.message || 'Greška pri brisanju saopštenja')
     }
+  }
+
+  // Blokiraj prikaz dok se sve ne učita
+  if (loading || rssLoading || !initialLoadComplete) {
+    return (
+      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#f9c344] mb-4"></div>
+          <p className="text-gray-600 text-lg font-medium">Učitavanje...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

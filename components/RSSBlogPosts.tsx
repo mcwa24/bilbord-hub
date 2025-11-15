@@ -42,6 +42,8 @@ export default function RSSBlogPosts({ items, showTitle = true }: RSSBlogPostsPr
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300 rounded-t-3xl"
                   sizes="(max-width: 768px) 100vw, 33vw"
+                  priority={index < 6}
+                  loading={index < 6 ? "eager" : "lazy"}
                 />
               </div>
             ) : (
