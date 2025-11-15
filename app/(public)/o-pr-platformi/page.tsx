@@ -77,7 +77,7 @@ export default function OPRPlatformiPage() {
       },
       shareFeature: {
         title: 'Jednostavno deljenje saopštenja',
-        text: 'Svako PR saopštenje možete preuzeti ručno ili koristiti funkciju deljenja. Kada kliknete na ikonu deljenja pored saopštenja, kopira se jedinstveni link. Svako ko klikne na taj link automatski dobija download i slika (ZIP arhiva) i dokumenta (PDF) - sve na jednom mestu, bez dodatnih koraka.',
+        text: 'Svako PR saopštenje možete preuzeti ručno ili koristiti funkciju deljenja. Kada kliknete na ikonu deljenja pored saopštenja, kopira se jedinstveni link. Svako ko klikne na taj link automatski dobija download slika (ZIP arhiva) i dokumenta - sve na jednom mestu, bez dodatnih koraka.',
         benefits: [
           'Jednostavno deljenje - samo kopirajte link',
           'Automatski download - slike i dokumenti se preuzimaju odjednom',
@@ -98,7 +98,7 @@ export default function OPRPlatformiPage() {
           },
           {
             title: '3. Preuzimanje materijala',
-            text: 'Preuzmite PDF dokumente i ZIP arhive sa slikama direktno sa platforme ili koristite funkciju deljenja.'
+            text: 'Preuzmite dokumente i ZIP arhive sa slikama direktno sa platforme ili koristite funkciju deljenja.'
           },
           {
             title: '4. Deljenje linkova',
@@ -178,7 +178,7 @@ export default function OPRPlatformiPage() {
       },
       shareFeature: {
         title: 'Easy sharing of releases',
-        text: 'You can download each PR release manually or use the sharing function. When you click on the share icon next to a release, a unique link is copied. Anyone who clicks on that link automatically gets a download of both images (ZIP archive) and documents (PDF) - all in one place, without additional steps.',
+        text: 'You can download each PR release manually or use the sharing function. When you click on the share icon next to a release, a unique link is copied. Anyone who clicks on that link automatically gets a download of images (ZIP archive) and documents - all in one place, without additional steps.',
         benefits: [
           'Easy sharing - just copy the link',
           'Automatic download - images and documents are downloaded at once',
@@ -199,7 +199,7 @@ export default function OPRPlatformiPage() {
           },
           {
             title: '3. Download materials',
-            text: 'Download PDF documents and ZIP archives with images directly from the platform or use the sharing function.'
+            text: 'Download documents and ZIP archives with images directly from the platform or use the sharing function.'
           },
           {
             title: '4. Share links',
