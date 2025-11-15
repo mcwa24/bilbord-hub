@@ -9,33 +9,63 @@ import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bilbord-hub.vercel.app'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Bilbord Hub | Centralizovana PR platforma",
   description: "Bilbord Hub je centralizovana PR platforma na kojoj PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih preuzimaju.",
   keywords: "PR platforma, PR saopštenja, mediji, press release, PR agencije",
+  authors: [{ name: "Bilbord Hub" }],
+  creator: "Bilbord Hub",
+  publisher: "Bilbord Hub",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: '/FINAL LOGO BILBORD-01.png',
     shortcut: '/FINAL LOGO BILBORD-01.png',
     apple: '/FINAL LOGO BILBORD-01.png',
   },
   openGraph: {
+    type: 'website',
+    locale: 'sr_RS',
+    url: siteUrl,
+    siteName: 'Bilbord Hub',
     title: "Bilbord Hub | Centralizovana PR platforma",
     description: "Bilbord Hub je centralizovana PR platforma na kojoj PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih preuzimaju.",
     images: [
       {
-        url: '/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg',
+        url: `${siteUrl}/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg`,
         width: 1200,
         height: 630,
         alt: 'Bilbord Hub - Centralizovana PR platforma',
+        type: 'image/jpeg',
       },
     ],
-    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: "Bilbord Hub | Centralizovana PR platforma",
     description: "Bilbord Hub je centralizovana PR platforma na kojoj PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih preuzimaju.",
-    images: ['/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg'],
+    images: [`${siteUrl}/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg`],
+    creator: '@bilbordhub',
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+  verification: {
+    // Dodaj verifikacione kodove kada budu dostupni
+    // google: 'your-google-verification-code',
+    // yandex: 'your-yandex-verification-code',
   },
 };
 
