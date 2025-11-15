@@ -131,33 +131,16 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil((filteredCount || 0) / itemsPerPage)
 
-    // Učitaj veličine fajlova paralelno za sve releases
-    const releasesWithSizes = await Promise.all(
-      releases.map(async (release: any) => {
-        const zipFiles = release.material_links?.filter(
-          (link: any) => link.url?.toLowerCase().endsWith('.zip') || link.label === 'Slike'
-        ) || []
-        const documents = release.material_links?.filter(
-          (link: any) => !link.url?.toLowerCase().endsWith('.zip') && link.label !== 'Slike'
-        ) || []
-
-        const [docSize, zipSize] = await Promise.all([
-          documents.length > 0 ? getFileSize(documents[0].url) : Promise.resolve(0),
-          zipFiles.length > 0 ? getFileSize(zipFiles[0].url) : Promise.resolve(0),
-        ])
-
-        return {
-          ...release,
-          fileSizes: {
-            doc: docSize,
-            zip: zipSize
-          }
-        }
-      })
-    )
-
+    // Optimizovano: vraćamo podatke odmah bez učitavanja veličina fajlova
+    // Veličine fajlova se mogu učitati na klijentu po potrebi
     const response = NextResponse.json({ 
-      releases: releasesWithSizes,
+      releases: releases.map((release: any) => ({
+        ...release,
+        fileSizes: {
+          doc: 0, // Učitava se na klijentu po potrebi
+          zip: 0  // Učitava se na klijentu po potrebi
+        }
+      })),
       pagination: {
         page,
         totalPages,

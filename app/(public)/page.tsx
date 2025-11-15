@@ -92,10 +92,8 @@ export default function Home() {
       if (searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
-      // Dodaj timestamp query parametar da sprečimo keširanje
-      const timestamp = Date.now()
-      const separator = url.includes('?') ? '&' : '?'
-      const res = await fetch(`${url}${separator}_t=${timestamp}`, {
+      // Bez timestamp query parametra - već imamo no-cache headers
+      const res = await fetch(url, {
         cache: 'no-store', // Real-time update - bez cache-a
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate',
