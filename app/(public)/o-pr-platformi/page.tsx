@@ -90,7 +90,7 @@ export default function OPRPlatformiPage() {
         steps: [
           {
             title: '1. Upload saopštenja',
-            text: 'Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, opisom, tagovima, slikama i dokumentima.'
+            text: 'Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, tagovima, slikama i dokumentima.'
           },
           {
             title: '2. Pregled saopštenja',
@@ -191,7 +191,7 @@ export default function OPRPlatformiPage() {
         steps: [
           {
             title: '1. Upload releases',
-            text: 'Hub team or companies upload PR releases to the platform with title, description, tags, images, and documents.'
+            text: 'Hub team or companies upload PR releases to the platform with title, tags, images, and documents.'
           },
           {
             title: '2. View release',

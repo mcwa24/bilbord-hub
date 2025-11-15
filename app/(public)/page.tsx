@@ -461,7 +461,7 @@ export default function Home() {
                   1. Upload saopštenja
                 </h3>
                 <p className="text-[#1d1d1f] text-gray-700">
-                  Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, opisom, tagovima, slikama i dokumentima.
+                  Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, tagovima, slikama i dokumentima.
                 </p>
               </div>
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
