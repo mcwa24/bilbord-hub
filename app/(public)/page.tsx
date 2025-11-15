@@ -1,6 +1,8 @@
 'use client'
 
 // Keširanje je uklonjeno - sajt je potpuno dinamičan
+// Force dynamic rendering (client components ne podržavaju sve opcije)
+
 import { useState, useEffect } from 'react'
 import Link from "next/link";
 import Image from "next/image";
@@ -61,8 +63,14 @@ export default function Home() {
   const fetchRSSFeed = async () => {
     setRssLoading(true)
     try {
-      const res = await fetch('/api/rss', { 
-        cache: 'no-store' // Bez keširanja - uvek fresh podaci
+      // Dodaj timestamp query parametar da sprečimo keširanje
+      const timestamp = Date.now()
+      const res = await fetch(`/api/rss?_t=${timestamp}`, { 
+        cache: 'no-store', // Bez keširanja - uvek fresh podaci
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache'
+        }
       })
       const data = await res.json()
       if (data.items && Array.isArray(data.items)) {
@@ -93,8 +101,15 @@ export default function Home() {
       if (searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
-      const res = await fetch(url, {
-        cache: 'no-store' // Real-time update - bez cache-a
+      // Dodaj timestamp query parametar da sprečimo keširanje
+      const timestamp = Date.now()
+      const separator = url.includes('?') ? '&' : '?'
+      const res = await fetch(`${url}${separator}_t=${timestamp}`, {
+        cache: 'no-store', // Real-time update - bez cache-a
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache'
+        }
       })
       const data = await res.json()
       setReleases(data.releases || [])
