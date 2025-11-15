@@ -1,5 +1,6 @@
 'use client'
 
+// Keširanje je uklonjeno - sajt je potpuno dinamičan
 import { useState, useEffect } from 'react'
 import Link from "next/link";
 import Image from "next/image";
@@ -41,9 +42,7 @@ interface RSSItem {
   excerpt?: string
 }
 
-const CACHE_KEY = 'pr_releases_cache'
-const CACHE_TIMESTAMP_KEY = 'pr_releases_cache_timestamp'
-const CACHE_DURATION = 30 * 1000 // 30 sekundi - kratak cache za real-time update
+// Keširanje je uklonjeno - sajt je potpuno dinamičan
 
 export default function Home() {
   const [releases, setReleases] = useState<PRRelease[]>([])
@@ -63,8 +62,7 @@ export default function Home() {
     setRssLoading(true)
     try {
       const res = await fetch('/api/rss', { 
-        cache: 'force-cache',
-        next: { revalidate: 300 } // Cache 5 minuta
+        cache: 'no-store' // Bez keširanja - uvek fresh podaci
       })
       const data = await res.json()
       if (data.items && Array.isArray(data.items)) {
@@ -114,45 +112,16 @@ export default function Home() {
   }
 
 
-  // Učitaj podatke iz cache-a odmah pri inicijalizaciji
+  // Učitaj podatke odmah pri inicijalizaciji - bez keširanja
   useEffect(() => {
     let mounted = true
     
     const loadInitialData = async () => {
-      const loadCachedData = () => {
-        try {
-          const cachedData = localStorage.getItem(CACHE_KEY)
-          const cacheTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY)
-          
-          if (cachedData && cacheTimestamp) {
-            const timestamp = parseInt(cacheTimestamp)
-            const now = Date.now()
-            
-            // Ako je cache stariji od 5 minuta, ignoriši ga
-            if (now - timestamp < CACHE_DURATION) {
-              const parsed = JSON.parse(cachedData)
-              // Cache je uvek za osnovnu stranicu bez filtera
-              if (parsed.releases && Array.isArray(parsed.releases)) {
-                if (mounted) {
-                  setReleases(parsed.releases)
-                  setTotalPages(parsed.totalPages || 1)
-                }
-                return true
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error loading cache:', error)
-        }
-        return false
-      }
-
-      // Uvek učitaj fresh podatke - ne koristi cache
       if (mounted) {
         setAdminLoggedIn(isAdmin())
       }
       
-      // Učitaj RSS feed i PR releases paralelno - uvek fresh
+      // Učitaj RSS feed i PR releases paralelno - uvek fresh podaci
       await Promise.allSettled([
         fetchRSSFeed(),
         fetchReleases()
