@@ -132,6 +132,7 @@ export default function AdminPage() {
 
       // Pakuj sve slike u jedan ZIP za download
       let zipUrl: string | null = null
+      let zipSize = 0 // Veličina ZIP fajla u bajtovima
       try {
         const JSZip = (await import('jszip')).default
         const zip = new JSZip()
@@ -148,9 +149,9 @@ export default function AdminPage() {
           comment: 'Bilbord Hub'
         })
         
+        zipSize = zipBlob.size // Veličina ZIP fajla u bajtovima
         const zipFileName = `slike-${timestamp}.zip`
         const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
-        const zipSize = zipBlob.size // Veličina ZIP fajla u bajtovima
         const storagePath = `uploads/slike-${timestamp}.zip`
         const { data, error } = await uploadImage(storagePath, zipFile)
         
@@ -170,7 +171,7 @@ export default function AdminPage() {
         url: zipUrl || uploadedImages[0], // Fallback na prvu sliku ako ZIP ne uspe
         type: 'image' as const,
         path: zipUrl ? `uploads/slike-${timestamp}.zip` : '',
-        size: zipSize || 0, // Veličina ZIP fajla u bajtovima
+        size: zipSize, // Veličina ZIP fajla u bajtovima
         imageUrls: uploadedImages, // Čuvamo sve URL-ove slika
       }
       setUploadedZip(uploaded)
