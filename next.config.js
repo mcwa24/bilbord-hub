@@ -9,16 +9,6 @@ const nextConfig = {
       },
     ],
   },
-  // Onemogući keširanje za dinamičke stranice
-  experimental: {
-    isrMemoryCacheSize: 0, // Onemogući ISR cache
-  },
-  // Force no static optimization
-  output: 'standalone',
-  // Disable static page generation
-  generateBuildId: async () => {
-    return `build-${Date.now()}`
-  },
 }
 
 module.exports = nextConfig

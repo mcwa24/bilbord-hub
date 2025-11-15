@@ -15,18 +15,18 @@ export async function GET(request: Request) {
     const category = searchParams.get('category')
     
     const rssUrl = 'https://bilbord.rs/rss/'
-    const response = await fetch(rssUrl, {
+    const rssResponse = await fetch(rssUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       },
       cache: 'no-store' // Bez keširanja - uvek fresh podaci
     })
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch RSS feed: ${response.status}`)
+    if (!rssResponse.ok) {
+      throw new Error(`Failed to fetch RSS feed: ${rssResponse.status}`)
     }
 
-    const xmlText = await response.text()
+    const xmlText = await rssResponse.text()
     
     // Parsiranje RSS feed-a
     const items: RSSItem[] = []
@@ -102,11 +102,11 @@ export async function GET(request: Request) {
     })
 
     // Vrati sve vesti (bez limita) sa no-cache headers
-    const response = NextResponse.json({ items })
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
-    response.headers.set('Pragma', 'no-cache')
-    response.headers.set('Expires', '0')
-    return response
+    const nextResponse = NextResponse.json({ items })
+    nextResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    nextResponse.headers.set('Pragma', 'no-cache')
+    nextResponse.headers.set('Expires', '0')
+    return nextResponse
   } catch (error: any) {
     console.error('Error fetching RSS feed:', error)
     const errorResponse = NextResponse.json(
