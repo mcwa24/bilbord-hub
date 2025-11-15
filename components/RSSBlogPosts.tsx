@@ -32,20 +32,20 @@ export default function RSSBlogPosts({ items, showTitle = true }: RSSBlogPostsPr
           rel="noopener noreferrer"
           className="group block"
         >
-          <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
             {/* Slika */}
             {item.imageUrl ? (
-              <div className="relative w-full h-48 overflow-hidden">
+              <div className="relative w-full h-48 overflow-hidden rounded-t-3xl">
                 <Image
                   src={item.imageUrl}
                   alt={item.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300 rounded-t-3xl"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
             ) : (
-              <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-3xl">
                 <span className="text-gray-400 text-sm">Nema slike</span>
               </div>
             )}

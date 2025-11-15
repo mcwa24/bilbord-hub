@@ -401,7 +401,7 @@ export default function Home() {
       <section className="section-padding bg-white pt-8 md:pt-12">
         <div className="container-custom">
           {/* Promo baner */}
-          <div className="bg-[#f9c344] rounded-lg p-8 md:p-10 mb-12 text-[#1d1d1f]">
+          <div className="bg-[#f9c344] rounded-3xl p-8 md:p-10 mb-12 text-[#1d1d1f]">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex-1 text-center md:text-left">
                 <h3 className="text-3xl md:text-4xl font-bold mb-3">
