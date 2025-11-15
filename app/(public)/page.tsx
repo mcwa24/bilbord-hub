@@ -260,14 +260,15 @@ export default function Home() {
           marginLeft: '-50vw',
         }}
       >
-        <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
-            PR Hub platforma
-          </h1>
-          <p className="text-gray-700 text-base mb-6 font-medium">
-            Centralizovani hub za najnovija PR saopštenja.
+        <div className="max-w-6xl mx-auto px-6 text-left md:text-center relative z-10">
+          <p className="text-base md:text-lg text-gray-600 mb-2 font-medium">
+            Bilbord Hub platforma
           </p>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
+            Centralizovani hub <br className="hidden md:block" />
+            za najnovija PR saopštenja
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl md:mx-auto mb-8 leading-relaxed">
             Preuzmite poslednja PR saopštenja sa jednog mesta. Pretraga, filtriranje 
             i organizovano listanje svih PR objava na jednom mestu.
           </p>
