@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PRReleaseList from "@/components/PRReleaseList";
 import RSSFeedList from "@/components/RSSFeedList";
+import RSSBlogPosts from "@/components/RSSBlogPosts";
 import { isAdmin } from '@/lib/admin';
 import toast from 'react-hot-toast';
 
@@ -32,6 +33,8 @@ interface RSSItem {
   link: string
   pubDate: string
   description?: string
+  imageUrl?: string
+  excerpt?: string
 }
 
 const CACHE_KEY = 'pr_releases_cache'
@@ -371,18 +374,35 @@ export default function Home() {
 
       <section className="section-padding bg-white pt-8 md:pt-12">
         <div className="container-custom">
-          <div className="border-t border-gray-200 pt-8">
+          <div className="border-t border-gray-200 pt-12">
             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-8">
-              Poslednje na portalu
+              Poslednje na{' '}
+              <Link 
+                href="https://bilbord.rs/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition"
+              >
+                Bilbord
+              </Link>{' '}
+              Portalu
             </h2>
-          {rssLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
-              <p className="text-gray-600 mt-4">Učitavanje vesti...</p>
-            </div>
-          ) : (
-            <RSSFeedList items={rssItems} />
-          )}
+            
+            {/* Blog postovi - poslednja 3 */}
+            {!rssLoading && rssItems.length > 0 && (
+              <RSSBlogPosts items={rssItems} />
+            )}
+            
+          <div className="mt-8">
+            {rssLoading ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+                <p className="text-gray-600 mt-4">Učitavanje vesti...</p>
+              </div>
+            ) : (
+              <RSSFeedList items={rssItems.slice(3)} />
+            )}
+          </div>
           </div>
         </div>
       </section>

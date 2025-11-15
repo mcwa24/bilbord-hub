@@ -5,6 +5,8 @@ interface RSSItem {
   link: string
   pubDate: string
   description?: string
+  imageUrl?: string
+  excerpt?: string
 }
 
 export async function GET() {
@@ -38,6 +40,28 @@ export async function GET() {
       // Pokušaj da parsiraš datum (može biti pubDate ili date)
       const pubDateMatch = itemContent.match(/<pubDate>([\s\S]*?)<\/pubDate>|<date>([\s\S]*?)<\/date>/i)
       const descriptionMatch = itemContent.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/i)
+      
+      // Pokušaj da parsiraš sliku iz media:content ili content:encoded
+      const mediaContentMatch = itemContent.match(/<media:content[^>]*url=["']([^"']+)["']/i)
+      const contentEncodedMatch = itemContent.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/i)
+      
+      let imageUrl = ''
+      if (mediaContentMatch) {
+        imageUrl = mediaContentMatch[1].trim()
+      } else if (contentEncodedMatch) {
+        const contentEncoded = contentEncodedMatch[1]
+        const imgMatch = contentEncoded.match(/<img[^>]*src=["']([^"']+)["']/i)
+        if (imgMatch) {
+          imageUrl = imgMatch[1].trim()
+        }
+      }
+      
+      // Parsiraj excerpt iz description (prvih ~150 karaktera)
+      let excerpt = ''
+      if (descriptionMatch) {
+        const desc = (descriptionMatch[1] || descriptionMatch[2] || '').replace(/<[^>]*>/g, '').trim()
+        excerpt = desc.length > 150 ? desc.substring(0, 150) + '...' : desc
+      }
 
       if (titleMatch && linkMatch) {
         const title = (titleMatch[1] || titleMatch[2] || '').replace(/<[^>]*>/g, '').trim()
@@ -50,7 +74,9 @@ export async function GET() {
             title,
             link,
             pubDate,
-            description
+            description,
+            imageUrl: imageUrl || undefined,
+            excerpt: excerpt || undefined
           })
         }
       }

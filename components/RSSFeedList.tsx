@@ -8,6 +8,8 @@ interface RSSItem {
   link: string
   pubDate: string
   description?: string
+  imageUrl?: string
+  excerpt?: string
 }
 
 interface RSSFeedListProps {
