@@ -469,7 +469,7 @@ export default function Home() {
                   2. Pregled saopštenja
                 </h3>
                 <p className="text-[#1d1d1f] text-gray-700">
-                  Kliknite na saopštenje da vidite detalje, slike, sadržaj i materijale za preuzimanje.
+                  Sva saopštenja su vidljiva direktno u listi sa naslovom, datumom, tagovima i linkovima za preuzimanje materijala.
                 </p>
               </div>
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">

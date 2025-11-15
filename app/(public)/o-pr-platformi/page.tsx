@@ -94,7 +94,7 @@ export default function OPRPlatformiPage() {
           },
           {
             title: '2. Pregled saopštenja',
-            text: 'Kliknite na saopštenje da vidite detalje, slike, sadržaj i materijale za preuzimanje.'
+            text: 'Sva saopštenja su vidljiva direktno u listi sa naslovom, datumom, tagovima i linkovima za preuzimanje materijala.'
           },
           {
             title: '3. Preuzimanje materijala',
@@ -195,7 +195,7 @@ export default function OPRPlatformiPage() {
           },
           {
             title: '2. View release',
-            text: 'Click on a release to see details, images, content, and downloadable materials.'
+            text: 'All releases are visible directly in the list with title, date, tags, and links to download materials.'
           },
           {
             title: '3. Download materials',
