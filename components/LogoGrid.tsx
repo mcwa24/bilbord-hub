@@ -39,7 +39,7 @@ export default function LogoGrid() {
       {logos.map((logo, index) => (
         <div
           key={logo}
-          className="flex items-center justify-center p-4 bg-white rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center p-4 bg-white rounded-lg pointer-events-none"
           style={{ 
             height: '120px',
             width: '100%'
