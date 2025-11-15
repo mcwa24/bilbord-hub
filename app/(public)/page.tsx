@@ -458,10 +458,10 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
                 <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
-                  1. Pretraga i filtriranje
+                  1. Upload saopštenja
                 </h3>
                 <p className="text-[#1d1d1f] text-gray-700">
-                  Koristite pretragu i filtere da pronađete PR saopštenja po kategorijama, tagovima ili datumu objave.
+                  Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, opisom, tagovima, slikama i dokumentima.
                 </p>
               </div>
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">

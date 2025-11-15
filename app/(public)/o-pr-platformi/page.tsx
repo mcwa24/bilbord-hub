@@ -89,8 +89,8 @@ export default function OPRPlatformiPage() {
         title: 'Kako funkcioniše PR Hub platforma',
         steps: [
           {
-            title: '1. Pretraga i filtriranje',
-            text: 'Koristite pretragu i filtere da pronađete PR saopštenja po kategorijama, tagovima ili datumu objave.'
+            title: '1. Upload saopštenja',
+            text: 'Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, opisom, tagovima, slikama i dokumentima.'
           },
           {
             title: '2. Pregled saopštenja',
@@ -190,8 +190,8 @@ export default function OPRPlatformiPage() {
         title: 'How PR Hub platform works',
         steps: [
           {
-            title: '1. Search and filter',
-            text: 'Use search and filters to find PR releases by categories, tags, or publication date.'
+            title: '1. Upload releases',
+            text: 'Hub team or companies upload PR releases to the platform with title, description, tags, images, and documents.'
           },
           {
             title: '2. View release',
