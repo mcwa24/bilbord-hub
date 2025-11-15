@@ -176,17 +176,6 @@ export default function Home() {
     }
   }
 
-  const fetchHeroPRReleases = async () => {
-    try {
-      const res = await fetch('/api/releases?limit=6&page=1')
-      const data = await res.json()
-      if (data.releases && Array.isArray(data.releases)) {
-        setHeroPRReleases(data.releases)
-      }
-    } catch (error) {
-      console.error('Error fetching hero PR releases:', error)
-    }
-  }
 
   const handleTagClick = (tag: string) => {
     setSelectedTag(tag)
