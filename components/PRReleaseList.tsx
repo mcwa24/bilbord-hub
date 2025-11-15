@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Download } from 'lucide-react'
+import { Download, Share2 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -146,6 +146,16 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
           }
         }
 
+        const handleShare = async () => {
+          const shareUrl = `${window.location.origin}/download/${release.id}`
+          try {
+            await navigator.clipboard.writeText(shareUrl)
+            toast.success('Link kopiran u clipboard!')
+          } catch (error) {
+            toast.error('Greška pri kopiranju linka')
+          }
+        }
+
         return (
           <div
             key={release.id}
@@ -221,8 +231,19 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                     )}
                   </div>
                   
-                  {/* Edit i Delete ikone - Desktop */}
+                  {/* Share, Edit i Delete ikone - Desktop */}
                   <div className="flex items-center gap-2 justify-end">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleShare()
+                      }}
+                      className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
+                      title="Kopiraj link za deljenje"
+                    >
+                      <Share2 size={16} className="text-gray-600" />
+                    </button>
                     {showEdit && (
                       <>
                         <Link
@@ -311,29 +332,42 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                     </div>
                   )}
                   
-                  {/* Edit i Delete ikone - Mobile */}
-                  {showEdit && (
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/dashboard/edit/${release.id}`}
-                        className="inline hover:opacity-70 transition cursor-pointer no-underline flex-shrink-0"
-                        title="Izmeni saopštenje"
-                      >
-                        📝
-                      </Link>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handleDelete()
-                        }}
-                        className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
-                        title="Obriši saopštenje"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  )}
+                  {/* Share, Edit i Delete ikone - Mobile */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleShare()
+                      }}
+                      className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
+                      title="Kopiraj link za deljenje"
+                    >
+                      <Share2 size={16} className="text-gray-600" />
+                    </button>
+                    {showEdit && (
+                      <>
+                        <Link
+                          href={`/dashboard/edit/${release.id}`}
+                          className="inline hover:opacity-70 transition cursor-pointer no-underline flex-shrink-0"
+                          title="Izmeni saopštenje"
+                        >
+                          📝
+                        </Link>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleDelete()
+                          }}
+                          className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
+                          title="Obriši saopštenje"
+                        >
+                          🗑️
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
