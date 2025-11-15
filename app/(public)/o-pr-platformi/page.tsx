@@ -74,6 +74,37 @@ export default function OPRPlatformiPage() {
         text: 'Da biste koristili PR Hub platformu, potrebno je da imate aktivnu pretplatu na portalu Bilbord. Pretplate se razlikuju po kategorijama i omogućavaju pristup različitim tipovima PR saopštenja.',
         link: 'https://bilbord.rs/pretplate/',
         linkText: 'Saznajte više o pretplatama'
+      },
+      shareFeature: {
+        title: 'Jednostavno deljenje saopštenja',
+        text: 'Svako PR saopštenje možete preuzeti ručno ili koristiti funkciju deljenja. Kada kliknete na ikonu deljenja pored saopštenja, kopira se jedinstveni link. Svako ko klikne na taj link automatski dobija download i slika (ZIP arhiva) i dokumenta (PDF) - sve na jednom mestu, bez dodatnih koraka.',
+        benefits: [
+          'Jednostavno deljenje - samo kopirajte link',
+          'Automatski download - slike i dokumenti se preuzimaju odjednom',
+          'Brza distribucija - pošaljite link putem email-a ili društvenih mreža',
+          'Bez dodatnih koraka - sve se dešava automatski'
+        ]
+      },
+      hubSteps: {
+        title: 'Kako funkcioniše PR Hub platforma',
+        steps: [
+          {
+            title: '1. Pretraga i filtriranje',
+            text: 'Koristite pretragu i filtere da pronađete PR saopštenja po kategorijama, tagovima ili datumu objave.'
+          },
+          {
+            title: '2. Pregled saopštenja',
+            text: 'Kliknite na saopštenje da vidite detalje, slike, sadržaj i materijale za preuzimanje.'
+          },
+          {
+            title: '3. Preuzimanje materijala',
+            text: 'Preuzmite PDF dokumente i ZIP arhive sa slikama direktno sa platforme ili koristite funkciju deljenja.'
+          },
+          {
+            title: '4. Deljenje linkova',
+            text: 'Koristite ikonu deljenja da kopirate jedinstveni link. Svako ko klikne na link automatski dobija download svih materijala.'
+          }
+        ]
       }
     },
     en: {
@@ -144,6 +175,37 @@ export default function OPRPlatformiPage() {
         text: 'To use the PR Hub platform, you need to have an active subscription on Bilbord portal. Subscriptions differ by categories and provide access to different types of PR releases.',
         link: 'https://bilbord.rs/pretplate/',
         linkText: 'Learn more about subscriptions'
+      },
+      shareFeature: {
+        title: 'Easy sharing of releases',
+        text: 'You can download each PR release manually or use the sharing function. When you click on the share icon next to a release, a unique link is copied. Anyone who clicks on that link automatically gets a download of both images (ZIP archive) and documents (PDF) - all in one place, without additional steps.',
+        benefits: [
+          'Easy sharing - just copy the link',
+          'Automatic download - images and documents are downloaded at once',
+          'Quick distribution - send the link via email or social media',
+          'No additional steps - everything happens automatically'
+        ]
+      },
+      hubSteps: {
+        title: 'How PR Hub platform works',
+        steps: [
+          {
+            title: '1. Search and filter',
+            text: 'Use search and filters to find PR releases by categories, tags, or publication date.'
+          },
+          {
+            title: '2. View release',
+            text: 'Click on a release to see details, images, content, and downloadable materials.'
+          },
+          {
+            title: '3. Download materials',
+            text: 'Download PDF documents and ZIP archives with images directly from the platform or use the sharing function.'
+          },
+          {
+            title: '4. Share links',
+            text: 'Use the share icon to copy a unique link. Anyone who clicks on the link automatically gets a download of all materials.'
+          }
+        ]
       }
     }
   }
@@ -191,6 +253,23 @@ export default function OPRPlatformiPage() {
             <p className="text-[#1d1d1f] text-lg leading-relaxed">
               {currentContent.keyBenefit.text}
             </p>
+          </div>
+
+          <div className="bg-gradient-to-r from-[#f9c344] to-[#f0b830] p-8 rounded-2xl mb-8 shadow-lg">
+            <h2 className="text-3xl font-bold text-[#1d1d1f] mb-4">
+              {currentContent.shareFeature.title}
+            </h2>
+            <p className="text-[#1d1d1f] text-lg mb-6 leading-relaxed">
+              {currentContent.shareFeature.text}
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              {currentContent.shareFeature.benefits.map((benefit, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <span className="text-[#1d1d1f] font-bold text-xl flex-shrink-0">✓</span>
+                  <span className="text-[#1d1d1f] font-medium">{benefit}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <h2 className="text-2xl font-bold text-[#1d1d1f] mt-8 mb-4">
@@ -255,10 +334,28 @@ export default function OPRPlatformiPage() {
             href={currentContent.subscription.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-lg hover:bg-[#f0b830] transition-colors"
+            className="inline-block px-6 py-3 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-lg hover:bg-[#f0b830] transition-colors mb-12"
           >
             {currentContent.subscription.linkText}
           </a>
+
+          <div className="border-t-2 border-gray-200 pt-12 mt-12">
+            <h2 className="text-3xl font-bold text-[#1d1d1f] mb-6 text-center">
+              {currentContent.hubSteps.title}
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {currentContent.hubSteps.steps.map((step, index) => (
+                <div key={index} className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
+                  <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
+                    {step.title}
+                  </h3>
+                  <p className="text-[#1d1d1f] text-gray-700">
+                    {step.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
