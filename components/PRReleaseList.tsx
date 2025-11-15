@@ -107,13 +107,9 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
     )
   }
 
-  // Dodaj prazne elemente da lista uvek ima 20 elemenata (ako je showAll=false)
-  const itemsToShow = showAll ? releases : releases
-  const emptyItemsCount = showAll ? 0 : Math.max(0, 20 - itemsToShow.length)
-  
   return (
     <div>
-      {itemsToShow.map((release) => {
+      {releases.map((release) => {
         // Pronađi ZIP fajlove (slike) i dokumente
         const zipFiles = release.material_links.filter(
           (link) => link.url.toLowerCase().endsWith('.zip') || link.label === 'Slike'
@@ -186,21 +182,19 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                   {/* Naslov (KB) */}
                   <div className="min-w-0 overflow-hidden">
                     {documents.length > 0 ? (
-                      <div className="flex items-center gap-1 min-w-0">
-                        <a
-                          href={documents[0].url}
-                          download={documents[0].label || release.title}
-                          className="text-[#1d1d1f] hover:underline inline-flex items-center gap-1 min-w-0 flex-1 overflow-hidden"
-                        >
-                          <Download size={14} className="flex-shrink-0" />
-                          <span className="font-semibold truncate">
-                            {highlightSearchTerm(release.title, searchQuery)}
-                          </span>
-                        </a>
+                      <a
+                        href={documents[0].url}
+                        download={documents[0].label || release.title}
+                        className="text-[#1d1d1f] hover:underline inline-flex items-center gap-1 min-w-0 flex-1 overflow-hidden"
+                      >
+                        <Download size={14} className="flex-shrink-0" />
+                        <span className="font-semibold truncate">
+                          {highlightSearchTerm(release.title, searchQuery)}
+                        </span>
                         <span className="text-gray-500 font-normal whitespace-nowrap flex-shrink-0">
                           {sizes.doc > 0 ? `(${formatFileSize(sizes.doc, 'KB')})` : '(---)'}
                         </span>
-                      </div>
+                      </a>
                     ) : (
                       <span className="text-[#1d1d1f] font-semibold truncate block" title={release.title}>
                         {highlightSearchTerm(release.title, searchQuery)}
@@ -280,21 +274,19 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                   {/* Drugi red: Naslov (KB) */}
                   <div className="min-w-0 w-full">
                     {documents.length > 0 ? (
-                      <div className="flex items-start gap-1 min-w-0">
-                        <a
-                          href={documents[0].url}
-                          download={documents[0].label || release.title}
-                          className="text-[#1d1d1f] hover:underline flex items-start gap-1 min-w-0 flex-1"
-                        >
-                          <Download size={14} className="flex-shrink-0 mt-0.5" />
-                          <span className="font-semibold break-words">
-                            {highlightSearchTerm(release.title, searchQuery)}
-                          </span>
-                        </a>
+                      <a
+                        href={documents[0].url}
+                        download={documents[0].label || release.title}
+                        className="text-[#1d1d1f] hover:underline inline-flex items-start gap-1 min-w-0 flex-1 break-words"
+                      >
+                        <Download size={14} className="flex-shrink-0 mt-0.5" />
+                        <span className="font-semibold">
+                          {highlightSearchTerm(release.title, searchQuery)}
+                        </span>
                         <span className="text-gray-500 font-normal whitespace-nowrap flex-shrink-0">
                           {sizes.doc > 0 ? `(${formatFileSize(sizes.doc, 'KB')})` : '(---)'}
                         </span>
-                      </div>
+                      </a>
                     ) : (
                       <span className="text-[#1d1d1f] font-semibold break-words block" title={release.title}>
                         {highlightSearchTerm(release.title, searchQuery)}
@@ -344,30 +336,10 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                   )}
                 </div>
               </div>
-
-              {release.thumbnail_url && (
-                <div className="flex-shrink-0 w-full md:w-auto">
-                  <img
-                    src={release.thumbnail_url}
-                    alt={release.title}
-                    className="w-24 h-24 object-cover rounded-lg mx-auto md:mx-0"
-                  />
-                </div>
-              )}
             </div>
           </div>
         )
       })}
-      
-      {/* Prazni elementi da lista uvek zauzima prostor za 10 elemenata */}
-      {!showAll && emptyItemsCount > 0 && Array.from({ length: emptyItemsCount }).map((_, index) => (
-        <div
-          key={`empty-${index}`}
-          className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0"
-          style={{ visibility: 'hidden', minHeight: '80px' }}
-          aria-hidden="true"
-        />
-      ))}
     </div>
   )
 }

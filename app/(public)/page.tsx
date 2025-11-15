@@ -43,7 +43,7 @@ interface RSSItem {
 
 const CACHE_KEY = 'pr_releases_cache'
 const CACHE_TIMESTAMP_KEY = 'pr_releases_cache_timestamp'
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minuta
+const CACHE_DURATION = 30 * 1000 // 30 sekundi - kratak cache za real-time update
 
 export default function Home() {
   const [releases, setReleases] = useState<PRRelease[]>([])
@@ -53,6 +53,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [totalItems, setTotalItems] = useState(0)
   const [rssItems, setRssItems] = useState<RSSItem[]>([])
   const [rssLoading, setRssLoading] = useState(true)
   const [heroItems, setHeroItems] = useState<RSSItem[]>([])
@@ -95,25 +96,14 @@ export default function Home() {
         url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
       const res = await fetch(url, {
-        cache: 'force-cache',
-        next: { revalidate: 60 } // Cache 1 minut
+        cache: 'no-store' // Real-time update - bez cache-a
       })
       const data = await res.json()
       setReleases(data.releases || [])
       setTotalPages(data.pagination?.totalPages || 1)
+      setTotalItems(data.pagination?.totalItems || 0)
       
-      // Sačuvaj u cache samo ako nema filtera ili pretrage
-      if (!selectedTag && !searchQuery.trim() && currentPage === 1) {
-        try {
-          localStorage.setItem(CACHE_KEY, JSON.stringify({
-            releases: data.releases || [],
-            totalPages: data.pagination?.totalPages || 1
-          }))
-          localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString())
-        } catch (error) {
-          console.error('Error saving cache:', error)
-        }
-      }
+      // Ne čuvaj u localStorage cache - uvek učitaj fresh podatke
     } catch (error) {
       console.error('Error fetching releases:', error)
     } finally {
@@ -157,16 +147,15 @@ export default function Home() {
         return false
       }
 
-      // Pokušaj da učitamo iz cache-a odmah
-      const hasCache = loadCachedData()
+      // Uvek učitaj fresh podatke - ne koristi cache
       if (mounted) {
         setAdminLoggedIn(isAdmin())
       }
       
-      // Učitaj RSS feed i PR releases paralelno
+      // Učitaj RSS feed i PR releases paralelno - uvek fresh
       await Promise.allSettled([
         fetchRSSFeed(),
-        hasCache ? Promise.resolve() : fetchReleases()
+        fetchReleases()
       ])
       
       // Sačekaj da se sve učita pre nego što prikažemo stranicu
@@ -178,17 +167,19 @@ export default function Home() {
 
     loadInitialData()
 
-    // Automatsko osvežavanje RSS feed-a svakih 5 minuta (samo nakon inicijalnog učitavanja)
-    const rssInterval = setInterval(() => {
+    // Automatsko osvežavanje RSS feed-a i releases svakih 30 sekundi (samo nakon inicijalnog učitavanja)
+    const refreshInterval = setInterval(() => {
       if (initialLoadComplete && mounted) {
         fetchRSSFeed()
+        fetchReleases()
       }
-    }, 5 * 60 * 1000) // 5 minuta
+    }, 30 * 1000) // 30 sekundi
 
     // Osvežavanje kada korisnik vrati fokus na tab
     const handleVisibilityChange = () => {
       if (!document.hidden && initialLoadComplete && mounted) {
         fetchRSSFeed()
+        fetchReleases()
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -196,7 +187,7 @@ export default function Home() {
     // Cleanup
     return () => {
       mounted = false
-      clearInterval(rssInterval)
+      clearInterval(refreshInterval)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -412,8 +403,17 @@ export default function Home() {
                 <>
                   <PRReleaseList releases={releases} showAll={false} onTagClick={handleTagClick} showEdit={adminLoggedIn} onDelete={handleDelete} searchQuery={searchQuery} />
                   
-                  {totalPages > 1 && (
+                  {totalPages > 1 && totalItems > 20 && (
                     <div className="mt-8 flex items-center justify-center gap-2 flex-wrap text-sm">
+                      {currentPage > 1 && (
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          className="text-sm text-gray-600 hover:text-[#1d1d1f] transition"
+                        >
+                          Prethodna
+                        </button>
+                      )}
+                      
                       {getVisiblePages().map((pageNum, index) => (
                         <button
                           key={index}
@@ -428,12 +428,19 @@ export default function Home() {
                         </button>
                       ))}
                       
-                      {currentPage < totalPages && (
+                      {currentPage < totalPages ? (
                         <button
                           onClick={() => handlePageChange(currentPage + 1)}
-                          className="text-sm text-gray-600 hover:text-[#1d1d1f] transition ml-2"
+                          className="text-sm text-gray-600 hover:text-[#1d1d1f] transition"
                         >
                           Sledeća
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handlePageChange(1)}
+                          className="text-sm text-gray-600 hover:text-[#1d1d1f] transition"
+                        >
+                          Na početak
                         </button>
                       )}
                     </div>

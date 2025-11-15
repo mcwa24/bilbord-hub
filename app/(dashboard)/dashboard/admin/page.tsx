@@ -89,80 +89,103 @@ export default function AdminPage() {
     if (files.length === 0) return
     
     setImageFiles(files)
+    setUploading(true)
     
     try {
       const timestamp = Date.now()
       const uploadedImages: string[] = []
-      let thumbnailUrl: string | null = null
+      const uploadErrors: string[] = []
 
       // Upload-uj svaku sliku posebno u storage
       for (let i = 0; i < files.length; i++) {
         const file = files[i]
         const fileName = file.name.split('/').pop() || file.name
-        const imagePath = `uploads/images/${timestamp}-${i}-${fileName}`
+        // Čisti ime fajla od nevalidnih karaktera
+        const cleanFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
+        const imagePath = `uploads/images/${timestamp}-${i}-${cleanFileName}`
         
-        const { data: imageData, error: imageError } = await uploadImage(imagePath, file)
-        
-        if (imageError) {
-          console.error(`Error uploading image ${i}:`, imageError)
-          continue
-        }
-
-        if (imageData) {
-          const imageUrl = getImageUrl(imageData.path)
-          uploadedImages.push(imageUrl)
+        try {
+          const { data: imageData, error: imageError } = await uploadImage(imagePath, file)
           
-          // Prva slika je thumbnail
-          if (i === 0) {
-            thumbnailUrl = imageUrl
+          if (imageError) {
+            console.error(`Error uploading image ${i} (${fileName}):`, imageError)
+            uploadErrors.push(`${fileName}: ${imageError.message || 'Upload failed'}`)
+            continue
           }
+
+          if (imageData) {
+            const imageUrl = getImageUrl(imageData.path)
+            uploadedImages.push(imageUrl)
+          }
+        } catch (err: any) {
+          console.error(`Exception uploading image ${i} (${fileName}):`, err)
+          uploadErrors.push(`${fileName}: ${err.message || 'Upload failed'}`)
         }
       }
 
       if (uploadedImages.length === 0) {
-        throw new Error('Nijedna slika nije upload-ovana')
+        const errorMsg = uploadErrors.length > 0 
+          ? `Greška pri upload-u slika:\n${uploadErrors.join('\n')}`
+          : 'Nijedna slika nije upload-ovana'
+        throw new Error(errorMsg)
       }
 
       // Pakuj sve slike u jedan ZIP za download
-      const JSZip = (await import('jszip')).default
-      const zip = new JSZip()
+      let zipUrl: string | null = null
+      try {
+        const JSZip = (await import('jszip')).default
+        const zip = new JSZip()
 
-      files.forEach((file) => {
-        const fileName = file.name.split('/').pop() || file.name
-        zip.file(fileName, file)
-      })
+        files.forEach((file) => {
+          const fileName = file.name.split('/').pop() || file.name
+          zip.file(fileName, file)
+        })
 
-      const zipBlob = await zip.generateAsync({ 
-        type: 'blob',
-        compression: 'DEFLATE',
-        compressionOptions: { level: 1 },
-        comment: 'Bilbord Hub'
-      })
-      
-      const zipFileName = `slike-${timestamp}.zip`
-      const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
-      const storagePath = `uploads/slike-${timestamp}.zip`
-      const { data, error } = await uploadImage(storagePath, zipFile)
-      
-      if (error) {
-        console.error('ZIP upload error:', error)
-        // Nastavi čak i ako ZIP upload ne uspe
+        const zipBlob = await zip.generateAsync({ 
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 1 },
+          comment: 'Bilbord Hub'
+        })
+        
+        const zipFileName = `slike-${timestamp}.zip`
+        const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
+        const storagePath = `uploads/slike-${timestamp}.zip`
+        const { data, error } = await uploadImage(storagePath, zipFile)
+        
+        if (error) {
+          console.error('ZIP upload error:', error)
+          // Nastavi čak i ako ZIP upload ne uspe - korisnik može da download-uje pojedinačne slike
+        } else if (data) {
+          zipUrl = getImageUrl(data.path)
+        }
+      } catch (zipError: any) {
+        console.error('ZIP creation/upload error:', zipError)
+        // Nastavi čak i ako ZIP ne uspe
       }
 
       const uploaded = {
-        name: zipFileName,
-        url: data ? getImageUrl(data.path) : uploadedImages[0], // Fallback na prvu sliku ako ZIP ne uspe
+        name: `slike-${timestamp}.zip`,
+        url: zipUrl || uploadedImages[0], // Fallback na prvu sliku ako ZIP ne uspe
         type: 'image' as const,
-        path: data?.path || '',
-        size: zipBlob.size,
-        thumbnailUrl: thumbnailUrl,
+        path: zipUrl ? `uploads/slike-${timestamp}.zip` : '',
+        size: 0, // ZIP size nije relevantan ako nije upload-ovan
         imageUrls: uploadedImages, // Čuvamo sve URL-ove slika
       }
       setUploadedZip(uploaded)
-      toast.success(`Upload-ovano ${uploadedImages.length} slika!`)
+      
+      if (uploadErrors.length > 0) {
+        toast.success(`Upload-ovano ${uploadedImages.length}/${files.length} slika! Neke slike nisu upload-ovane.`, { duration: 5000 })
+      } else {
+        toast.success(`Upload-ovano ${uploadedImages.length} slika!`)
+      }
     } catch (error: any) {
       console.error('Upload error:', error)
       toast.error(error.message || 'Greška pri upload-u slika')
+      setImageFiles([])
+      setUploadedZip(null)
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -215,7 +238,7 @@ export default function AdminPage() {
         tags: tags,
         material_links: materialLinks,
         alt_texts: altTexts,
-        thumbnail_url: uploadedZip?.thumbnailUrl || null,
+        thumbnail_url: null, // Ne koristimo thumbnail
         seo_meta_description: releaseName,
         published_at: publishedAt,
       }
