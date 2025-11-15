@@ -14,9 +14,28 @@ export const metadata: Metadata = {
   description: "Bilbord Hub je centralizovana PR platforma na kojoj PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih preuzimaju.",
   keywords: "PR platforma, PR saopštenja, mediji, press release, PR agencije",
   icons: {
-    icon: '/21150324_764549870419530_5822848782914038843_n.png',
-    shortcut: '/21150324_764549870419530_5822848782914038843_n.png',
-    apple: '/21150324_764549870419530_5822848782914038843_n.png',
+    icon: '/FINAL LOGO BILBORD-01.png',
+    shortcut: '/FINAL LOGO BILBORD-01.png',
+    apple: '/FINAL LOGO BILBORD-01.png',
+  },
+  openGraph: {
+    title: "Bilbord Hub | Centralizovana PR platforma",
+    description: "Bilbord Hub je centralizovana PR platforma na kojoj PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih preuzimaju.",
+    images: [
+      {
+        url: '/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Bilbord Hub - Centralizovana PR platforma',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Bilbord Hub | Centralizovana PR platforma",
+    description: "Bilbord Hub je centralizovana PR platforma na kojoj PR agencije i kompanije postavljaju svoja saopštenja, a mediji ih preuzimaju.",
+    images: ['/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg'],
   },
 };
 
