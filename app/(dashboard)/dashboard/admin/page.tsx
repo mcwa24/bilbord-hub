@@ -150,6 +150,7 @@ export default function AdminPage() {
         
         const zipFileName = `slike-${timestamp}.zip`
         const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
+        const zipSize = zipBlob.size // Veličina ZIP fajla u bajtovima
         const storagePath = `uploads/slike-${timestamp}.zip`
         const { data, error } = await uploadImage(storagePath, zipFile)
         
@@ -169,7 +170,7 @@ export default function AdminPage() {
         url: zipUrl || uploadedImages[0], // Fallback na prvu sliku ako ZIP ne uspe
         type: 'image' as const,
         path: zipUrl ? `uploads/slike-${timestamp}.zip` : '',
-        size: 0, // ZIP size nije relevantan ako nije upload-ovan
+        size: zipSize || 0, // Veličina ZIP fajla u bajtovima
         imageUrls: uploadedImages, // Čuvamo sve URL-ove slika
       }
       setUploadedZip(uploaded)
@@ -208,6 +209,7 @@ export default function AdminPage() {
           type: 'other',
           url: uploadedDocument.url,
           label: uploadedDocument.name,
+          size: uploadedDocument.size, // Čuvamo veličinu fajla u bajtovima
         })
       }
       if (uploadedZip) {
@@ -215,6 +217,7 @@ export default function AdminPage() {
           type: 'other',
           url: uploadedZip.url,
           label: 'Slike',
+          size: uploadedZip.size, // Čuvamo veličinu ZIP fajla u bajtovima
         })
       }
 

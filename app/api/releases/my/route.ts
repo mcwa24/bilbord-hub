@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
 
     const releases = data || []
 
-    // Učitaj veličine fajlova paralelno za sve releases
+    // Koristi veličine fajlova iz material_links (sačuvane prilikom upload-a)
+    // Fallback na HEAD zahtev za stara saopštenja koja nemaju size
     const releasesWithSizes = await Promise.all(
       releases.map(async (release: any) => {
         const zipFiles = release.material_links?.filter(
@@ -42,10 +43,14 @@ export async function GET(request: NextRequest) {
           (link: any) => !link.url?.toLowerCase().endsWith('.zip') && link.label !== 'Slike'
         ) || []
 
-        const [docSize, zipSize] = await Promise.all([
-          documents.length > 0 ? getFileSize(documents[0].url) : Promise.resolve(0),
-          zipFiles.length > 0 ? getFileSize(zipFiles[0].url) : Promise.resolve(0),
-        ])
+        // Koristi veličine iz material_links ako postoje, inače HEAD zahtev (fallback za stara saopštenja)
+        const docSize = documents.length > 0 && documents[0].size 
+          ? documents[0].size 
+          : documents.length > 0 ? await getFileSize(documents[0].url) : 0
+        
+        const zipSize = zipFiles.length > 0 && zipFiles[0].size 
+          ? zipFiles[0].size 
+          : zipFiles.length > 0 ? await getFileSize(zipFiles[0].url) : 0
 
         return {
           ...release,

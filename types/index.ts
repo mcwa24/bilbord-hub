@@ -11,6 +11,7 @@ export interface PRRelease {
     type: 'google_drive' | 'dropbox' | 'wetransfer' | 'press_room' | 'other';
     url: string;
     label: string;
+    size?: number; // Veličina fajla u bajtovima (čuva se prilikom upload-a)
   }[];
   alt_texts: {
     image_url: string;
