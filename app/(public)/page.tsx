@@ -102,6 +102,25 @@ export default function Home() {
     loadCachedData()
     setAdminLoggedIn(isAdmin())
     fetchRSSFeed()
+
+    // Automatsko osvežavanje RSS feed-a svakih 5 minuta
+    const rssInterval = setInterval(() => {
+      fetchRSSFeed()
+    }, 5 * 60 * 1000) // 5 minuta
+
+    // Osvežavanje kada korisnik vrati fokus na tab
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchRSSFeed()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // Cleanup
+    return () => {
+      clearInterval(rssInterval)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [])
 
   useEffect(() => {
@@ -236,7 +255,7 @@ export default function Home() {
       >
         <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
-            PR Hub Platforma
+            PR Hub platforma
           </h1>
           <p className="text-gray-700 text-base mb-6 font-medium">
             Centralizovani hub za najnovija PR saopštenja.
@@ -400,7 +419,7 @@ export default function Home() {
                 <p className="text-gray-600 mt-4">Učitavanje vesti...</p>
               </div>
             ) : (
-              <RSSFeedList items={rssItems.slice(9, 19)} />
+              <RSSFeedList items={rssItems.slice(9)} />
             )}
           </div>
           </div>
