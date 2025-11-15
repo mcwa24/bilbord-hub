@@ -16,12 +16,18 @@ export async function GET(
 
     if (error) throw error
 
-    return NextResponse.json({ release: data })
+    const response = NextResponse.json({ release: data })
+    // Kratak cache sa stale-while-revalidate za pojedinačna saopštenja
+    // Ako se ne menjaju, koristi cache; ako se menjaju, uvek fresh
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+    return response
   } catch (error: any) {
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: error.message },
       { status: 500 }
     )
+    errorResponse.headers.set('Cache-Control', 'no-store')
+    return errorResponse
   }
 }
 

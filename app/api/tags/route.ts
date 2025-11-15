@@ -24,12 +24,17 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ tags: Array.from(allTags).sort() })
+    const response = NextResponse.json({ tags: Array.from(allTags).sort() })
+    // Kratak cache za tagove (5 minuta) - ne menjaju se često
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+    return response
   } catch (error: any) {
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: error.message },
       { status: 500 }
     )
+    errorResponse.headers.set('Cache-Control', 'no-store')
+    return errorResponse
   }
 }
 
