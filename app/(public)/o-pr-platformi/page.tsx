@@ -9,6 +9,10 @@ export default function OPRPlatformiPage() {
     sr: {
       title: 'O PR Platformi',
       intro: 'PR Hub platforma je centralizovani sistem za distribuciju PR saopštenja koji povezuje PR agencije, kompanije i medije na jednom mestu. Upload PR saopštenja i upravljanje platformom vrši naš tim.',
+      keyBenefit: {
+        title: 'Zašto PR Hub?',
+        text: 'Poenta PR Hub platforme je da objavljivači ne moraju imati direktnu saradnju sa pojedinačnim portalima, firmama ili medijima. Umesto toga, vaša PR saopštenja se automatski šire kroz platformu, a portali, mediji i firme mogu pristupiti i objavljivati vaša saopštenja bez potrebe za direktnim kontaktom. Ovo značajno pojednostavljuje proces distribucije i omogućava širu vidljivost vaših PR materijala.'
+      },
       howItWorks: {
         title: 'Kako funkcioniše',
         text: 'Naša platforma omogućava jednostavnu i efikasnu distribuciju PR saopštenja sa automatskim obaveštavanjem pretplatnika.',
@@ -75,6 +79,10 @@ export default function OPRPlatformiPage() {
     en: {
       title: 'About PR Platform',
       intro: 'PR Hub platform is a centralized system for PR release distribution that connects PR agencies, companies, and media in one place. Our team handles uploading PR releases and managing the platform.',
+      keyBenefit: {
+        title: 'Why PR Hub?',
+        text: 'The point of PR Hub platform is that publishers do not need to have direct partnerships with individual portals, companies, or media. Instead, your PR releases are automatically distributed through the platform, and portals, media, and companies can access and publish your releases without the need for direct contact. This significantly simplifies the distribution process and enables wider visibility of your PR materials.'
+      },
       howItWorks: {
         title: 'How it works',
         text: 'Our platform enables simple and efficient distribution of PR releases with automatic subscriber notifications.',
@@ -175,6 +183,15 @@ export default function OPRPlatformiPage() {
 
         <div className="prose prose-lg max-w-none text-[#1d1d1f]">
           <p className="mb-8 text-lg">{currentContent.intro}</p>
+
+          <div className="bg-[#f9c344] bg-opacity-20 border-l-4 border-[#f9c344] p-6 rounded-lg mb-8">
+            <h2 className="text-2xl font-bold text-[#1d1d1f] mb-4">
+              {currentContent.keyBenefit.title}
+            </h2>
+            <p className="text-[#1d1d1f] text-lg leading-relaxed">
+              {currentContent.keyBenefit.text}
+            </p>
+          </div>
 
           <h2 className="text-2xl font-bold text-[#1d1d1f] mt-8 mb-4">
             {currentContent.howItWorks.title}

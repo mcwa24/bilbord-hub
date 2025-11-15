@@ -298,7 +298,7 @@ export default function Home() {
           
           {/* Hero blog postovi - random 6 RSS postova */}
           {!rssLoading && heroItems.length > 0 && (
-            <div className="mt-12">
+            <div className="mt-12 hidden md:block">
               <RSSBlogPosts items={heroItems} showTitle={false} />
             </div>
           )}
@@ -440,7 +440,9 @@ export default function Home() {
             
             {/* Blog postovi - poslednja 3 (najnovija) */}
             {!rssLoading && rssItems.length > 0 && (
-              <RSSBlogPosts items={rssItems.slice(0, 3)} />
+              <div className="hidden md:block">
+                <RSSBlogPosts items={rssItems.slice(0, 3)} />
+              </div>
             )}
             
           <div className="mt-8">
