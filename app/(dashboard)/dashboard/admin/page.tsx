@@ -19,6 +19,8 @@ interface UploadedFile {
   type: 'image' | 'document'
   path: string
   size: number // in bytes
+  thumbnailUrl?: string | null
+  imageUrls?: string[] // Sve URL-ove slika
 }
 
 export default function AdminPage() {
@@ -89,13 +91,43 @@ export default function AdminPage() {
     setImageFiles(files)
     
     try {
-      // Pakuj sve slike u jedan ZIP
+      const timestamp = Date.now()
+      const uploadedImages: string[] = []
+      let thumbnailUrl: string | null = null
+
+      // Upload-uj svaku sliku posebno u storage
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const fileName = file.name.split('/').pop() || file.name
+        const imagePath = `uploads/images/${timestamp}-${i}-${fileName}`
+        
+        const { data: imageData, error: imageError } = await uploadImage(imagePath, file)
+        
+        if (imageError) {
+          console.error(`Error uploading image ${i}:`, imageError)
+          continue
+        }
+
+        if (imageData) {
+          const imageUrl = getImageUrl(imageData.path)
+          uploadedImages.push(imageUrl)
+          
+          // Prva slika je thumbnail
+          if (i === 0) {
+            thumbnailUrl = imageUrl
+          }
+        }
+      }
+
+      if (uploadedImages.length === 0) {
+        throw new Error('Nijedna slika nije upload-ovana')
+      }
+
+      // Pakuj sve slike u jedan ZIP za download
       const JSZip = (await import('jszip')).default
       const zip = new JSZip()
 
-      // Dodaj slike sa originalnim nazivima (bez meta podataka)
       files.forEach((file) => {
-        // Koristi samo ime fajla bez putanje
         const fileName = file.name.split('/').pop() || file.name
         zip.file(fileName, file)
       })
@@ -103,33 +135,31 @@ export default function AdminPage() {
       const zipBlob = await zip.generateAsync({ 
         type: 'blob',
         compression: 'DEFLATE',
-        compressionOptions: { level: 1 }, // Niska kompresija za zadržavanje kvaliteta
-        comment: 'Bilbord Hub' // Meta podatak za ZIP
+        compressionOptions: { level: 1 },
+        comment: 'Bilbord Hub'
       })
       
-      const timestamp = Date.now()
-      // Koristi originalno ime ako postoji, inače generiši ime
       const zipFileName = `slike-${timestamp}.zip`
       const zipFile = new File([zipBlob], zipFileName, { type: 'application/zip' })
-
-      // Upload-uj ZIP fajl sa originalnim imenom (samo timestamp za jedinstvenost)
       const storagePath = `uploads/slike-${timestamp}.zip`
       const { data, error } = await uploadImage(storagePath, zipFile)
       
       if (error) {
-        console.error('Upload error:', error)
-        throw new Error(error.message || 'Greška pri upload-u ZIP arhive')
+        console.error('ZIP upload error:', error)
+        // Nastavi čak i ako ZIP upload ne uspe
       }
 
       const uploaded = {
         name: zipFileName,
-        url: getImageUrl(data!.path),
+        url: data ? getImageUrl(data.path) : uploadedImages[0], // Fallback na prvu sliku ako ZIP ne uspe
         type: 'image' as const,
-        path: data!.path,
+        path: data?.path || '',
         size: zipBlob.size,
+        thumbnailUrl: thumbnailUrl,
+        imageUrls: uploadedImages, // Čuvamo sve URL-ove slika
       }
       setUploadedZip(uploaded)
-      toast.success(`Upload-ovano ${files.length} slika u ZIP arhivi!`)
+      toast.success(`Upload-ovano ${uploadedImages.length} slika!`)
     } catch (error: any) {
       console.error('Upload error:', error)
       toast.error(error.message || 'Greška pri upload-u slika')
@@ -170,6 +200,12 @@ export default function AdminPage() {
         ? new Date(publishedDate + 'T00:00:00').toISOString()
         : new Date().toISOString()
 
+      // Pripremi alt_texts sa svim slikama
+      const altTexts = uploadedZip?.imageUrls?.map((url, index) => ({
+        image_url: url,
+        alt_text: `${releaseName} - Slika ${index + 1}`
+      })) || []
+
       const releaseData = {
         title: releaseName,
         description: releaseName,
@@ -178,7 +214,8 @@ export default function AdminPage() {
         industry: 'General',
         tags: tags,
         material_links: materialLinks,
-        alt_texts: [],
+        alt_texts: altTexts,
+        thumbnail_url: uploadedZip?.thumbnailUrl || null,
         seo_meta_description: releaseName,
         published_at: publishedAt,
       }

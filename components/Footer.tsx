@@ -27,6 +27,9 @@ export default function Footer() {
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
                     <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
+                        <Link href="/o-pr-platformi" className="text-gray-600 hover:text-gray-800">
+                            O PR Platformi
+                        </Link>
                         <Link href="/cookie-policy" className="text-gray-600 hover:text-gray-800">
                             Cookie Policy
                         </Link>

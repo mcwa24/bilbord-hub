@@ -26,6 +26,10 @@ interface PRRelease {
     label: string
   }>
   thumbnail_url: string | null
+  alt_texts?: Array<{
+    image_url: string
+    alt_text: string
+  }>
 }
 
 interface RSSItem {
@@ -70,6 +74,7 @@ export default function Home() {
       setRssLoading(false)
     }
   }
+
 
   // Učitaj podatke iz cache-a odmah pri inicijalizaciji
   useEffect(() => {
@@ -168,6 +173,18 @@ export default function Home() {
       console.error('Error fetching releases:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchHeroPRReleases = async () => {
+    try {
+      const res = await fetch('/api/releases?limit=6&page=1')
+      const data = await res.json()
+      if (data.releases && Array.isArray(data.releases)) {
+        setHeroPRReleases(data.releases)
+      }
+    } catch (error) {
+      console.error('Error fetching hero PR releases:', error)
     }
   }
 
@@ -290,7 +307,7 @@ export default function Home() {
             </Button>
           </motion.div>
           
-          {/* Hero blog postovi - sledeća 3 starija */}
+          {/* Hero blog postovi - random 6 RSS postova */}
           {!rssLoading && heroItems.length > 0 && (
             <div className="mt-12">
               <RSSBlogPosts items={heroItems} showTitle={false} />
@@ -394,6 +411,30 @@ export default function Home() {
 
       <section className="section-padding bg-white pt-8 md:pt-12">
         <div className="container-custom">
+          {/* Promo baner */}
+          <div className="bg-[#f9c344] rounded-lg p-8 md:p-10 mb-12 text-[#1d1d1f]">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="text-3xl md:text-4xl font-bold mb-3">
+                  Postanite naš korisnik
+                </h3>
+                <p className="text-lg md:text-xl mb-2 font-medium">
+                  Distribuirajte vaša PR saopštenja na jednom mestu
+                </p>
+                <p className="text-base md:text-lg opacity-90">
+                  Povećajte vidljivost vaših saopštenja i dostignite širu publiku. 
+                  Naša platforma vam omogućava jednostavno deljenje i distribuciju PR materijala.
+                </p>
+              </div>
+              <Link
+                href="/o-pr-platformi"
+                className="px-8 py-4 bg-white text-[#1d1d1f] font-semibold rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap shadow-lg text-lg"
+              >
+                Saznajte više
+              </Link>
+            </div>
+          </div>
+
           <div className="border-t border-gray-200 pt-12">
             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-8">
               Poslednje na{' '}
