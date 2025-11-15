@@ -11,7 +11,7 @@ export default function OPRPlatformiPage() {
       intro: 'PR Hub platforma je centralizovani sistem za distribuciju PR saopštenja koji povezuje PR agencije, kompanije i medije na jednom mestu. Upload PR saopštenja i upravljanje platformom vrši naš tim.',
       keyBenefit: {
         title: 'Zašto PR Hub?',
-        text: 'Poenta PR Hub platforme je da objavljivači ne moraju imati direktnu saradnju sa pojedinačnim portalima, firmama ili medijima. Umesto toga, vaša PR saopštenja se automatski šire kroz platformu, a portali, mediji i firme mogu pristupiti i objavljivati vaša saopštenja bez potrebe za direktnim kontaktom. Ovo značajno pojednostavljuje proces distribucije i omogućava širu vidljivost vaših PR materijala.'
+        text: 'PR Hub platforma omogućava da objavljivači ne moraju imati direktnu saradnju sa pojedinačnim portalima, firmama ili medijima. Vaša PR saopštenja se automatski šire kroz platformu, a portali, mediji i firme mogu pristupiti i objavljivati vaša saopštenja bez potrebe za direktnim kontaktom. Ovo značajno pojednostavljuje proces distribucije i omogućava širu vidljivost vaših PR materijala.'
       },
       howItWorks: {
         title: 'Kako funkcioniše',
