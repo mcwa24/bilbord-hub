@@ -101,11 +101,9 @@ export async function GET(request: Request) {
       return dateB - dateA
     })
 
-    // Vrati sve vesti (bez limita) sa no-cache headers
+    // Vrati sve vesti (bez limita) sa cache headers (RSS može da se kešira)
     const nextResponse = NextResponse.json({ items })
-    nextResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
-    nextResponse.headers.set('Pragma', 'no-cache')
-    nextResponse.headers.set('Expires', '0')
+    nextResponse.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
     return nextResponse
   } catch (error: any) {
     console.error('Error fetching RSS feed:', error)
@@ -113,7 +111,7 @@ export async function GET(request: Request) {
       { error: 'Failed to fetch RSS feed', message: error.message },
       { status: 500 }
     )
-    errorResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    errorResponse.headers.set('Cache-Control', 'no-store')
     return errorResponse
   }
 }
