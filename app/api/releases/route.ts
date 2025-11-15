@@ -132,28 +132,34 @@ export async function GET(request: NextRequest) {
     const totalPages = Math.ceil((filteredCount || 0) / itemsPerPage)
 
     // Optimizovano: koristimo veličine fajlova iz material_links (sačuvane prilikom upload-a)
-    // Za stara saopštenja koja nemaju size, vraćamo 0 (ne čekamo HEAD zahteve za brže učitavanje)
-    const releasesWithSizes = releases.map((release: any) => {
-      const zipFiles = release.material_links?.filter(
-        (link: any) => link.url?.toLowerCase().endsWith('.zip') || link.label === 'Slike'
-      ) || []
-      const documents = release.material_links?.filter(
-        (link: any) => !link.url?.toLowerCase().endsWith('.zip') && link.label !== 'Slike'
-      ) || []
+    // Za stara saopštenja koja nemaju size, koristimo HEAD zahtev (fallback)
+    const releasesWithSizes = await Promise.all(
+      releases.map(async (release: any) => {
+        const zipFiles = release.material_links?.filter(
+          (link: any) => link.url?.toLowerCase().endsWith('.zip') || link.label === 'Slike'
+        ) || []
+        const documents = release.material_links?.filter(
+          (link: any) => !link.url?.toLowerCase().endsWith('.zip') && link.label !== 'Slike'
+        ) || []
 
-      // Koristi veličine iz material_links (sačuvane prilikom upload-a)
-      // Za stara saopštenja bez size, vraćamo 0 (brže učitavanje)
-      const docSize = documents.length > 0 && documents[0].size ? documents[0].size : 0
-      const zipSize = zipFiles.length > 0 && zipFiles[0].size ? zipFiles[0].size : 0
+        // Koristi veličine iz material_links ako postoje, inače HEAD zahtev za stara saopštenja
+        const docSize = documents.length > 0 && documents[0].size 
+          ? documents[0].size 
+          : documents.length > 0 ? await getFileSize(documents[0].url) : 0
+        
+        const zipSize = zipFiles.length > 0 && zipFiles[0].size 
+          ? zipFiles[0].size 
+          : zipFiles.length > 0 ? await getFileSize(zipFiles[0].url) : 0
 
-      return {
-        ...release,
-        fileSizes: {
-          doc: docSize,
-          zip: zipSize
+        return {
+          ...release,
+          fileSizes: {
+            doc: docSize,
+            zip: zipSize
+          }
         }
-      }
-    })
+      })
+    )
 
     const response = NextResponse.json({ 
       releases: releasesWithSizes,
