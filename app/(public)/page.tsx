@@ -449,6 +449,47 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Kako funkcioniše PR Hub platforma */}
+          <div className="border-t-2 border-gray-200 pt-12 mt-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-8 text-center">
+              Kako funkcioniše PR Hub platforma
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
+                  1. Pretraga i filtriranje
+                </h3>
+                <p className="text-[#1d1d1f] text-gray-700">
+                  Koristite pretragu i filtere da pronađete PR saopštenja po kategorijama, tagovima ili datumu objave.
+                </p>
+              </div>
+              <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
+                  2. Pregled saopštenja
+                </h3>
+                <p className="text-[#1d1d1f] text-gray-700">
+                  Kliknite na saopštenje da vidite detalje, slike, sadržaj i materijale za preuzimanje.
+                </p>
+              </div>
+              <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
+                  3. Preuzimanje materijala
+                </h3>
+                <p className="text-[#1d1d1f] text-gray-700">
+                  Preuzmite dokumente i ZIP arhive sa slikama direktno sa platforme ili koristite funkciju deljenja.
+                </p>
+              </div>
+              <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
+                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
+                  4. Deljenje linkova
+                </h3>
+                <p className="text-[#1d1d1f] text-gray-700">
+                  Koristite ikonu deljenja da kopirate jedinstveni link. Svako ko klikne na link automatski dobija download svih materijala.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
