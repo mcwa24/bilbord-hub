@@ -9,7 +9,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PRReleaseList from "@/components/PRReleaseList";
 import RSSFeedList from "@/components/RSSFeedList";
-import RSSBlogPosts from "@/components/RSSBlogPosts";
+import LogoGrid from "@/components/LogoGrid";
 import { isAdmin } from '@/lib/admin';
 import toast from 'react-hot-toast';
 
@@ -336,12 +336,10 @@ export default function Home() {
             </Button>
           </motion.div>
           
-          {/* Hero blog postovi - random 6 RSS postova */}
-          {!rssLoading && heroItems.length > 0 && (
-            <div className="mt-12 hidden md:block">
-              <RSSBlogPosts items={heroItems} showTitle={false} />
-            </div>
-          )}
+          {/* Hero logoi */}
+          <div className="mt-12">
+            <LogoGrid />
+          </div>
         </div>
       </section>
 
@@ -505,39 +503,6 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-          </div>
-
-          <div className="border-t border-gray-200 pt-12">
-            <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-8">
-              Poslednje na{' '}
-              <Link 
-                href="https://bilbord.rs/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:opacity-80 transition"
-              >
-                Bilbord
-              </Link>{' '}
-              Portalu
-            </h2>
-            
-            {/* Blog postovi - poslednja 3 (najnovija) */}
-            {!rssLoading && rssItems.length > 0 && (
-              <div className="hidden md:block">
-                <RSSBlogPosts items={rssItems.slice(0, 3)} />
-              </div>
-            )}
-            
-          <div className="mt-8">
-            {rssLoading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
-                <p className="text-gray-600 mt-4">Učitavanje vesti...</p>
-              </div>
-            ) : (
-              <RSSFeedList items={rssItems.slice(3, 23)} />
-            )}
-          </div>
           </div>
         </div>
       </section>
