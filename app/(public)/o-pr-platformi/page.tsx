@@ -8,7 +8,7 @@ export default function OPRPlatformiPage() {
   const content = {
     sr: {
       title: 'O PR Platformi',
-      intro: 'PR Hub platforma je centralizovani sistem za distribuciju PR saopštenja koji povezuje PR agencije, kompanije i medije na jednom mestu. Upload PR saopštenja i upravljanje platformom vrši naš tim.',
+      intro: 'PR Hub platforma je centralizovani sistem za distribuciju PR saopštenja koji povezuje PR agencije, kompanije i medije na jednom mestu. PR saopštenja mogu upload-ovati Bilbord tim, kao i firme i agencije same kroz platformu.',
       keyBenefit: {
         title: 'Zašto PR Hub?',
         text: 'PR Hub platforma omogućava da objavljivači ne moraju imati direktnu saradnju sa pojedinačnim portalima, firmama ili medijima. Vaša PR saopštenja se automatski šire kroz platformu, a portali, mediji i firme mogu pristupiti i objavljivati vaša saopštenja bez potrebe za direktnim kontaktom. Ovo značajno pojednostavljuje proces distribucije i omogućava širu vidljivost vaših PR materijala.'
@@ -19,11 +19,11 @@ export default function OPRPlatformiPage() {
         steps: [
           {
             title: '1. Upload PR saopštenja',
-            text: 'Kada imate saradnju sa portalom Bilbord, naš tim upload-uje vaša PR saopštenja na PR Hub platformu. Dodajemo naslov, opis, tagove, slike i originalne fajlove (PDF dokumente, ZIP arhive sa slikama).'
+            text: 'PR saopštenja mogu upload-ovati Bilbord tim ili firme i agencije same kroz platformu. Dodajte naslov, opis, tagove, slike i originalne fajlove (PDF dokumente, ZIP arhive sa slikama).'
           },
           {
             title: '2. Automatsko obaveštavanje pretplatnika',
-            text: 'Kada naš tim upload-uje PR saopštenje na PR Hub platformi, svi korisnici sa odgovarajućim pretplatama na portalu Bilbord automatski dobijaju obaveštenje o novom saopštenju. Pretplate se filtriraju po kategorijama, tagovima i interesovanjima.'
+            text: 'Kada se PR saopštenje upload-uje na PR Hub platformi (bilo od strane Bilbord tima ili firme/agencije), svi korisnici sa odgovarajućim pretplatama na portalu Bilbord automatski dobijaju obaveštenje o novom saopštenju. Pretplate se filtriraju po kategorijama, tagovima i interesovanjima.'
           },
           {
             title: '3. Centralizovani hub',
@@ -38,7 +38,7 @@ export default function OPRPlatformiPage() {
       features: {
         title: 'Ključne funkcionalnosti',
         items: [
-          'Upload PR saopštenja od strane našeg tima na PR Hub platformi',
+          'Upload PR saopštenja od strane Bilbord tima ili firme/agencije same',
           'Automatsko obaveštavanje pretplatnika sa portala Bilbord',
           'Upload i organizacija originalnih fajlova (PDF, slike)',
           'Pretraga i filtriranje po kategorijama, tagovima i datumu',
@@ -53,7 +53,7 @@ export default function OPRPlatformiPage() {
         forPR: {
           title: 'Za PR agencije i kompanije',
           items: [
-            'Jednostavna distribucija PR saopštenja - naš tim upload-uje vaša saopštenja',
+            'Jednostavna distribucija PR saopštenja - upload-ujte saopštenja sami ili neka Bilbord tim to uradi za vas',
             'Automatsko obaveštavanje relevantnih medija',
             'Praćenje statistike preuzimanja',
             'Organizovano čuvanje PR materijala'
@@ -109,7 +109,7 @@ export default function OPRPlatformiPage() {
     },
     en: {
       title: 'About PR Platform',
-      intro: 'PR Hub platform is a centralized system for PR release distribution that connects PR agencies, companies, and media in one place. Our team handles uploading PR releases and managing the platform.',
+      intro: 'PR Hub platform is a centralized system for PR release distribution that connects PR agencies, companies, and media in one place. PR releases can be uploaded by the Bilbord team, as well as by companies and agencies themselves through the platform.',
       keyBenefit: {
         title: 'Why PR Hub?',
         text: 'The point of PR Hub platform is that publishers do not need to have direct partnerships with individual portals, companies, or media. Instead, your PR releases are automatically distributed through the platform, and portals, media, and companies can access and publish your releases without the need for direct contact. This significantly simplifies the distribution process and enables wider visibility of your PR materials.'
@@ -120,11 +120,11 @@ export default function OPRPlatformiPage() {
         steps: [
           {
             title: '1. Upload PR releases',
-            text: 'When you have a partnership with Bilbord portal, our team uploads your PR releases on the PR Hub platform. We add title, description, tags, images, and original files (PDF documents, ZIP archives with images).'
+            text: 'PR releases can be uploaded by the Bilbord team or by companies and agencies themselves through the platform. Add title, description, tags, images, and original files (PDF documents, ZIP archives with images).'
           },
           {
             title: '2. Automatic subscriber notifications',
-            text: 'When our team uploads a PR release on the PR Hub platform, all users with appropriate subscriptions on Bilbord portal automatically receive a notification about the new release. Subscriptions are filtered by categories, tags, and interests.'
+            text: 'When a PR release is uploaded on the PR Hub platform (either by the Bilbord team or by a company/agency), all users with appropriate subscriptions on Bilbord portal automatically receive a notification about the new release. Subscriptions are filtered by categories, tags, and interests.'
           },
           {
             title: '3. Centralized hub',
@@ -139,7 +139,7 @@ export default function OPRPlatformiPage() {
       features: {
         title: 'Key features',
         items: [
-          'Upload PR releases by our team on PR Hub platform',
+          'Upload PR releases by Bilbord team or companies/agencies themselves',
           'Automatic notification of Bilbord portal subscribers',
           'Upload and organization of original files (PDF, images)',
           'Search and filter by categories, tags, and date',
@@ -154,7 +154,7 @@ export default function OPRPlatformiPage() {
         forPR: {
           title: 'For PR agencies and companies',
           items: [
-            'Simple distribution of PR releases - our team uploads your releases',
+            'Simple distribution of PR releases - upload releases yourself or let the Bilbord team do it for you',
             'Automatic notification of relevant media',
             'Tracking download statistics',
             'Organized storage of PR materials'
