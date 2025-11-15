@@ -14,16 +14,17 @@ interface RSSItem {
 
 interface RSSBlogPostsProps {
   items: RSSItem[]
+  showTitle?: boolean
 }
 
-export default function RSSBlogPosts({ items }: RSSBlogPostsProps) {
+export default function RSSBlogPosts({ items, showTitle = true }: RSSBlogPostsProps) {
   if (items.length === 0) {
     return null
   }
 
   return (
     <div className="grid md:grid-cols-3 gap-6 mb-8">
-      {items.slice(0, 3).map((item, index) => (
+      {items.map((item, index) => (
         <Link
           key={index}
           href={item.link}
@@ -49,17 +50,14 @@ export default function RSSBlogPosts({ items }: RSSBlogPostsProps) {
               </div>
             )}
             
-            {/* Naslov i excerpt */}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-[#1d1d1f] mb-2 line-clamp-2 group-hover:text-[#f9c344] transition-colors">
-                {item.title}
-              </h3>
-              {item.excerpt && (
-                <p className="text-sm text-gray-600 line-clamp-3">
-                  {item.excerpt}
-                </p>
-              )}
-            </div>
+            {/* Naslov */}
+            {showTitle && (
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-[#1d1d1f] mb-2 line-clamp-2 group-hover:text-[#f9c344] transition-colors text-left">
+                  {item.title}
+                </h3>
+              </div>
+            )}
           </div>
         </Link>
       ))}

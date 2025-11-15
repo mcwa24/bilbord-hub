@@ -51,6 +51,7 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1)
   const [rssItems, setRssItems] = useState<RSSItem[]>([])
   const [rssLoading, setRssLoading] = useState(false)
+  const [heroItems, setHeroItems] = useState<RSSItem[]>([])
 
   const fetchRSSFeed = async () => {
     setRssLoading(true)
@@ -59,6 +60,8 @@ export default function Home() {
       const data = await res.json()
       if (data.items && Array.isArray(data.items)) {
         setRssItems(data.items)
+        // Hero sekcija uzima sledeća 6 starijih postova (indeksi 3, 4, 5, 6, 7, 8)
+        setHeroItems(data.items.slice(3, 9))
       }
     } catch (error) {
       console.error('Error fetching RSS feed:', error)
@@ -231,55 +234,52 @@ export default function Home() {
           marginLeft: '-50vw',
         }}
       >
-        
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-start justify-between gap-12 relative z-10">
-          <div className="flex-1 basis-1/2 min-w-0 text-left">
-            <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
-              PR Hub
-            </h1>
-            <p className="text-gray-700 text-base mb-6 font-medium">
-              Centralizovani hub za najnovija PR saopštenja.
-            </p>
-            <p className="text-base md:text-lg text-gray-600 max-w-xl mb-6 leading-relaxed">
-              Preuzmite poslednja PR saopštenja sa jednog mesta. Pretraga, filtriranje 
-              i organizovano listanje svih PR objava na jednom mestu.
-            </p>
-            <Link href="#najnovija-saopstenja">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button className="shadow-xl hover:shadow-2xl transition-all duration-300">
-                  Saopštenja
-                </Button>
-              </motion.div>
-            </Link>
-          </div>
-          
+        <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
+            PR Hub Platforma
+          </h1>
+          <p className="text-gray-700 text-base mb-6 font-medium">
+            Centralizovani hub za najnovija PR saopštenja.
+          </p>
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+            Preuzmite poslednja PR saopštenja sa jednog mesta. Pretraga, filtriranje 
+            i organizovano listanje svih PR objava na jednom mestu.
+          </p>
           <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex-1 basis-1/2 flex items-center justify-center md:justify-end"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-block"
           >
-            <div className="relative w-full max-w-2xl">
-              <div className="absolute inset-0 bg-white/20 backdrop-blur-xl rounded-3xl shadow-2xl transform rotate-3"></div>
-              <div className="relative">
-                <Image
-                  src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
-                  alt="Bilbord Hub"
-                  width={800}
-                  height={800}
-                  className="w-full h-auto object-contain rounded-3xl shadow-2xl border-4 border-white/30"
-                  priority
-                />
-              </div>
-            </div>
+            <Button 
+              className="shadow-xl hover:shadow-2xl transition-all duration-300"
+              onClick={(e) => {
+                e.preventDefault()
+                const section = document.getElementById('najnovija-saopstenja')
+                if (section) {
+                  const offset = 80 // Offset u pikselima
+                  const elementPosition = section.getBoundingClientRect().top
+                  const offsetPosition = elementPosition + window.pageYOffset - offset
+                  window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                  })
+                }
+              }}
+            >
+              Saopštenja
+            </Button>
           </motion.div>
+          
+          {/* Hero blog postovi - sledeća 3 starija */}
+          {!rssLoading && heroItems.length > 0 && (
+            <div className="mt-12">
+              <RSSBlogPosts items={heroItems} showTitle={false} />
+            </div>
+          )}
         </div>
       </section>
 
-      <section id="najnovija-saopstenja" className="section-padding bg-white scroll-mt-32">
+      <section id="najnovija-saopstenja" className="section-padding bg-white scroll-mt-20">
         <div className="container-custom">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
             <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
@@ -388,9 +388,9 @@ export default function Home() {
               Portalu
             </h2>
             
-            {/* Blog postovi - poslednja 3 */}
+            {/* Blog postovi - poslednja 3 (najnovija) */}
             {!rssLoading && rssItems.length > 0 && (
-              <RSSBlogPosts items={rssItems} />
+              <RSSBlogPosts items={rssItems.slice(0, 3)} />
             )}
             
           <div className="mt-8">
@@ -400,7 +400,7 @@ export default function Home() {
                 <p className="text-gray-600 mt-4">Učitavanje vesti...</p>
               </div>
             ) : (
-              <RSSFeedList items={rssItems.slice(3)} />
+              <RSSFeedList items={rssItems.slice(9, 19)} />
             )}
           </div>
           </div>

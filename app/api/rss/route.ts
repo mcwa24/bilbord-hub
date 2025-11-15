@@ -9,8 +9,11 @@ interface RSSItem {
   excerpt?: string
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const category = searchParams.get('category')
+    
     const rssUrl = 'https://bilbord.rs/rss/'
     const response = await fetch(rssUrl, {
       headers: {
@@ -40,6 +43,15 @@ export async function GET() {
       // Pokušaj da parsiraš datum (može biti pubDate ili date)
       const pubDateMatch = itemContent.match(/<pubDate>([\s\S]*?)<\/pubDate>|<date>([\s\S]*?)<\/date>/i)
       const descriptionMatch = itemContent.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>|<description>([\s\S]*?)<\/description>/i)
+      
+      // Parsiraj kategoriju/tag
+      const categoryMatch = itemContent.match(/<category><!\[CDATA\[([\s\S]*?)\]\]><\/category>|<category>([\s\S]*?)<\/category>/i)
+      const itemCategory = categoryMatch ? (categoryMatch[1] || categoryMatch[2] || '').trim() : ''
+      
+      // Ako je tražena kategorija i item nema tu kategoriju, preskoči ga
+      if (category && itemCategory.toLowerCase() !== category.toLowerCase()) {
+        continue
+      }
       
       // Pokušaj da parsiraš sliku iz media:content ili content:encoded
       const mediaContentMatch = itemContent.match(/<media:content[^>]*url=["']([^"']+)["']/i)
@@ -89,8 +101,8 @@ export async function GET() {
       return dateB - dateA
     })
 
-    // Vrati prvih 20 vesti
-    return NextResponse.json({ items: items.slice(0, 20) })
+    // Vrati sve vesti (bez limita)
+    return NextResponse.json({ items })
   } catch (error: any) {
     console.error('Error fetching RSS feed:', error)
     return NextResponse.json(
