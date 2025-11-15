@@ -101,14 +101,20 @@ export async function GET(request: Request) {
       return dateB - dateA
     })
 
-    // Vrati sve vesti (bez limita)
-    return NextResponse.json({ items })
+    // Vrati sve vesti (bez limita) sa no-cache headers
+    const response = NextResponse.json({ items })
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    return response
   } catch (error: any) {
     console.error('Error fetching RSS feed:', error)
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: 'Failed to fetch RSS feed', message: error.message },
       { status: 500 }
     )
+    errorResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    return errorResponse
   }
 }
 

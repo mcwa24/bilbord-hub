@@ -9,6 +9,10 @@ const nextConfig = {
       },
     ],
   },
+  // Onemogući keširanje za dinamičke stranice
+  experimental: {
+    isrMemoryCacheSize: 0, // Onemogući ISR cache
+  },
 }
 
 module.exports = nextConfig

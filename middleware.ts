@@ -8,6 +8,14 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  // Dodaj no-cache headere za dinamičke stranice i API rute
+  const pathname = request.nextUrl.pathname
+  if (pathname === '/' || pathname.startsWith('/api/')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+  }
+
   // Skip Supabase if env variables are not set
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return response

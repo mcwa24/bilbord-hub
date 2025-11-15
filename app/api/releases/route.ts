@@ -156,7 +156,7 @@ export async function GET(request: NextRequest) {
       })
     )
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       releases: releasesWithSizes,
       pagination: {
         page,
@@ -165,11 +165,18 @@ export async function GET(request: NextRequest) {
         itemsPerPage
       }
     })
+    // Dodaj no-cache headere za live podatke
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    return response
   } catch (error: any) {
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: error.message },
       { status: 500 }
     )
+    errorResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    return errorResponse
   }
 }
 
