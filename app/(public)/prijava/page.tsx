@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Mail, Lock } from 'lucide-react'
-import Button from '@/components/ui/Button'
+import Image from 'next/image'
 import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import { setAdminSession } from '@/lib/admin'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 
@@ -16,94 +17,164 @@ function LoginForm() {
   const [email, setEmail] = useState(emailParam || '')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null)
+  const [locked, setLocked] = useState(false)
+  const [lockoutTime, setLockoutTime] = useState<number | null>(null)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!email || !email.includes('@')) {
-      toast.error('Unesite validan email')
+    
+    if (locked) {
+      toast.error('Previše neuspešnih pokušaja. Pokušajte ponovo kasnije.')
       return
     }
-
-    if (!password) {
-      toast.error('Unesite lozinku')
-      return
-    }
-
+    
     setLoading(true)
+    setRemainingAttempts(null)
+
     try {
-      const supabase = createClient()
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Prvo pokušaj admin login
+      const adminRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: email, password })
       })
+      
+      const adminData = await adminRes.json()
+      
+      if (adminRes.ok && adminData.success) {
+        // Admin login uspešan
+        setAdminSession(true)
+        toast.success('Uspešno prijavljeni kao admin')
+        router.push('/dashboard/admin')
+        router.refresh()
+        return
+      }
 
-      if (error) throw error
+      // Ako nije admin, pokušaj user login (Supabase)
+      if (email.includes('@')) {
+        const supabase = createClient()
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
 
-      if (data.user) {
-        toast.success('Uspešno ste se prijavili!')
-        router.push('/moj-panel')
+        if (error) {
+          // Ako je admin lockout, prikaži to
+          if (adminData.locked) {
+            setLocked(true)
+            const timeMatch = adminData.error.match(/(\d+)\s+minuta/)
+            if (timeMatch) {
+              setLockoutTime(parseInt(timeMatch[1]))
+            }
+            toast.error(adminData.error)
+          } else {
+            toast.error(error.message || 'Pogrešno korisničko ime ili lozinka')
+          }
+        } else if (data.user) {
+          // User login uspešan
+          toast.success('Uspešno ste se prijavili!')
+          router.push('/moj-panel')
+        }
+      } else {
+        // Ako nije email format i admin login nije uspeo
+        if (adminData.locked) {
+          setLocked(true)
+          const timeMatch = adminData.error.match(/(\d+)\s+minuta/)
+          if (timeMatch) {
+            setLockoutTime(parseInt(timeMatch[1]))
+          }
+          toast.error(adminData.error)
+        } else if (adminData.remainingAttempts !== undefined) {
+          setRemainingAttempts(adminData.remainingAttempts)
+          if (adminData.remainingAttempts > 0) {
+            toast.error(`${adminData.error}. Preostalo pokušaja: ${adminData.remainingAttempts}`)
+          } else {
+            toast.error(adminData.error)
+          }
+        } else {
+          toast.error('Unesite validan email za korisnički nalog ili admin credentials')
+        }
       }
     } catch (error: any) {
-      toast.error(error.message || 'Greška pri prijavi')
+      toast.error(error.message || 'Greška pri prijavljivanju')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32 pb-16">
-      <div className="container-custom max-w-md">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-4 text-center">
-          Prijava
-        </h1>
-        <p className="text-lg text-gray-600 mb-8 text-center">
-          Prijavite se da biste upravljali email obaveštenjima
-        </p>
+    <div className="min-h-screen bg-white flex">
+      {/* Leva strana - Slika */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <Image
+          src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
+          alt="Bilbord"
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
 
-        <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8">
+      {/* Desna strana - Forma */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h1 className="text-5xl font-bold text-[#1d1d1f] mb-2">
+              Klijent
+            </h1>
+            <h2 className="text-3xl font-bold text-[#1d1d1f]">
+              Prijava na sistem
+            </h2>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email adresa
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
+                Email ili korisničko ime
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="unesite@email.com"
-                  className="pl-10"
-                  required
-                />
-              </div>
+              <Input
+                type="text"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email ili korisničko ime"
+                className="w-full bg-gray-100 rounded-lg border-none"
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
                 Lozinka
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Unesite lozinku"
-                  className="pl-10"
-                  required
-                />
-              </div>
+              <Input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Lozinka"
+                className="w-full bg-gray-100 rounded-lg border-none"
+              />
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full"
+            {locked && lockoutTime && (
+              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                Previše neuspešnih pokušaja. Pokušajte ponovo za {lockoutTime} minuta.
+              </div>
+            )}
+            
+            {remainingAttempts !== null && remainingAttempts > 0 && !locked && (
+              <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
+                Preostalo pokušaja: {remainingAttempts}
+              </div>
+            )}
+
+            <Button 
+              type="submit" 
+              className="w-full bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-lg py-3" 
+              disabled={loading || locked}
             >
-              {loading ? 'Prijava...' : 'Prijavi se'}
+              {loading ? 'Učitavanje...' : locked ? 'Zaključano' : 'Nastavak'}
             </Button>
           </form>
 
@@ -126,3 +197,17 @@ function LoginForm() {
   )
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#f9c344] mb-4"></div>
+          <p className="text-gray-600 text-lg font-medium">Učitavanje...</p>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
+  )
+}

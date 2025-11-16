@@ -131,16 +131,9 @@ export default function Header() {
               </Link>
             )}
             
-            {adminLoggedIn ? (
+            {(adminLoggedIn || userLoggedIn) ? (
               <button
-                onClick={handleLogout}
-                className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
-              >
-                Odjava
-              </button>
-            ) : userLoggedIn ? (
-              <button
-                onClick={handleUserLogout}
+                onClick={adminLoggedIn ? handleLogout : handleUserLogout}
                 className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
               >
                 Odjava
@@ -252,21 +245,11 @@ export default function Header() {
                       </Link>
                     )}
                     
-                    {adminLoggedIn ? (
+                    {(adminLoggedIn || userLoggedIn) ? (
                       <button
                         onClick={() => {
                           setIsMenuOpen(false);
-                          handleLogout();
-                        }}
-                        className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition w-full text-left"
-                      >
-                        Odjava
-                      </button>
-                    ) : userLoggedIn ? (
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          handleUserLogout();
+                          adminLoggedIn ? handleLogout() : handleUserLogout();
                         }}
                         className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition w-full text-left"
                       >
