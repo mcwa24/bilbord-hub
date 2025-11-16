@@ -16,6 +16,7 @@ export default function MyPanelPage() {
   const [allTags, setAllTags] = useState<string[]>([])
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [receiveAll, setReceiveAll] = useState(true)
+  const [creatingSubscription, setCreatingSubscription] = useState(false)
 
   useEffect(() => {
     checkUser()
@@ -68,15 +69,22 @@ export default function MyPanelPage() {
         setReceiveAll(data.subscription.receive_all)
         setSelectedTags(data.subscription.subscribed_tags || [])
       } else {
-        // Ako nema subscription, kreiraj ga
-        await createSubscription(email)
+        // Ako nema subscription, ne kreiraj ga automatski - korisnik će kliknuti dugme
+        setSubscription(null)
       }
     } catch (error) {
       console.error('Error loading subscription:', error)
+      setSubscription(null)
     }
   }
 
   const createSubscription = async (email: string) => {
+    if (!email) {
+      toast.error('Email adresa nije dostupna')
+      return
+    }
+
+    setCreatingSubscription(true)
     try {
       const res = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
@@ -85,13 +93,22 @@ export default function MyPanelPage() {
       })
 
       const data = await res.json()
+      
       if (res.ok && data.subscription) {
         setSubscription(data.subscription)
         setReceiveAll(true)
         setSelectedTags([])
+        toast.success('Email obaveštenja su aktivirana!')
+        // Ponovo učitaj subscription da osveži podatke
+        await loadSubscription(email)
+      } else {
+        throw new Error(data.error || 'Greška pri aktivaciji email obaveštenja')
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating subscription:', error)
+      toast.error(error.message || 'Greška pri aktivaciji email obaveštenja')
+    } finally {
+      setCreatingSubscription(false)
     }
   }
 
@@ -338,8 +355,17 @@ export default function MyPanelPage() {
               <p className="text-gray-600 mb-4">
                 Nema aktivne pretplate za email obaveštenja.
               </p>
-              <Button onClick={() => createSubscription(user?.email)}>
-                Aktiviraj email obaveštenja
+              <Button 
+                onClick={() => {
+                  if (user?.email) {
+                    createSubscription(user.email)
+                  } else {
+                    toast.error('Email adresa nije dostupna')
+                  }
+                }}
+                disabled={creatingSubscription || !user?.email}
+              >
+                {creatingSubscription ? 'Aktiviranje...' : 'Aktiviraj email obaveštenja'}
               </Button>
             </div>
           )}
