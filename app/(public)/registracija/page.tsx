@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mail, Lock, User } from 'lucide-react'
-import Button from '@/components/ui/Button'
+import Image from 'next/image'
 import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 
@@ -70,76 +70,81 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32 pb-16">
-      <div className="container-custom max-w-md">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-4 text-center">
-          Registracija
-        </h1>
-        <p className="text-lg text-gray-600 mb-8 text-center">
-          Kreirajte nalog da biste upravljali email obaveštenjima
-        </p>
+    <div className="min-h-screen bg-white flex">
+      {/* Leva strana - Slika */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <Image
+          src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
+          alt="Bilbord"
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
 
-        <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8">
+      {/* Desna strana - Forma */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h1 className="text-5xl font-bold text-[#1d1d1f] mb-2">
+              Klijent
+            </h1>
+            <h2 className="text-3xl font-bold text-[#1d1d1f]">
+              Registracija
+            </h2>
+          </div>
+
           <form onSubmit={handleRegister} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
                 Email adresa
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="unesite@email.com"
-                  className="pl-10"
-                  required
-                />
-              </div>
+              <Input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="unesite@email.com"
+                className="w-full bg-gray-100 rounded-lg border-none"
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
                 Lozinka
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Najmanje 6 karaktera"
-                  className="pl-10"
-                  required
-                  minLength={6}
-                />
-              </div>
+              <Input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Najmanje 6 karaktera"
+                className="w-full bg-gray-100 rounded-lg border-none"
+                minLength={6}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
                 Potvrdite lozinku
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Ponovite lozinku"
-                  className="pl-10"
-                  required
-                  minLength={6}
-                />
-              </div>
+              <Input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Ponovite lozinku"
+                className="w-full bg-gray-100 rounded-lg border-none"
+                minLength={6}
+              />
             </div>
 
-            <Button
-              type="submit"
+            <Button 
+              type="submit" 
+              className="w-full bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-lg py-3" 
               disabled={loading}
-              className="w-full"
             >
-              {loading ? 'Registracija...' : 'Registruj se'}
+              {loading ? 'Učitavanje...' : 'Nastavak'}
             </Button>
           </form>
 
@@ -156,4 +161,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-
