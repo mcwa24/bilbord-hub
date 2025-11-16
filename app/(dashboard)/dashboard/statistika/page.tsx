@@ -232,25 +232,13 @@ export default function StatistikaPage() {
               Statistika za: {selectedRelease.title}
             </h2>
             
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
-                  <Eye size={24} className="text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Ukupno pregleda</p>
-                  <p className="text-2xl font-bold text-[#1d1d1f]">{selectedRelease.view_count || 0}</p>
-                </div>
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
+                <Download size={24} className="text-[#1d1d1f]" />
               </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
-                  <Download size={24} className="text-[#1d1d1f]" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Ukupno preuzimanja</p>
-                  <p className="text-2xl font-bold text-[#1d1d1f]">{selectedRelease.download_count || 0}</p>
-                </div>
+              <div>
+                <p className="text-sm text-gray-600">Ukupno preuzimanja</p>
+                <p className="text-2xl font-bold text-[#1d1d1f]">{selectedRelease.download_count || 0}</p>
               </div>
             </div>
 
