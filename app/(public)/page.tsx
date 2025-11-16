@@ -507,7 +507,13 @@ export default function Home() {
           {/* Email obaveštenja prijava */}
           <div className="border-t-2 border-gray-200 pt-12 mt-12">
             <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#f9c344] to-[#f0b830]"></div>
+              <Image
+                src="/maxim-ilyahov-0aRycsfH57A-unsplash_Bilbord_Portal.jpg"
+                alt="Bilbord Portal"
+                fill
+                className="object-cover rounded-3xl"
+                priority
+              />
               <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
                 <div className="bg-white rounded-2xl p-6 md:p-8 max-w-3xl w-full text-center">
                   <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4">
