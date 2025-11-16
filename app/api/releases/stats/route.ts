@@ -54,13 +54,13 @@ export async function GET(request: NextRequest) {
 
     // Najpopularnija saopštenja (top 10 po download count-u)
     const topDownloads = releases
-      ?.filter((r) => (r.download_count || 0) > 0)
+      ?.filter((r: any) => (r.download_count || 0) > 0)
       .slice(0, 10) || []
 
     // Najpopularnija saopštenja po pregledima (top 10)
     const topViews = releases
-      ?.filter((r) => (r.view_count || 0) > 0)
-      .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
+      ?.filter((r: any) => (r.view_count || 0) > 0)
+      .sort((a: any, b: any) => (b.view_count || 0) - (a.view_count || 0))
       .slice(0, 10) || []
 
     return NextResponse.json({
