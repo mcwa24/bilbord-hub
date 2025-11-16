@@ -1,4 +1,3 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
@@ -29,38 +28,7 @@ export async function middleware(request: NextRequest) {
     response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
   }
 
-  // Skip Supabase if env variables are not set
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return response
-  }
-
-  try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-            response = NextResponse.next({
-              request,
-            })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            )
-          },
-        },
-      }
-    )
-
-    await supabase.auth.getUser()
-  } catch (error) {
-    // If Supabase fails, just continue without auth
-    console.error('Middleware Supabase error:', error)
-  }
+  // Supabase auth removed - we only use it for newsletter subscriptions, not user login
 
   return response
 }
