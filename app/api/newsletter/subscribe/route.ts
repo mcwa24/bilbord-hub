@@ -75,6 +75,10 @@ export async function POST(request: NextRequest) {
     // Pošalji confirmation email samo ako korisnik nije ulogovan
     let emailSent = false
     if (!userId) {
+      console.log('Sending confirmation email to:', email.toLowerCase())
+      console.log('RESEND_API_KEY present:', !!process.env.RESEND_API_KEY)
+      console.log('RESEND_FROM_EMAIL:', process.env.RESEND_FROM_EMAIL)
+      
       const emailResult = await sendConfirmationEmail(
         email.toLowerCase(),
         verificationToken,
@@ -83,12 +87,15 @@ export async function POST(request: NextRequest) {
 
       if (emailResult.error) {
         console.error('Error sending confirmation email:', emailResult.error)
+        console.error('Email result:', emailResult)
         // Ne baci grešku - subscription je kreiran, samo email nije poslat
       } else {
+        console.log('Confirmation email sent successfully')
         emailSent = true
       }
     } else {
       // Ako je ulogovan, ne treba confirmation email
+      console.log('User is logged in, skipping confirmation email')
       emailSent = true
     }
 

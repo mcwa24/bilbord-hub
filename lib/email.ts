@@ -69,10 +69,13 @@ export async function sendNewsletterEmail(
     })
 
     if (error) {
-      console.error('Resend error:', error)
+      console.error('Resend API error:', error)
+      console.error('Resend API Key present:', !!process.env.RESEND_API_KEY)
+      console.error('From email:', process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>')
       return { error: error.message }
     }
 
+    console.log('Newsletter email sent successfully:', data)
     return { success: true, data }
   } catch (error: any) {
     console.error('Email send error:', error)
