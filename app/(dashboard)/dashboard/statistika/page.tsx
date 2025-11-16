@@ -93,7 +93,15 @@ export default function StatistikaPage() {
     try {
       const res = await fetch('/api/releases/stats')
       const data = await res.json()
+      console.log('Stats API response:', data)
+      console.log('totalUsers from API:', data.totalUsers)
       setStats({
+        totalReleases: data.totalReleases || 0,
+        totalDownloads: data.totalDownloads || 0,
+        totalStorageBytes: data.totalStorageBytes || 0,
+        totalUsers: data.totalUsers || 0,
+      })
+      console.log('Stats state after update:', {
         totalReleases: data.totalReleases || 0,
         totalDownloads: data.totalDownloads || 0,
         totalStorageBytes: data.totalStorageBytes || 0,
