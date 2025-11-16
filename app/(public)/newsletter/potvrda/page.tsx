@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { CheckCircle, XCircle, Mail } from 'lucide-react'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 
-export default function NewsletterConfirmationPage() {
+function NewsletterConfirmationContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const success = searchParams.get('success') === 'true'
@@ -131,6 +131,21 @@ export default function NewsletterConfirmationPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function NewsletterConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white pt-32 pb-16">
+        <div className="container-custom max-w-4xl text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#f9c344] mb-4"></div>
+          <p className="text-gray-600 text-lg font-medium">Učitavanje...</p>
+        </div>
+      </div>
+    }>
+      <NewsletterConfirmationContent />
+    </Suspense>
   )
 }
 
