@@ -34,16 +34,26 @@ export async function POST(request: NextRequest) {
         .eq('email', email.toLowerCase())
         .single()
       
-      if (!error && data) {
+      if (error) {
+        // Ako je greška "PGRST116" (not found), to je OK - korisnik ne postoji
+        if (error.code !== 'PGRST116') {
+          console.error('Error checking existing subscription:', error)
+        }
+      } else if (data) {
         existing = data
+        console.log('Existing subscription found:', {
+          email: existing.email,
+          is_verified: existing.is_verified,
+          is_active: existing.is_active
+        })
       }
     } catch (error) {
-      // Ignore error - subscription might not exist
       console.error('Error checking existing subscription:', error)
     }
 
     // Ako već postoji i već je verifikovan i aktivan, ne šalji email
-    if (existing && existing.is_verified && existing.is_active) {
+    if (existing && existing.is_verified === true && existing.is_active === true) {
+      console.log('User already verified and active - skipping email')
       return NextResponse.json({
         success: true,
         message: 'Već ste prijavljeni na email obaveštenja!',
