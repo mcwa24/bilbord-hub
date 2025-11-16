@@ -48,12 +48,6 @@ export default function Footer() {
                         <Link href="https://bilbord.rs/kontakt/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-800">
                             Kontakt
                         </Link>
-                        <Link href="/newsletter/prijava" className="text-gray-600 hover:text-gray-800">
-                            Email Obaveštenja
-                        </Link>
-                        <Link href="/newsletter/upravljanje" className="text-gray-600 hover:text-gray-800">
-                            Upravljanje Pretplatom
-                        </Link>
                     </div>
 
                     <button
