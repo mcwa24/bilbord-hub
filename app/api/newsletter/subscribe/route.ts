@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Proverite vaš email za potvrdu prijave',
+      message: shouldSendEmail ? 'Proverite vaš email za potvrdu prijave' : 'Već ste prijavljeni na email obaveštenja!',
       subscription: subscription,
       emailSent: emailSent,
     })

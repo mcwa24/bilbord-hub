@@ -28,7 +28,11 @@ export default function NewsletterSubscribe() {
       const data = await res.json()
 
       if (res.ok && data.success) {
-        toast.success('Proverite vaš email za potvrdu prijave!')
+        if (data.message && data.message.includes('Već ste prijavljeni')) {
+          toast.success('Već ste prijavljeni na email obaveštenja!')
+        } else {
+          toast.success('Proverite vaš email za potvrdu prijave!')
+        }
         setEmail('')
       } else {
         throw new Error(data.error || 'Greška pri prijavi')
