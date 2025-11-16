@@ -127,7 +127,7 @@ export default function StatistikaPage() {
           Statistika
         </h1>
 
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
           <Card>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
