@@ -5,7 +5,6 @@ import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
     const { email } = await request.json()
 
     if (!email || !email.includes('@')) {
@@ -15,54 +14,88 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Proveri da li Supabase environment varijable postoje
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json(
+        { error: 'Newsletter servis trenutno nije dostupan' },
+        { status: 503 }
+      )
+    }
+
+    const supabase = await createClient()
+
     // Generiši verification token
     const verificationToken = crypto.randomBytes(32).toString('hex')
 
     // Proveri da li već postoji subscription
-    const { data: existing } = await supabase
-      .from('newsletter_subscriptions')
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .single()
+    let existing = null
+    try {
+      const { data, error } = await supabase
+        .from('newsletter_subscriptions')
+        .select('*')
+        .eq('email', email.toLowerCase())
+        .single()
+      
+      if (!error && data) {
+        existing = data
+      }
+    } catch (error) {
+      // Ignore error - subscription might not exist
+      console.error('Error checking existing subscription:', error)
+    }
 
     let subscription
 
-    if (existing) {
-      // Ažuriraj postojeću subscription
-      const { data, error } = await supabase
-        .from('newsletter_subscriptions')
-        .update({
-          is_active: true,
-          receive_all: true, // Uvek prima sva obaveštenja
-          subscribed_tags: [], // Bez tagova
-          verification_token: verificationToken,
-          is_verified: false, // Uvek treba verifikacija
-          updated_at: new Date().toISOString(),
-        })
-        .eq('email', email.toLowerCase())
-        .select()
-        .single()
+    try {
+      if (existing) {
+        // Ažuriraj postojeću subscription
+        const { data, error } = await supabase
+          .from('newsletter_subscriptions')
+          .update({
+            is_active: true,
+            receive_all: true, // Uvek prima sva obaveštenja
+            subscribed_tags: [], // Bez tagova
+            verification_token: verificationToken,
+            is_verified: false, // Uvek treba verifikacija
+            updated_at: new Date().toISOString(),
+          })
+          .eq('email', email.toLowerCase())
+          .select()
+          .single()
 
-      if (error) throw error
-      subscription = data
-    } else {
-      // Kreiraj novu subscription
-      const { data, error } = await supabase
-        .from('newsletter_subscriptions')
-        .insert({
-          email: email.toLowerCase(),
-          is_active: true,
-          receive_all: true, // Uvek prima sva obaveštenja
-          subscribed_tags: [], // Bez tagova
-          verification_token: verificationToken,
-          is_verified: false, // Uvek treba verifikacija
-          user_id: null, // Ne koristimo user_id više
-        })
-        .select()
-        .single()
+        if (error) {
+          console.error('Error updating subscription:', error)
+          throw error
+        }
+        subscription = data
+      } else {
+        // Kreiraj novu subscription
+        const { data, error } = await supabase
+          .from('newsletter_subscriptions')
+          .insert({
+            email: email.toLowerCase(),
+            is_active: true,
+            receive_all: true, // Uvek prima sva obaveštenja
+            subscribed_tags: [], // Bez tagova
+            verification_token: verificationToken,
+            is_verified: false, // Uvek treba verifikacija
+            user_id: null, // Ne koristimo user_id više
+          })
+          .select()
+          .single()
 
-      if (error) throw error
-      subscription = data
+        if (error) {
+          console.error('Error creating subscription:', error)
+          throw error
+        }
+        subscription = data
+      }
+    } catch (dbError: any) {
+      console.error('Database error:', dbError)
+      return NextResponse.json(
+        { error: dbError.message || 'Greška pri čuvanju pretplate. Molimo pokušajte ponovo.' },
+        { status: 500 }
+      )
     }
 
     // Pošalji confirmation email
