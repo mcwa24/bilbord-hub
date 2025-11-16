@@ -15,6 +15,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Proveri da li je korisnik ulogovan
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id || null
+
     // Generiši verification token
     const verificationToken = crypto.randomBytes(32).toString('hex')
     const finalTags = receiveAll ? [] : (tags || [])
@@ -38,7 +42,8 @@ export async function POST(request: NextRequest) {
           receive_all: receiveAllFlag,
           subscribed_tags: finalTags,
           verification_token: verificationToken,
-          is_verified: false, // Reset verification kada se promene tagovi
+          is_verified: userId ? true : false, // Ako je ulogovan, automatski verifikovano
+          user_id: userId || existing.user_id, // Ažuriraj user_id ako je ulogovan
           updated_at: new Date().toISOString(),
         })
         .eq('email', email.toLowerCase())
@@ -57,7 +62,8 @@ export async function POST(request: NextRequest) {
           receive_all: receiveAllFlag,
           subscribed_tags: finalTags,
           verification_token: verificationToken,
-          is_verified: false,
+          is_verified: userId ? true : false, // Ako je ulogovan, automatski verifikovano
+          user_id: userId,
         })
         .select()
         .single()
@@ -66,23 +72,31 @@ export async function POST(request: NextRequest) {
       subscription = data
     }
 
-    // Pošalji confirmation email
-    const emailResult = await sendConfirmationEmail(
-      email.toLowerCase(),
-      verificationToken,
-      finalTags
-    )
+    // Pošalji confirmation email samo ako korisnik nije ulogovan
+    let emailSent = false
+    if (!userId) {
+      const emailResult = await sendConfirmationEmail(
+        email.toLowerCase(),
+        verificationToken,
+        finalTags
+      )
 
-    if (emailResult.error) {
-      console.error('Error sending confirmation email:', emailResult.error)
-      // Ne baci grešku - subscription je kreiran, samo email nije poslat
+      if (emailResult.error) {
+        console.error('Error sending confirmation email:', emailResult.error)
+        // Ne baci grešku - subscription je kreiran, samo email nije poslat
+      } else {
+        emailSent = true
+      }
+    } else {
+      // Ako je ulogovan, ne treba confirmation email
+      emailSent = true
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Proverite vaš email za potvrdu prijave',
+      message: userId ? 'Uspešno ste prijavljeni na email obaveštenja!' : 'Proverite vaš email za potvrdu prijave',
       subscription: subscription,
-      emailSent: !emailResult.error,
+      emailSent: emailSent,
     })
   } catch (error: any) {
     console.error('Newsletter subscribe error:', error)

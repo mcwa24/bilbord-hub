@@ -7,19 +7,48 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { isAdmin, logoutAdmin } from "@/lib/admin";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const isDashboard = pathname?.startsWith('/dashboard');
   const isLoginPage = pathname === '/dashboard/login';
 
   useEffect(() => {
     setAdminLoggedIn(isAdmin());
+    checkUserAuth();
   }, [pathname]);
+
+  const checkUserAuth = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserLoggedIn(!!user);
+      setUserEmail(user?.email || null);
+    } catch (error) {
+      setUserLoggedIn(false);
+      setUserEmail(null);
+    }
+  };
+
+  const handleUserLogout = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      setUserLoggedIn(false);
+      setUserEmail(null);
+      router.push('/');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const handleLogout = () => {
     logoutAdmin();
@@ -93,6 +122,15 @@ export default function Header() {
               </Link>
             )}
             
+            {userLoggedIn && !adminLoggedIn && (
+              <Link
+                href="/moj-panel"
+                className={`${pathname === "/moj-panel" ? "underline font-semibold" : ""} text-[#1d1d1f] hover:underline transition`}
+              >
+                Moj Panel
+              </Link>
+            )}
+            
             {adminLoggedIn ? (
               <button
                 onClick={handleLogout}
@@ -100,9 +138,16 @@ export default function Header() {
               >
                 Odjava
               </button>
+            ) : userLoggedIn ? (
+              <button
+                onClick={handleUserLogout}
+                className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
+              >
+                Odjava
+              </button>
             ) : (
               <Link
-                href="/dashboard/login"
+                href="/prijava"
                 className="ml-2 px-8 py-4 rounded-full text-base font-medium text-[#1d1d1f] bg-[#f9c344] hover:bg-[#f0b830] transition"
               >
                 Prijava
@@ -197,6 +242,15 @@ export default function Header() {
                         Admin
                       </Link>
                     )}
+                    {userLoggedIn && !adminLoggedIn && (
+                      <Link
+                        href="/moj-panel"
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`${pathname === "/moj-panel" ? "underline font-semibold" : ""} block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition`}
+                      >
+                        Moj Panel
+                      </Link>
+                    )}
                     
                     {adminLoggedIn ? (
                       <button
@@ -208,9 +262,19 @@ export default function Header() {
                       >
                         Odjava
                       </button>
+                    ) : userLoggedIn ? (
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          handleUserLogout();
+                        }}
+                        className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition w-full text-left"
+                      >
+                        Odjava
+                      </button>
                     ) : (
                       <Link
-                        href="/dashboard/login"
+                        href="/prijava"
                         onClick={() => setIsMenuOpen(false)}
                         className="block text-[#1d1d1f] py-2 px-2 text-base rounded-md hover:bg-gray-50 transition"
                       >

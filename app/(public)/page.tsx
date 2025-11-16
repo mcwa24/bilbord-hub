@@ -526,8 +526,8 @@ export default function Home() {
                     <NewsletterSubscribe />
                   </div>
                   <p className="text-sm text-gray-600 mt-4">
-                    <a href="/newsletter/upravljanje" className="text-[#1d1d1f] hover:underline font-medium">
-                      Upravljajte svojom pretplatom
+                    <a href="/prijava" className="text-[#1d1d1f] hover:underline font-medium">
+                      Već imate nalog? Prijavite se
                     </a>
                   </p>
                 </div>
