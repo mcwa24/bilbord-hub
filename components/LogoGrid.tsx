@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 const logos = [
   'aik bank.png',
@@ -35,6 +36,52 @@ const logos = [
   'Yandex_Logo_2021.png',
 ]
 
+function GifFirstFrame({ logo, index }: { logo: string; index: number }) {
+  const [imageSrc, setImageSrc] = useState<string | null>(null)
+
+  useEffect(() => {
+    const img = document.createElement('img')
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(img, 0, 0)
+          setImageSrc(canvas.toDataURL('image/png'))
+        }
+      } catch (error) {
+        // Fallback na originalni GIF ako canvas ne radi
+        setImageSrc(`/logos/${logo}`)
+      }
+    }
+    img.onerror = () => {
+      setImageSrc(`/logos/${logo}`)
+    }
+    img.src = `/logos/${logo}`
+  }, [logo])
+
+  if (!imageSrc) {
+    return null
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={`Partner logo ${index + 1}`}
+      className="object-contain"
+      style={{ 
+        maxWidth: '90%', 
+        maxHeight: '90%',
+        width: 'auto',
+        height: 'auto'
+      }}
+      loading={index < 6 ? "eager" : "lazy"}
+    />
+  )
+}
+
 export default function LogoGrid() {
   return (
     <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
@@ -47,21 +94,25 @@ export default function LogoGrid() {
             width: '100%'
           }}
         >
-          <Image
-            src={`/logos/${logo}`}
-            alt={`Partner logo ${index + 1}`}
-            width={100}
-            height={80}
-            className="object-contain"
-            style={{ 
-              maxWidth: '90%', 
-              maxHeight: '90%',
-              width: 'auto',
-              height: 'auto'
-            }}
-            loading={index < 6 ? "eager" : "lazy"}
-            unoptimized={logo.endsWith('.svg') || logo.endsWith('.webp') || logo.endsWith('.gif')}
-          />
+          {logo.endsWith('.gif') ? (
+            <GifFirstFrame logo={logo} index={index} />
+          ) : (
+            <Image
+              src={`/logos/${logo}`}
+              alt={`Partner logo ${index + 1}`}
+              width={100}
+              height={80}
+              className="object-contain"
+              style={{ 
+                maxWidth: '90%', 
+                maxHeight: '90%',
+                width: 'auto',
+                height: 'auto'
+              }}
+              loading={index < 6 ? "eager" : "lazy"}
+              unoptimized={logo.endsWith('.svg') || logo.endsWith('.webp')}
+            />
+          )}
         </div>
       ))}
     </div>
