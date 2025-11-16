@@ -46,18 +46,30 @@ export async function POST(request: NextRequest) {
     }
 
     let subscription
+    let shouldSendEmail = false
 
     try {
       if (existing) {
-        // Ažuriraj postojeću subscription
+        // Ako je već verifikovan i aktivan, ne šalji email
+        if (existing.is_verified && existing.is_active) {
+          return NextResponse.json({
+            success: true,
+            message: 'Već ste prijavljeni na email obaveštenja!',
+            subscription: existing,
+            emailSent: false,
+          })
+        }
+
+        // Ako postoji ali nije verifikovan ili nije aktivan, ažuriraj i pošalji email
+        shouldSendEmail = true
         const { data, error } = await supabase
           .from('newsletter_subscriptions')
           .update({
             is_active: true,
-            receive_all: true, // Uvek prima sva obaveštenja
-            subscribed_tags: [], // Bez tagova
+            receive_all: true,
+            subscribed_tags: [],
             verification_token: verificationToken,
-            is_verified: false, // Uvek treba verifikacija
+            is_verified: false,
             updated_at: new Date().toISOString(),
           })
           .eq('email', email.toLowerCase())
@@ -70,17 +82,18 @@ export async function POST(request: NextRequest) {
         }
         subscription = data
       } else {
-        // Kreiraj novu subscription
+        // Kreiraj novu subscription i pošalji email
+        shouldSendEmail = true
         const { data, error } = await supabase
           .from('newsletter_subscriptions')
           .insert({
             email: email.toLowerCase(),
             is_active: true,
-            receive_all: true, // Uvek prima sva obaveštenja
-            subscribed_tags: [], // Bez tagova
+            receive_all: true,
+            subscribed_tags: [],
             verification_token: verificationToken,
-            is_verified: false, // Uvek treba verifikacija
-            user_id: null, // Ne koristimo user_id više
+            is_verified: false,
+            user_id: null,
           })
           .select()
           .single()
@@ -99,18 +112,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Pošalji confirmation email
+    // Pošalji confirmation email samo ako treba
     let emailSent = false
-    const emailResult = await sendConfirmationEmail(
-      email.toLowerCase(),
-      verificationToken
-    )
+    if (shouldSendEmail) {
+      const emailResult = await sendConfirmationEmail(
+        email.toLowerCase(),
+        verificationToken
+      )
 
-    if (emailResult.error) {
-      console.error('Error sending confirmation email:', emailResult.error)
-      // Ne baci grešku - subscription je kreiran, samo email nije poslat
-    } else {
-      emailSent = true
+      if (emailResult.error) {
+        console.error('Error sending confirmation email:', emailResult.error)
+        // Ne baci grešku - subscription je kreiran, samo email nije poslat
+      } else {
+        emailSent = true
+      }
     }
 
     return NextResponse.json({
