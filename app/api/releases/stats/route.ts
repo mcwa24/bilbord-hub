@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function getFileSize(url: string): Promise<number> {
   try {
@@ -64,14 +65,23 @@ export async function GET(request: NextRequest) {
       .slice(0, 10) || []
 
     // Učitaj broj registrovanih korisnika (newsletter subscriptions)
-    const { count: totalUsers, error: usersError } = await supabase
-      .from('newsletter_subscriptions')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_verified', true)
-      .eq('is_active', true)
+    // Koristimo admin client da bi zaobišli RLS policies
+    let totalUsers = 0
+    try {
+      const adminSupabase = createAdminClient()
+      const { count, error: usersError } = await adminSupabase
+        .from('newsletter_subscriptions')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_verified', true)
+        .eq('is_active', true)
 
-    if (usersError) {
-      console.error('Error fetching users count:', usersError)
+      if (usersError) {
+        console.error('Error fetching users count:', usersError)
+      } else {
+        totalUsers = count || 0
+      }
+    } catch (error) {
+      console.error('Error creating admin client for users count:', error)
     }
 
     return NextResponse.json({
