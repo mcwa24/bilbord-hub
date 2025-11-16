@@ -1,15 +1,26 @@
-import { sendEmailSMTP } from './smtp'
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function sendConfirmationEmail(
   email: string,
   verificationToken: string,
   tags: string[]
 ) {
+  if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY nije postavljen')
+    return { error: 'Email servis nije konfigurisan' }
+  }
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
   const confirmationUrl = `${siteUrl}/newsletter/potvrda?token=${verificationToken}&email=${encodeURIComponent(email)}`
 
   try {
-    const html = `
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
+      to: email,
+      subject: 'Potvrdite prijavu na Bilbord Hub email obaveštenja',
+      html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -50,22 +61,16 @@ export async function sendConfirmationEmail(
             </div>
           </body>
         </html>
-      `
-
-    const result = await sendEmailSMTP({
-      to: email,
-      subject: 'Potvrdite prijavu na Bilbord Hub email obaveštenja',
-      html: html,
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
+      `,
     })
 
-    if (result.error) {
-      console.error('SMTP error sending confirmation email:', result.error)
-      return { error: result.error }
+    if (error) {
+      console.error('Resend API error:', error)
+      return { error: error.message }
     }
 
-    console.log('Confirmation email sent successfully via SMTP')
-    return { success: true, data: result }
+    console.log('Confirmation email sent successfully:', data)
+    return { success: true, data }
   } catch (error: any) {
     console.error('Email send error:', error)
     return { error: error.message || 'Greška pri slanju emaila' }
