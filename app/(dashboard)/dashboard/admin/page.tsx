@@ -288,6 +288,37 @@ export default function AdminPage() {
     return (bytes / 1024).toFixed(2) + ' KB'
   }
 
+  // Ako još nije provereno, prikaži loading
+  if (isAuthorized === null) {
+    return (
+      <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#f9c344] mb-4"></div>
+          <p className="text-gray-600 text-lg font-medium">Učitavanje...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Ako nije autorizovan, prikaži 404
+  if (isAuthorized === false) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-6xl font-bold text-[#1d1d1f] mb-4">404</h1>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">Stranica nije pronađena</h2>
+          <p className="text-gray-600 mb-8">Stranica koju tražite ne postoji.</p>
+          <a 
+            href="/prijava" 
+            className="inline-block px-8 py-3 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-semibold rounded-full transition"
+          >
+            Vrati se na prijavu
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
