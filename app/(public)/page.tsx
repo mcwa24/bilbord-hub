@@ -504,23 +504,28 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Newsletter prijava */}
+          {/* Email obaveštenja prijava */}
           <div className="border-t-2 border-gray-200 pt-12 mt-12">
-            <div className="bg-gradient-to-r from-[#f9c344] to-[#f0b830] rounded-2xl p-8 md:p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4">
-                Prijavite se na newsletter
-              </h2>
-              <p className="text-[#1d1d1f] text-lg mb-6 max-w-2xl mx-auto">
-                Budite u toku sa najnovijim PR saopštenjima. Primate email obaveštenja kada se objavi novo saopštenje.
-              </p>
-              <div className="max-w-md mx-auto">
-                <NewsletterSubscribe />
+            <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden mb-6">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#f9c344] to-[#f0b830]"></div>
+              <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
+                <div className="bg-white rounded-2xl p-6 md:p-8 max-w-3xl w-full text-center">
+                  <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4">
+                    Prijavite se na email obaveštenja
+                  </h2>
+                  <p className="text-[#1d1d1f] text-base md:text-lg mb-6 max-w-2xl mx-auto">
+                    Budite u toku sa najnovijim PR saopštenjima. Primate email obaveštenja kada se objavi novo saopštenje.
+                  </p>
+                  <div className="max-w-md mx-auto mb-4">
+                    <NewsletterSubscribe />
+                  </div>
+                  <p className="text-sm text-gray-600 mt-4">
+                    <a href="/newsletter/upravljanje" className="text-[#1d1d1f] hover:underline font-medium">
+                      Upravljajte svojom pretplatom
+                    </a>
+                  </p>
+                </div>
               </div>
-              <p className="text-sm text-[#1d1d1f] mt-4">
-                <a href="/newsletter/upravljanje" className="underline hover:no-underline">
-                  Upravljajte svojom pretplatom
-                </a>
-              </p>
             </div>
           </div>
         </div>

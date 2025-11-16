@@ -102,7 +102,7 @@ export default function NewsletterManagementPage() {
   }
 
   const handleUnsubscribe = async () => {
-    if (!confirm('Da li ste sigurni da želite da se odjavite sa newslettera?')) {
+    if (!confirm('Da li ste sigurni da želite da se odjavite sa email obaveštenja?')) {
       return
     }
 
@@ -117,14 +117,14 @@ export default function NewsletterManagementPage() {
       const data = await res.json()
 
       if (res.ok) {
-        toast.success('Uspešno ste odjavljeni sa newslettera')
+        toast.success('Uspešno ste odjavljeni sa email obaveštenja')
         setSubscription(null)
         setEmail('')
       } else {
         throw new Error(data.error || 'Greška pri odjavi')
       }
     } catch (error: any) {
-      toast.error(error.message || 'Greška pri odjavi sa newslettera')
+      toast.error(error.message || 'Greška pri odjavi sa email obaveštenja')
     } finally {
       setLoading(false)
     }
@@ -142,10 +142,10 @@ export default function NewsletterManagementPage() {
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-4">
-          Upravljanje newsletter pretplatom
+          Upravljanje pretplatom na email obaveštenja
         </h1>
         <p className="text-lg text-gray-600 mb-8">
-          Unesite vaš email da pronađete i upravljate vašom pretplatom. Možete promeniti tagove, odjaviti se sa određenog taga ili potpuno odjaviti sa newslettera.
+          Unesite vaš email da pronađete i upravljate vašom pretplatom. Možete promeniti tagove, odjaviti se sa određenog taga ili potpuno odjaviti sa email obaveštenja.
         </p>
 
         <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8 mb-8">
@@ -313,7 +313,7 @@ export default function NewsletterManagementPage() {
                 Nema aktivne pretplate za ovaj email.
               </p>
               <a href="/newsletter/prijava" className="text-[#f9c344] hover:underline font-medium">
-                Prijavite se na newsletter
+                Prijavite se na email obaveštenja
               </a>
             </div>
           )}

@@ -49,10 +49,10 @@ export default function Footer() {
                             Kontakt
                         </Link>
                         <Link href="/newsletter/prijava" className="text-gray-600 hover:text-gray-800">
-                            Newsletter Prijava
+                            Email Obaveštenja
                         </Link>
                         <Link href="/newsletter/upravljanje" className="text-gray-600 hover:text-gray-800">
-                            Newsletter Upravljanje
+                            Upravljanje Pretplatom
                         </Link>
                     </div>
 

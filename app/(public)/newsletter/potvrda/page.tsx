@@ -67,7 +67,7 @@ function NewsletterConfirmationContent() {
               Poslali smo vam email na <strong>{email}</strong> sa linkom za potvrdu prijave.
             </p>
             <p className="text-gray-600 mb-8">
-              Kliknite na link u email-u da aktivirate vašu pretplatu na newsletter.
+              Kliknite na link u email-u da aktivirate vašu pretplatu na email obaveštenja.
             </p>
             <div className="space-y-4">
               <Link href="/">

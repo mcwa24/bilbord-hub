@@ -19,7 +19,7 @@ export async function sendConfirmationEmail(
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
       to: email,
-      subject: 'Potvrdite prijavu na Bilbord Hub newsletter',
+      subject: 'Potvrdite prijavu na Bilbord Hub email obaveštenja',
       html: `
         <!DOCTYPE html>
         <html>
@@ -32,9 +32,9 @@ export async function sendConfirmationEmail(
               <h1 style="color: #1d1d1f; margin: 0;">Bilbord Hub</h1>
             </div>
             <div style="background-color: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px;">
-              <h2 style="color: #1d1d1f; margin-top: 0;">Potvrdite prijavu na newsletter</h2>
+              <h2 style="color: #1d1d1f; margin-top: 0;">Potvrdite prijavu na email obaveštenja</h2>
               <p style="color: #666; margin: 20px 0;">
-                Hvala vam što ste se prijavili na Bilbord Hub newsletter! Kliknite na dugme ispod da potvrdite vašu email adresu.
+                Hvala vam što ste se prijavili na Bilbord Hub email obaveštenja! Kliknite na dugme ispod da potvrdite vašu email adresu.
               </p>
               
               ${tags.length > 0 ? `
@@ -56,7 +56,7 @@ export async function sendConfirmationEmail(
               </div>
               
               <p style="color: #999; font-size: 12px; margin: 20px 0 0 0;">
-                Ako niste se prijavili na newsletter, ignorišite ovaj email.
+                Ako niste se prijavili na email obaveštenja, ignorišite ovaj email.
               </p>
             </div>
           </body>

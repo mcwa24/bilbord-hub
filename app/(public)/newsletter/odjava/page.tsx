@@ -42,12 +42,12 @@ export default function NewsletterUnsubscribePage() {
 
       if (res.ok) {
         setSuccess(true)
-        toast.success('Uspešno ste odjavljeni sa newslettera')
+        toast.success('Uspešno ste odjavljeni sa email obaveštenja')
       } else {
         throw new Error(data.error || 'Greška pri odjavi')
       }
     } catch (error: any) {
-      toast.error(error.message || 'Greška pri odjavi sa newslettera')
+      toast.error(error.message || 'Greška pri odjavi sa email obaveštenja')
     } finally {
       setLoading(false)
     }
@@ -58,10 +58,10 @@ export default function NewsletterUnsubscribePage() {
       <div className="min-h-screen bg-white pt-32 pb-16">
         <div className="container-custom max-w-4xl text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-4">
-            Odjavljeni ste sa newslettera
+            Odjavljeni ste sa email obaveštenja
           </h1>
           <p className="text-gray-600 mb-8">
-            Uspešno ste odjavljeni sa newslettera Bilbord Hub platforme.
+            Uspešno ste odjavljeni sa email obaveštenja Bilbord Hub platforme.
           </p>
           <a href="/" className="text-[#f9c344] hover:underline">
             Vrati se na početnu stranicu
@@ -75,12 +75,12 @@ export default function NewsletterUnsubscribePage() {
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-8">
-          Odjava sa newslettera
+          Odjava sa email obaveštenja
         </h1>
 
         <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8">
           <p className="text-gray-600 mb-6">
-            Unesite vašu email adresu da biste se odjavili sa newslettera.
+            Unesite vašu email adresu da biste se odjavili sa email obaveštenja.
           </p>
           
           <div className="flex gap-3">

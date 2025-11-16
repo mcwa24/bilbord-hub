@@ -57,7 +57,7 @@ export async function sendNewsletterEmail(
               <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
               
               <p style="color: #999; font-size: 12px; margin: 0;">
-                Ovaj email ste primili jer ste se prijavili na newsletter Bilbord Hub platforme.
+                Ovaj email ste primili jer ste se prijavili na email obaveštenja Bilbord Hub platforme.
                 <br>
                 <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'}/newsletter/odjava?email=${encodeURIComponent(email)}${unsubscribeToken ? `&token=${unsubscribeToken}` : ''}" style="color: #999;">Odjavite se</a>
                 ${unsubscribeToken ? '' : ` | <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'}/newsletter/upravljanje?email=${encodeURIComponent(email)}" style="color: #999;">Upravljajte pretplatom</a>`}

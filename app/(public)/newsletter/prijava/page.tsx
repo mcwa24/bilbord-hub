@@ -73,7 +73,7 @@ export default function NewsletterSubscribePage() {
         throw new Error(data.error || 'Greška pri prijavi')
       }
     } catch (error: any) {
-      toast.error(error.message || 'Greška pri prijavi na newsletter')
+      toast.error(error.message || 'Greška pri prijavi na email obaveštenja')
     } finally {
       setLoading(false)
     }
@@ -83,7 +83,7 @@ export default function NewsletterSubscribePage() {
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-4">
-          Prijava na newsletter
+          Prijava na email obaveštenja
         </h1>
         <p className="text-lg text-gray-600 mb-8">
           Primate email obaveštenja kada se objavi novo PR saopštenje. Možete izabrati da primate sva saopštenja ili samo ona sa određenim tagovima.
