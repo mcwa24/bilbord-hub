@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, Download, TrendingUp, HardDrive, Search } from 'lucide-react'
+import { Eye, Download, TrendingUp, HardDrive, Search, Users } from 'lucide-react'
 import { PRRelease } from '@/types'
 import { isAdmin } from '@/lib/admin'
 import Card from '@/components/ui/Card'
@@ -32,11 +32,13 @@ export default function StatistikaPage() {
     totalViews: number
     totalDownloads: number
     totalStorageBytes: number
+    totalUsers: number
   }>({
     totalReleases: 0,
     totalViews: 0,
     totalDownloads: 0,
     totalStorageBytes: 0,
+    totalUsers: 0,
   })
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Array<PRRelease & { view_count: number; download_count: number }>>([])
@@ -98,6 +100,7 @@ export default function StatistikaPage() {
         totalViews: data.totalViews || 0,
         totalDownloads: data.totalDownloads || 0,
         totalStorageBytes: data.totalStorageBytes || 0,
+        totalUsers: data.totalUsers || 0,
       })
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -127,7 +130,7 @@ export default function StatistikaPage() {
           Statistika
         </h1>
 
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-5 gap-6 mb-8">
           <Card>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
@@ -172,6 +175,18 @@ export default function StatistikaPage() {
               <div>
                 <p className="text-sm text-gray-600">Ukupno zauzeto mesta</p>
                 <p className="text-2xl font-bold text-[#1d1d1f]">{formatStorageSize(stats.totalStorageBytes)}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
+                <Users size={24} className="text-[#1d1d1f]" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Registrovanih korisnika</p>
+                <p className="text-2xl font-bold text-[#1d1d1f]">{stats.totalUsers}</p>
               </div>
             </div>
           </Card>
