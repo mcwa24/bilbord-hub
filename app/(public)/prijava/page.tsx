@@ -72,7 +72,17 @@ function LoginForm() {
             toast.error(error.message || 'Pogrešno korisničko ime ili lozinka')
           }
         } else if (data.user) {
-          // User login uspešan
+          // User login uspešan - poveži subscription sa user_id ako postoji
+          try {
+            await fetch('/api/newsletter/link-user-subscription', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+            })
+          } catch (err) {
+            // Ignoriši grešku - nije kritično
+            console.error('Error linking subscription:', err)
+          }
+          
           toast.success('Uspešno ste se prijavili!')
           router.push('/moj-panel')
         }
