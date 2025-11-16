@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendConfirmationEmail } from '@/lib/email-confirmation'
+import { sendAdminNotificationEmail } from '@/lib/email-admin'
 import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Pošalji confirmation email
+    // Pošalji confirmation email korisniku
     let emailSent = false
     const emailResult = await sendConfirmationEmail(
       email.toLowerCase(),
@@ -123,6 +124,17 @@ export async function POST(request: NextRequest) {
       // Ne baci grešku - subscription je kreiran, samo email nije poslat
     } else {
       emailSent = true
+    }
+
+    // Pošalji admin notification email samo ako je nova subscription (ne ako je update postojeće)
+    if (!existing) {
+      const adminEmailResult = await sendAdminNotificationEmail(email.toLowerCase())
+      if (adminEmailResult.error) {
+        console.error('Error sending admin notification email:', adminEmailResult.error)
+        // Ne baci grešku - admin email nije kritičan
+      } else {
+        console.log('Admin notification email sent successfully')
+      }
     }
 
     return NextResponse.json({
