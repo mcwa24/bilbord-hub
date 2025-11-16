@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
     if (error) throw error
 
     const totalReleases = releases?.length || 0
-    const totalViews = releases?.reduce((sum, r) => sum + (r.view_count || 0), 0) || 0
-    const totalDownloads = releases?.reduce((sum, r) => sum + (r.download_count || 0), 0) || 0
+    const totalViews = releases?.reduce((sum: number, r: any) => sum + (r.view_count || 0), 0) || 0
+    const totalDownloads = releases?.reduce((sum: number, r: any) => sum + (r.download_count || 0), 0) || 0
 
     // Izračunaj ukupnu veličinu svih fajlova
     let totalStorageBytes = 0
