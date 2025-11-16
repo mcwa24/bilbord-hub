@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     await supabase.auth.exchangeCodeForSession(code)
     
-    // Poveži subscription sa user_id ako postoji
+    // Poveži subscription sa user_id ako postoji ili kreiraj novu ako ne postoji
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user?.email) {
@@ -20,20 +20,35 @@ export async function GET(request: NextRequest) {
           .eq('email', user.email.toLowerCase())
           .single()
 
-        if (subscription && !subscription.user_id) {
+        if (subscription) {
+          // Ako subscription postoji ali nema user_id, ažuriraj ga
+          if (!subscription.user_id) {
+            await supabase
+              .from('newsletter_subscriptions')
+              .update({
+                user_id: user.id,
+                is_verified: true,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', subscription.id)
+          }
+        } else {
+          // Ako subscription ne postoji, kreiraj ga
           await supabase
             .from('newsletter_subscriptions')
-            .update({
-              user_id: user.id,
+            .insert({
+              email: user.email.toLowerCase(),
+              is_active: true,
+              receive_all: true,
+              subscribed_tags: [],
               is_verified: true,
-              updated_at: new Date().toISOString(),
+              user_id: user.id,
             })
-            .eq('id', subscription.id)
         }
       }
     } catch (err) {
       // Ignoriši grešku - nije kritično
-      console.error('Error linking subscription:', err)
+      console.error('Error linking/creating subscription:', err)
     }
   }
 
