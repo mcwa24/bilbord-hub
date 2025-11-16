@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendConfirmationEmail } from '@/lib/email-confirmation'
 import crypto from 'crypto'
 
@@ -15,14 +15,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Proveri da li Supabase environment varijable postoje
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json(
         { error: 'Newsletter servis trenutno nije dostupan' },
         { status: 503 }
       )
     }
 
-    const supabase = await createClient()
+    // Koristi admin klijent za bypass RLS politika
+    const supabase = createAdminClient()
 
     // Generiši verification token
     const verificationToken = crypto.randomBytes(32).toString('hex')
