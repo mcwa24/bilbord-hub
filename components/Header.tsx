@@ -18,14 +18,14 @@ export default function Header() {
   const isLoginPage = pathname === '/dashboard/login';
   const isPrijavaPage = pathname === '/prijava';
 
-  // Sakrij header na prijava stranici
-  if (isPrijavaPage) {
-    return null;
-  }
-
   useEffect(() => {
     setAdminLoggedIn(isAdmin());
   }, [pathname]);
+
+  // Sakrij header na prijava stranici - mora biti posle hook-ova
+  if (isPrijavaPage) {
+    return null;
+  }
 
   const handleLogout = () => {
     logoutAdmin();
