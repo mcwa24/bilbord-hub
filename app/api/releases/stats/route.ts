@@ -63,11 +63,23 @@ export async function GET(request: NextRequest) {
       .sort((a: any, b: any) => (b.view_count || 0) - (a.view_count || 0))
       .slice(0, 10) || []
 
+    // Učitaj broj registrovanih korisnika (newsletter subscriptions)
+    const { count: totalUsers, error: usersError } = await supabase
+      .from('newsletter_subscriptions')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_verified', true)
+      .eq('is_active', true)
+
+    if (usersError) {
+      console.error('Error fetching users count:', usersError)
+    }
+
     return NextResponse.json({
       totalReleases,
       totalViews,
       totalDownloads,
       totalStorageBytes,
+      totalUsers: totalUsers || 0,
       releases: releases || [],
       topDownloads,
       topViews,
