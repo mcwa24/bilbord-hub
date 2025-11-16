@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, Download, TrendingUp, HardDrive, Search, Users } from 'lucide-react'
+import { Download, TrendingUp, HardDrive, Search, Users } from 'lucide-react'
 import { PRRelease } from '@/types'
 import { isAdmin } from '@/lib/admin'
 import Card from '@/components/ui/Card'
@@ -29,13 +29,11 @@ export default function StatistikaPage() {
   const router = useRouter()
   const [stats, setStats] = useState<{
     totalReleases: number
-    totalViews: number
     totalDownloads: number
     totalStorageBytes: number
     totalUsers: number
   }>({
     totalReleases: 0,
-    totalViews: 0,
     totalDownloads: 0,
     totalStorageBytes: 0,
     totalUsers: 0,
@@ -97,7 +95,6 @@ export default function StatistikaPage() {
       const data = await res.json()
       setStats({
         totalReleases: data.totalReleases || 0,
-        totalViews: data.totalViews || 0,
         totalDownloads: data.totalDownloads || 0,
         totalStorageBytes: data.totalStorageBytes || 0,
         totalUsers: data.totalUsers || 0,
@@ -130,7 +127,7 @@ export default function StatistikaPage() {
           Statistika
         </h1>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
@@ -139,18 +136,6 @@ export default function StatistikaPage() {
               <div>
                 <p className="text-sm text-gray-600">Ukupno saopštenja</p>
                 <p className="text-2xl font-bold text-[#1d1d1f]">{stats.totalReleases}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#f9c344] rounded-full flex items-center justify-center">
-                <Eye size={24} className="text-[#1d1d1f]" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Ukupno pregleda</p>
-                <p className="text-2xl font-bold text-[#1d1d1f]">{stats.totalViews}</p>
               </div>
             </div>
           </Card>
