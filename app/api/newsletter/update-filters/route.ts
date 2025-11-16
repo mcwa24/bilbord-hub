@@ -4,12 +4,34 @@ import { createClient } from '@/lib/supabase/server'
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { email, tags, receiveAll } = await request.json()
+    const { email, tags, receiveAll, token } = await request.json()
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(
         { error: 'Validan email je obavezan' },
         { status: 400 }
+      )
+    }
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Token je obavezan za ažuriranje pretplate' },
+        { status: 403 }
+      )
+    }
+
+    // Proveri token pre ažuriranja
+    const { data: existing, error: checkError } = await supabase
+      .from('newsletter_subscriptions')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .eq('verification_token', token)
+      .single()
+
+    if (checkError || !existing) {
+      return NextResponse.json(
+        { error: 'Nevažeći token ili email' },
+        { status: 403 }
       )
     }
 
@@ -21,6 +43,7 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq('email', email.toLowerCase())
+      .eq('verification_token', token)
       .select()
       .single()
 

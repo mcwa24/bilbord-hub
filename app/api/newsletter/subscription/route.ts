@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const searchParams = request.nextUrl.searchParams
     const email = searchParams.get('email')
+    const token = searchParams.get('token')
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(
@@ -14,10 +15,19 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Token je obavezan za pristup upravljanju' },
+        { status: 403 }
+      )
+    }
+
+    // Proveri token
     const { data, error } = await supabase
       .from('newsletter_subscriptions')
       .select('*')
       .eq('email', email.toLowerCase())
+      .eq('verification_token', token)
       .single()
 
     if (error && error.code !== 'PGRST116') {
@@ -26,8 +36,8 @@ export async function GET(request: NextRequest) {
 
     if (!data) {
       return NextResponse.json(
-        { error: 'Subscription nije pronađen' },
-        { status: 404 }
+        { error: 'Nevažeći token ili email' },
+        { status: 403 }
       )
     }
 

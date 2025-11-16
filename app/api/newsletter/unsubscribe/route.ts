@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Ako postoji token, proveri ga
+    // Token je obavezan za unsubscribe sa stranice upravljanja
     if (token) {
       const { data: subscription, error: fetchError } = await supabase
         .from('newsletter_subscriptions')
@@ -25,32 +25,34 @@ export async function POST(request: NextRequest) {
       if (fetchError || !subscription) {
         return NextResponse.json(
           { error: 'Nevažeći token ili email' },
-          { status: 400 }
+          { status: 403 }
         )
       }
-    }
 
-    // Ažuriraj subscription
-    let query = supabase
-      .from('newsletter_subscriptions')
-      .update({
-        is_active: false,
-        updated_at: new Date().toISOString(),
+      // Ažuriraj subscription sa tokenom
+      const { error } = await supabase
+        .from('newsletter_subscriptions')
+        .update({
+          is_active: false,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('email', email.toLowerCase())
+        .eq('verification_token', token)
+
+      if (error) throw error
+
+      return NextResponse.json({
+        success: true,
+        message: 'Uspešno ste odjavljeni sa email obaveštenja',
       })
-      .eq('email', email.toLowerCase())
-
-    if (token) {
-      query = query.eq('verification_token', token)
+    } else {
+      // Ako nema tokena, dozvoli unsubscribe samo ako je direktno iz email linka (za stari sistem)
+      // Ali za sigurnost, bolje je zahtevati token
+      return NextResponse.json(
+        { error: 'Token je obavezan za odjavu' },
+        { status: 403 }
+      )
     }
-
-    const { error } = await query
-
-    if (error) throw error
-
-    return NextResponse.json({
-      success: true,
-      message: 'Uspešno ste odjavljeni sa newslettera',
-    })
   } catch (error: any) {
     console.error('Newsletter unsubscribe error:', error)
     return NextResponse.json(

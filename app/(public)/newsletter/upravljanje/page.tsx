@@ -10,20 +10,23 @@ import toast from 'react-hot-toast'
 export default function NewsletterManagementPage() {
   const searchParams = useSearchParams()
   const emailParam = searchParams.get('email')
+  const tokenParam = searchParams.get('token')
   
   const [email, setEmail] = useState(emailParam || '')
+  const [token, setToken] = useState(tokenParam || '')
   const [loading, setLoading] = useState(false)
   const [subscription, setSubscription] = useState<any>(null)
   const [allTags, setAllTags] = useState<string[]>([])
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [receiveAll, setReceiveAll] = useState(true)
+  const [emailSent, setEmailSent] = useState(false)
 
   useEffect(() => {
-    if (emailParam) {
+    if (emailParam && tokenParam) {
       loadSubscription()
     }
     loadTags()
-  }, [emailParam])
+  }, [emailParam, tokenParam])
 
   const loadTags = async () => {
     try {
@@ -38,11 +41,11 @@ export default function NewsletterManagementPage() {
   }
 
   const loadSubscription = async () => {
-    if (!email) return
+    if (!email || !token) return
     
     setLoading(true)
     try {
-      const res = await fetch(`/api/newsletter/subscription?email=${encodeURIComponent(email)}`)
+      const res = await fetch(`/api/newsletter/subscription?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`)
       const data = await res.json()
       
       if (res.ok && data.subscription) {
@@ -51,26 +54,54 @@ export default function NewsletterManagementPage() {
         setSelectedTags(data.subscription.subscribed_tags || [])
       } else {
         setSubscription(null)
+        toast.error(data.error || 'Nevažeći token ili email')
       }
     } catch (error) {
       console.error('Error loading subscription:', error)
+      toast.error('Greška pri učitavanju pretplate')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleLoad = (e: React.FormEvent) => {
+  const handleRequestAccess = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !email.includes('@')) {
       toast.error('Unesite validan email')
       return
     }
-    loadSubscription()
+
+    setLoading(true)
+    try {
+      const res = await fetch('/api/newsletter/send-management-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        toast.success('Poslat vam je email sa linkom za upravljanje. Proverite vaš inbox.')
+        setEmailSent(true)
+      } else {
+        throw new Error(data.error || 'Greška pri slanju emaila')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Greška pri slanju linka za upravljanje')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleUpdateFilters = async () => {
     if (!email || !email.includes('@')) {
       toast.error('Unesite validan email')
+      return
+    }
+
+    if (!token) {
+      toast.error('Token je obavezan za ažuriranje')
       return
     }
 
@@ -83,6 +114,7 @@ export default function NewsletterManagementPage() {
           email,
           tags: receiveAll ? [] : selectedTags,
           receiveAll,
+          token,
         }),
       })
 
@@ -106,12 +138,17 @@ export default function NewsletterManagementPage() {
       return
     }
 
+    if (!token) {
+      toast.error('Token je obavezan za odjavu')
+      return
+    }
+
     setLoading(true)
     try {
       const res = await fetch('/api/newsletter/unsubscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, token }),
       })
 
       const data = await res.json()
@@ -149,27 +186,38 @@ export default function NewsletterManagementPage() {
         </p>
 
         <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8 mb-8">
-          <form onSubmit={handleLoad} className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email adresa
-            </label>
-            <div className="flex gap-3">
-              <div className="relative flex-1">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="unesite@email.com"
-                  className="pl-10"
-                  required
-                />
-              </div>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Učitavanje...' : 'Pronađi pretplatu'}
-              </Button>
-            </div>
-          </form>
+          {!token && !subscription && (
+            <>
+              <form onSubmit={handleRequestAccess} className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email adresa
+                </label>
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="unesite@email.com"
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={loading}>
+                    {loading ? 'Slanje...' : 'Pošalji link za upravljanje'}
+                  </Button>
+                </div>
+              </form>
+              {emailSent && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-green-800">
+                    ✓ Poslat vam je email sa linkom za upravljanje. Proverite vaš inbox i kliknite na link da pristupite upravljanju pretplatom.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
 
           {subscription && (
             <div className="space-y-6 pt-6 border-t border-gray-200">
