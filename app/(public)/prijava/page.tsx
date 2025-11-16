@@ -14,8 +14,10 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const emailParam = searchParams.get('email')
   
+  const [isRegisterMode, setIsRegisterMode] = useState(false)
   const [email, setEmail] = useState(emailParam || '')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null)
   const [locked, setLocked] = useState(false)
@@ -113,6 +115,62 @@ function LoginForm() {
     }
   }
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!email || !email.includes('@')) {
+      toast.error('Unesite validan email')
+      return
+    }
+
+    if (password.length < 6) {
+      toast.error('Lozinka mora imati najmanje 6 karaktera')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      toast.error('Lozinke se ne poklapaju')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) throw error
+
+      if (data.user) {
+        // Poveži subscription sa user_id ako postoji
+        try {
+          await fetch('/api/newsletter/link-user-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          })
+        } catch (err) {
+          // Ignoriši grešku - nije kritično
+          console.error('Error linking subscription:', err)
+        }
+        
+        toast.success('Registracija uspešna! Proverite vaš email za potvrdu.')
+        setIsRegisterMode(false)
+        setPassword('')
+        setConfirmPassword('')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Greška pri registraciji')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex">
       {/* Leva strana - Slika */}
@@ -134,72 +192,186 @@ function LoginForm() {
               Klijent
             </h1>
             <h2 className="text-3xl font-bold text-[#1d1d1f]">
-              Prijava na sistem
+              {isRegisterMode ? 'Registracija' : 'Prijava na sistem'}
             </h2>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
-                Email ili korisničko ime
-              </label>
-              <Input
-                type="text"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email ili korisničko ime"
-                className="w-full bg-gray-100 rounded-lg border-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
-                Lozinka
-              </label>
-              <Input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Lozinka"
-                className="w-full bg-gray-100 rounded-lg border-none"
-              />
-            </div>
-
-            {locked && lockoutTime && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
-                Previše neuspešnih pokušaja. Pokušajte ponovo za {lockoutTime} minuta.
-              </div>
-            )}
-            
-            {remainingAttempts !== null && remainingAttempts > 0 && !locked && (
-              <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
-                Preostalo pokušaja: {remainingAttempts}
-              </div>
-            )}
-
-            <Button 
-              type="submit" 
-              className="w-full bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-lg py-3" 
-              disabled={loading || locked}
+          {/* Tabovi za prebacivanje između prijave i registracije */}
+          <div className="flex gap-4 mb-6 border-b border-gray-200">
+            <button
+              type="button"
+              onClick={() => {
+                setIsRegisterMode(false)
+                setPassword('')
+                setConfirmPassword('')
+                setRemainingAttempts(null)
+                setLocked(false)
+              }}
+              className={`pb-3 px-2 font-medium transition ${
+                !isRegisterMode
+                  ? 'text-[#1d1d1f] border-b-2 border-[#f9c344]'
+                  : 'text-gray-500 hover:text-[#1d1d1f]'
+              }`}
             >
-              {loading ? 'Učitavanje...' : locked ? 'Zaključano' : 'Nastavak'}
-            </Button>
-          </form>
+              Prijava
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsRegisterMode(true)
+                setPassword('')
+                setConfirmPassword('')
+                setRemainingAttempts(null)
+                setLocked(false)
+              }}
+              className={`pb-3 px-2 font-medium transition ${
+                isRegisterMode
+                  ? 'text-[#1d1d1f] border-b-2 border-[#f9c344]'
+                  : 'text-gray-500 hover:text-[#1d1d1f]'
+              }`}
+            >
+              Registracija
+            </button>
+          </div>
+
+          {isRegisterMode ? (
+            <form onSubmit={handleRegister} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
+                  Email adresa
+                </label>
+                <Input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="unesite@email.com"
+                  className="w-full bg-gray-100 rounded-lg border-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
+                  Lozinka
+                </label>
+                <Input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Najmanje 6 karaktera"
+                  className="w-full bg-gray-100 rounded-lg border-none"
+                  minLength={6}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
+                  Potvrdite lozinku
+                </label>
+                <Input
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Ponovite lozinku"
+                  className="w-full bg-gray-100 rounded-lg border-none"
+                  minLength={6}
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-lg py-3" 
+                disabled={loading}
+              >
+                {loading ? 'Učitavanje...' : 'Registruj se'}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
+                  Email ili korisničko ime
+                </label>
+                <Input
+                  type="text"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email ili korisničko ime"
+                  className="w-full bg-gray-100 rounded-lg border-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
+                  Lozinka
+                </label>
+                <Input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Lozinka"
+                  className="w-full bg-gray-100 rounded-lg border-none"
+                />
+              </div>
+
+              {locked && lockoutTime && (
+                <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                  Previše neuspešnih pokušaja. Pokušajte ponovo za {lockoutTime} minuta.
+                </div>
+              )}
+              
+              {remainingAttempts !== null && remainingAttempts > 0 && !locked && (
+                <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
+                  Preostalo pokušaja: {remainingAttempts}
+                </div>
+              )}
+
+              <Button 
+                type="submit" 
+                className="w-full bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-lg py-3" 
+                disabled={loading || locked}
+              >
+                {loading ? 'Učitavanje...' : locked ? 'Zaključano' : 'Nastavak'}
+              </Button>
+            </form>
+          )}
 
           <div className="mt-6 space-y-3 text-center">
-            <p className="text-sm text-gray-600">
-              Nemate nalog?{' '}
-              <a href="/registracija" className="text-[#f9c344] hover:underline font-medium">
-                Registrujte se
-              </a>
-            </p>
-            <p className="text-sm text-gray-600">
-              <a href="/zaboravljena-lozinka" className="text-[#f9c344] hover:underline">
-                Zaboravili ste lozinku?
-              </a>
-            </p>
+            {!isRegisterMode && (
+              <>
+                <p className="text-sm text-gray-600">
+                  Nemate nalog?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setIsRegisterMode(true)}
+                    className="text-[#f9c344] hover:underline font-medium"
+                  >
+                    Registrujte se
+                  </button>
+                </p>
+                <p className="text-sm text-gray-600">
+                  <a href="/zaboravljena-lozinka" className="text-[#f9c344] hover:underline">
+                    Zaboravili ste lozinku?
+                  </a>
+                </p>
+              </>
+            )}
+            {isRegisterMode && (
+              <p className="text-sm text-gray-600">
+                Već imate nalog?{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsRegisterMode(false)}
+                  className="text-[#f9c344] hover:underline font-medium"
+                >
+                  Prijavite se
+                </button>
+              </p>
+            )}
           </div>
         </div>
       </div>
