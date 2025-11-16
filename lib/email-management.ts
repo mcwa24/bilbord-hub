@@ -1,25 +1,14 @@
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { sendEmailSMTP } from './smtp'
 
 export async function sendManagementLinkEmail(
   email: string,
   managementToken: string
 ) {
-  if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY nije postavljen')
-    return { error: 'Email servis nije konfigurisan' }
-  }
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
   const managementUrl = `${siteUrl}/newsletter/upravljanje?token=${managementToken}&email=${encodeURIComponent(email)}`
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
-      to: email,
-      subject: 'Link za upravljanje pretplatom - Bilbord Hub',
-      html: `
+    const html = `
         <!DOCTYPE html>
         <html>
           <head>
