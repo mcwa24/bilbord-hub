@@ -182,7 +182,7 @@ export default function NewsletterManagementPage() {
           Upravljanje pretplatom na email obaveštenja
         </h1>
         <p className="text-lg text-gray-600 mb-8">
-          Unesite vaš email da pronađete i upravljate vašom pretplatom. Možete promeniti tagove, odjaviti se sa određenog taga ili potpuno odjaviti sa email obaveštenja.
+          Za pristup upravljanju pretplatom, unesite vaš email i poslaćemo vam link sa sigurnosnim tokenom. Možete promeniti tagove, odjaviti se sa određenog taga ili potpuno odjaviti sa email obaveštenja.
         </p>
 
         <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8 mb-8">
