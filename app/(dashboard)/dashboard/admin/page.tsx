@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { isAdmin } from '@/lib/admin'
 import Link from 'next/link'
 import { Image as ImageIcon, FileText, Link as LinkIcon, Save, BarChart3 } from 'lucide-react'
@@ -43,12 +44,18 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false)
   const [uploadedDocument, setUploadedDocument] = useState<UploadedFile | null>(null)
   const [uploadedZip, setUploadedZip] = useState<UploadedFile | null>(null)
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
 
   useEffect(() => {
-    if (!isAdmin()) {
-      router.push('/dashboard/login')
+    // Proveri admin status na client side
+    const adminStatus = isAdmin()
+    setIsAuthorized(adminStatus)
+    
+    if (!adminStatus) {
+      // Ako nije admin, prikaži 404
+      notFound()
     }
-  }, [router])
+  }, [])
 
   const handleDocumentUpload = async (files: File[]) => {
     if (files.length === 0) return
