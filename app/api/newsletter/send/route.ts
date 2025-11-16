@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Učitaj sve aktivne i verifikovane subscriptions
+    // Učitaj sve aktivne i verifikovane subscriptions (bez filtriranja po tagovima)
     const { data: subscriptions, error: subsError } = await supabase
       .from('newsletter_subscriptions')
       .select('*')
@@ -45,23 +45,14 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Filtriraj subscriptions po tagovima
-    const releaseTags = release.tags || []
-    const relevantSubscriptions = subscriptions.filter((sub) => {
-      if (sub.receive_all) return true
-      if (!sub.subscribed_tags || sub.subscribed_tags.length === 0) return false
-      // Proveri da li se bilo koji tag iz release-a poklapa sa subscribed_tags
-      return releaseTags.some((tag: string) => sub.subscribed_tags.includes(tag))
-    })
-
-    // Pošalji emailove
+    // Pošalji emailove svima (bez filtriranja po tagovima)
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
     const downloadUrl = `${siteUrl}/download/${release.id}`
 
     let sentCount = 0
     const errors: string[] = []
 
-    for (const subscription of relevantSubscriptions) {
+    for (const subscription of subscriptions) {
       // Generiši unsubscribe token ako ne postoji
       let unsubscribeToken = subscription.verification_token
       if (!unsubscribeToken) {
@@ -80,7 +71,7 @@ export async function POST(request: NextRequest) {
           id: release.id,
           title: release.title,
           description: release.description || release.title,
-          tags: releaseTags,
+          tags: release.tags || [],
           published_at: release.published_at,
           downloadUrl,
         },
@@ -101,9 +92,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Emailovi poslati: ${sentCount}/${relevantSubscriptions.length}`,
+      message: `Emailovi poslati: ${sentCount}/${subscriptions.length}`,
       sent: sentCount,
-      total: relevantSubscriptions.length,
+      total: subscriptions.length,
       errors: errors.length > 0 ? errors : undefined,
     })
   } catch (error: any) {
@@ -114,4 +105,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

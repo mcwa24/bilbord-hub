@@ -4,8 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function sendConfirmationEmail(
   email: string,
-  verificationToken: string,
-  tags: string[]
+  verificationToken: string
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.error('RESEND_API_KEY nije postavljen')
@@ -37,16 +36,9 @@ export async function sendConfirmationEmail(
                 Hvala vam što ste se prijavili na Bilbord Hub email obaveštenja! Kliknite na dugme ispod da potvrdite vašu email adresu.
               </p>
               
-              ${tags.length > 0 ? `
-                <div style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
-                  <p style="margin: 0 0 10px 0; font-weight: bold; color: #1d1d1f;">Izabrani tagovi:</p>
-                  ${tags.map(tag => `<span style="display: inline-block; background-color: #f0f0f0; padding: 4px 8px; margin: 4px; border-radius: 4px; font-size: 12px;">${tag}</span>`).join('')}
-                </div>
-              ` : `
-                <div style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
-                  <p style="margin: 0; color: #1d1d1f;">Primaćete <strong>sva PR saopštenja</strong></p>
-                </div>
-              `}
+              <div style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+                <p style="margin: 0; color: #1d1d1f;">Primaćete <strong>sva PR saopštenja</strong> kada se objave nova saopštenja.</p>
+              </div>
               
               <div style="margin: 30px 0; text-align: center;">
                 <a href="${confirmationUrl}" 
@@ -76,4 +68,3 @@ export async function sendConfirmationEmail(
     return { error: error.message || 'Greška pri slanju emaila' }
   }
 }
-

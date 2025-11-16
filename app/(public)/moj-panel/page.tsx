@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Mail, Settings, CheckCircle } from 'lucide-react'
 import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 
@@ -13,14 +12,10 @@ export default function MyPanelPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [subscription, setSubscription] = useState<any>(null)
-  const [allTags, setAllTags] = useState<string[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [receiveAll, setReceiveAll] = useState(true)
   const [creatingSubscription, setCreatingSubscription] = useState(false)
 
   useEffect(() => {
     checkUser()
-    loadTags()
   }, [])
 
   const checkUser = async () => {
@@ -45,18 +40,6 @@ export default function MyPanelPage() {
     }
   }
 
-  const loadTags = async () => {
-    try {
-      const res = await fetch('/api/tags')
-      const data = await res.json()
-      if (data.tags) {
-        setAllTags(data.tags)
-      }
-    } catch (error) {
-      console.error('Error loading tags:', error)
-    }
-  }
-
   const loadSubscription = async (email: string) => {
     if (!email) return
 
@@ -66,8 +49,6 @@ export default function MyPanelPage() {
 
       if (res.ok && data.subscription) {
         setSubscription(data.subscription)
-        setReceiveAll(data.subscription.receive_all)
-        setSelectedTags(data.subscription.subscribed_tags || [])
       } else {
         // Ako nema subscription, ne kreiraj ga automatski - korisnik će kliknuti dugme
         setSubscription(null)
@@ -89,15 +70,13 @@ export default function MyPanelPage() {
       const res = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, tags: [], receiveAll: true }),
+        body: JSON.stringify({ email }),
       })
 
       const data = await res.json()
       
       if (res.ok && data.subscription) {
         setSubscription(data.subscription)
-        setReceiveAll(true)
-        setSelectedTags([])
         toast.success('Email obaveštenja su aktivirana!')
         // Ponovo učitaj subscription da osveži podatke
         await loadSubscription(email)
@@ -109,36 +88,6 @@ export default function MyPanelPage() {
       toast.error(error.message || 'Greška pri aktivaciji email obaveštenja')
     } finally {
       setCreatingSubscription(false)
-    }
-  }
-
-  const handleUpdateFilters = async () => {
-    if (!user?.email) return
-
-    setLoading(true)
-    try {
-      const res = await fetch('/api/newsletter/update-filters-by-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          tags: receiveAll ? [] : selectedTags,
-          receiveAll,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (res.ok) {
-        toast.success('Filteri su ažurirani!')
-        setSubscription(data.subscription)
-      } else {
-        throw new Error(data.error || 'Greška pri ažuriranju filtera')
-      }
-    } catch (error: any) {
-      toast.error(error.message || 'Greška pri ažuriranju filtera')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -169,25 +118,6 @@ export default function MyPanelPage() {
       toast.error(error.message || 'Greška pri odjavi sa email obaveštenja')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleLogout = async () => {
-    try {
-      const supabase = createClient()
-      await supabase.auth.signOut()
-      toast.success('Uspešno ste se odjavili')
-      router.push('/')
-    } catch (error: any) {
-      toast.error('Greška pri odjavi')
-    }
-  }
-
-  const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag))
-    } else {
-      setSelectedTags([...selectedTags, tag])
     }
   }
 
@@ -244,6 +174,9 @@ export default function MyPanelPage() {
                       Poslednji email: {new Date(subscription.last_email_sent_at).toLocaleDateString('sr-RS')}
                     </p>
                   )}
+                  <p className="text-sm text-gray-600 mt-2">
+                    Primate <strong>sva PR saopštenja</strong> kada se objave nova saopštenja.
+                  </p>
                 </div>
                 {subscription.is_active ? (
                   <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
@@ -264,89 +197,13 @@ export default function MyPanelPage() {
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Koja saopštenja želite da primate?
-                </label>
-                <div className="space-y-3 mb-4">
-                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      checked={receiveAll}
-                      onChange={() => {
-                        setReceiveAll(true)
-                        setSelectedTags([])
-                      }}
-                      className="w-4 h-4 text-[#f9c344] mt-1"
-                    />
-                    <div>
-                      <span className="text-[#1d1d1f] font-medium">Sva saopštenja</span>
-                      <p className="text-sm text-gray-600">Primaćete email za svako novo PR saopštenje</p>
-                    </div>
-                  </label>
-                  <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      checked={!receiveAll}
-                      onChange={() => setReceiveAll(false)}
-                      className="w-4 h-4 text-[#f9c344] mt-1"
-                    />
-                    <div>
-                      <span className="text-[#1d1d1f] font-medium">Samo saopštenja sa određenim tagovima</span>
-                      <p className="text-sm text-gray-600">Izaberite tagove ispod</p>
-                    </div>
-                  </label>
-                </div>
-
-                {!receiveAll && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      Izaberite tagove:
-                    </label>
-                    <div className="flex flex-wrap gap-2 max-h-64 overflow-y-auto p-3 border border-gray-200 rounded-lg bg-gray-50">
-                      {allTags.length === 0 ? (
-                        <p className="text-gray-500 text-sm">Učitavanje tagova...</p>
-                      ) : (
-                        allTags.map((tag) => (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => toggleTag(tag)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition flex items-center gap-1 ${
-                              selectedTags.includes(tag)
-                                ? 'bg-[#f9c344] text-[#1d1d1f]'
-                                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                            }`}
-                          >
-                            {selectedTags.includes(tag) && <CheckCircle size={14} />}
-                            {tag}
-                          </button>
-                        ))
-                      )}
-                    </div>
-                    {selectedTags.length === 0 && (
-                      <p className="text-sm text-red-500 mt-2">
-                        Izaberite barem jedan tag da biste primali emailove
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-                <Button
-                  onClick={handleUpdateFilters}
-                  disabled={loading || (!receiveAll && selectedTags.length === 0)}
-                  className="flex-1"
-                >
-                  {loading ? 'Čuvanje...' : 'Sačuvaj izmene'}
-                </Button>
+              <div className="pt-4 border-t border-gray-200">
                 <Button
                   onClick={handleUnsubscribe}
                   disabled={loading}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
                 >
-                  Potpuno odjavi se
+                  Odjavi se sa email obaveštenja
                 </Button>
               </div>
             </div>
@@ -354,6 +211,9 @@ export default function MyPanelPage() {
             <div className="text-center py-8">
               <p className="text-gray-600 mb-4">
                 Nema aktivne pretplate za email obaveštenja.
+              </p>
+              <p className="text-sm text-gray-600 mb-6">
+                Aktivirajte email obaveštenja da biste primali sva nova PR saopštenja.
               </p>
               <Button 
                 onClick={() => {
@@ -374,4 +234,3 @@ export default function MyPanelPage() {
     </div>
   )
 }
-

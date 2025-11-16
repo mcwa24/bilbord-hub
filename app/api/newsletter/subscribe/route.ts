@@ -6,7 +6,7 @@ import crypto from 'crypto'
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { email, tags, receiveAll } = await request.json()
+    const { email } = await request.json()
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(
@@ -21,8 +21,6 @@ export async function POST(request: NextRequest) {
 
     // Generiši verification token
     const verificationToken = crypto.randomBytes(32).toString('hex')
-    const finalTags = receiveAll ? [] : (tags || [])
-    const receiveAllFlag = receiveAll === true || finalTags.length === 0
 
     // Proveri da li već postoji subscription
     const { data: existing } = await supabase
@@ -39,8 +37,8 @@ export async function POST(request: NextRequest) {
         .from('newsletter_subscriptions')
         .update({
           is_active: true,
-          receive_all: receiveAllFlag,
-          subscribed_tags: finalTags,
+          receive_all: true, // Uvek prima sva obaveštenja
+          subscribed_tags: [], // Bez tagova
           verification_token: verificationToken,
           is_verified: userId ? true : false, // Ako je ulogovan, automatski verifikovano
           user_id: userId || existing.user_id, // Ažuriraj user_id ako je ulogovan
@@ -59,8 +57,8 @@ export async function POST(request: NextRequest) {
         .insert({
           email: email.toLowerCase(),
           is_active: true,
-          receive_all: receiveAllFlag,
-          subscribed_tags: finalTags,
+          receive_all: true, // Uvek prima sva obaveštenja
+          subscribed_tags: [], // Bez tagova
           verification_token: verificationToken,
           is_verified: userId ? true : false, // Ako je ulogovan, automatski verifikovano
           user_id: userId,
@@ -75,27 +73,19 @@ export async function POST(request: NextRequest) {
     // Pošalji confirmation email samo ako korisnik nije ulogovan
     let emailSent = false
     if (!userId) {
-      console.log('Sending confirmation email to:', email.toLowerCase())
-      console.log('RESEND_API_KEY present:', !!process.env.RESEND_API_KEY)
-      console.log('RESEND_FROM_EMAIL:', process.env.RESEND_FROM_EMAIL)
-      
       const emailResult = await sendConfirmationEmail(
         email.toLowerCase(),
-        verificationToken,
-        finalTags
+        verificationToken
       )
 
       if (emailResult.error) {
         console.error('Error sending confirmation email:', emailResult.error)
-        console.error('Email result:', emailResult)
         // Ne baci grešku - subscription je kreiran, samo email nije poslat
       } else {
-        console.log('Confirmation email sent successfully')
         emailSent = true
       }
     } else {
       // Ako je ulogovan, ne treba confirmation email
-      console.log('User is logged in, skipping confirmation email')
       emailSent = true
     }
 
@@ -113,4 +103,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-
