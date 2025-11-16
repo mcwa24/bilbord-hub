@@ -27,6 +27,11 @@ export default function NewsletterUnsubscribePage() {
       return
     }
 
+    if (!tokenParam) {
+      toast.error('Token je obavezan za odjavu. Koristite link iz emaila.')
+      return
+    }
+
     setLoading(true)
     try {
       const res = await fetch('/api/newsletter/unsubscribe', {
@@ -34,7 +39,7 @@ export default function NewsletterUnsubscribePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email,
-          token: tokenParam || undefined,
+          token: tokenParam,
         }),
       })
 
