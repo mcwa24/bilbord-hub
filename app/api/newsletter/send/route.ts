@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
           id: release.id,
           title: release.title,
           description: release.description || release.title,
+          content: release.content || undefined,
           tags: release.tags || [],
           published_at: release.published_at,
           downloadUrl,
