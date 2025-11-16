@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import React from 'react'
-import { Upload, Eye, Download, Share2 } from 'lucide-react'
+import { Upload, Eye, Download, Share2, Mail } from 'lucide-react'
+import NewsletterSubscribe from '@/components/NewsletterSubscribe'
 
 export default function OPRPlatformiPage() {
   const [language, setLanguage] = useState<'sr' | 'en'>('sr')
@@ -67,7 +68,8 @@ export default function OPRPlatformiPage() {
             'Centralizovani pristup svim PR saopštenjima',
             'Pretraga i filtriranje po interesovanjima',
             'Preuzimanje originalnih fajlova',
-            'Ready-to-publish HTML kod'
+            'Ready-to-publish HTML kod',
+            'Email obaveštenja po tagovima - dobijajte obaveštenja čim stigne PR saopštenje sa tagovima koje pratite'
           ]
         }
       },
@@ -172,7 +174,8 @@ export default function OPRPlatformiPage() {
             'Centralized access to all PR releases',
             'Search and filter by interests',
             'Download original files',
-            'Ready-to-publish HTML code'
+            'Ready-to-publish HTML code',
+            'Email notifications by tags - receive notifications as soon as a PR release arrives with tags you follow'
           ]
         }
       },
@@ -333,6 +336,26 @@ export default function OPRPlatformiPage() {
                   <li key={index} className="text-[#1d1d1f]">{item}</li>
                 ))}
               </ul>
+            </div>
+          </div>
+
+          {/* Baner za email obaveštenja */}
+          <div className="bg-gradient-to-r from-[#f9c344] to-[#f0b830] p-8 md:p-12 rounded-2xl mb-8 shadow-lg relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-4">
+                <Mail size={32} className="text-[#1d1d1f]" />
+                <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f]">
+                  {language === 'sr' ? 'Prijavite se na email obaveštenja' : 'Subscribe to email notifications'}
+                </h2>
+              </div>
+              <p className="text-[#1d1d1f] text-lg mb-6 leading-relaxed">
+                {language === 'sr' 
+                  ? 'Mediji mogu da se prijave na email obaveštenja i dobijaju obaveštenja čim stigne PR saopštenje sa tagovima koje pratite. Budite uvek u toku sa najnovijim PR saopštenjima iz vaših oblasti interesovanja.'
+                  : 'Media can subscribe to email notifications and receive alerts as soon as a PR release arrives with tags they follow. Stay up to date with the latest PR releases from your areas of interest.'}
+              </p>
+              <div className="bg-white/90 backdrop-blur-sm p-6 rounded-xl">
+                <NewsletterSubscribe />
+              </div>
             </div>
           </div>
 
