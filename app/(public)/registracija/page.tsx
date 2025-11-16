@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,8 +60,8 @@ export default function RegisterPage() {
           console.error('Error linking subscription:', err)
         }
         
-        toast.success('Registracija uspešna! Proverite vaš email za potvrdu.')
-        router.push('/prijava?email=' + encodeURIComponent(email))
+        setRegistrationSuccess(true)
+        toast.success('Registracija uspešna!')
       }
     } catch (error: any) {
       toast.error(error.message || 'Greška pri registraciji')
@@ -94,7 +95,36 @@ export default function RegisterPage() {
             </h2>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-6">
+          {registrationSuccess ? (
+            <div className="space-y-6">
+              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 text-center">
+                <div className="mb-4">
+                  <svg className="mx-auto h-16 w-16 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-[#1d1d1f] mb-3">
+                  Registracija uspešna!
+                </h3>
+                <p className="text-gray-700 mb-4 text-lg">
+                  Verifikacioni email je poslat na adresu:
+                </p>
+                <p className="text-[#1d1d1f] font-semibold mb-6 text-lg">
+                  {email}
+                </p>
+                <p className="text-gray-700 mb-6">
+                  Molimo proverite vašu email poštu i kliknite na link za verifikaciju naloga.
+                </p>
+                <Button
+                  onClick={() => router.push('/prijava?email=' + encodeURIComponent(email))}
+                  className="w-full bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-lg py-3"
+                >
+                  Idi na prijavu
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleRegister} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
                 Email adresa
@@ -147,15 +177,18 @@ export default function RegisterPage() {
               {loading ? 'Učitavanje...' : 'Nastavak'}
             </Button>
           </form>
+          )}
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Već imate nalog?{' '}
-              <a href="/prijava" className="text-[#f9c344] hover:underline font-medium">
-                Prijavite se
-              </a>
-            </p>
-          </div>
+          {!registrationSuccess && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                Već imate nalog?{' '}
+                <a href="/prijava" className="text-[#f9c344] hover:underline font-medium">
+                  Prijavite se
+                </a>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
