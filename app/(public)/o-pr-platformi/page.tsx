@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import React from 'react'
+import { Upload, Eye, Download, Share2 } from 'lucide-react'
 
 export default function OPRPlatformiPage() {
   const [language, setLanguage] = useState<'sr' | 'en'>('sr')
@@ -89,20 +91,24 @@ export default function OPRPlatformiPage() {
         title: 'Kako funkcioniše PR Hub platforma',
         steps: [
           {
-            title: '1. Upload saopštenja',
-            text: 'Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, tagovima, slikama i dokumentima.'
+            title: 'Upload saopštenja',
+            text: 'Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, tagovima, slikama i dokumentima.',
+            icon: 'upload'
           },
           {
-            title: '2. Pregled saopštenja',
-            text: 'Sva saopštenja su vidljiva direktno u listi sa naslovom, datumom, tagovima i linkovima za preuzimanje materijala.'
+            title: 'Pregled saopštenja',
+            text: 'Sva saopštenja su vidljiva direktno u listi sa naslovom, datumom, tagovima i linkovima za preuzimanje materijala.',
+            icon: 'eye'
           },
           {
-            title: '3. Preuzimanje materijala',
-            text: 'Preuzmite dokumente i ZIP arhive sa slikama direktno sa platforme ili koristite funkciju deljenja.'
+            title: 'Preuzimanje materijala',
+            text: 'Preuzmite dokumente i ZIP arhive sa slikama direktno sa platforme ili koristite funkciju deljenja.',
+            icon: 'download'
           },
           {
-            title: '4. Deljenje linkova',
-            text: 'Koristite ikonu deljenja da kopirate jedinstveni link. Svako ko klikne na link automatski dobija download svih materijala.'
+            title: 'Deljenje linkova',
+            text: 'Koristite ikonu deljenja da kopirate jedinstveni link. Svako ko klikne na link automatski dobija download svih materijala.',
+            icon: 'share'
           }
         ]
       }
@@ -190,20 +196,24 @@ export default function OPRPlatformiPage() {
         title: 'How PR Hub platform works',
         steps: [
           {
-            title: '1. Upload releases',
-            text: 'Hub team or companies upload PR releases to the platform with title, tags, images, and documents.'
+            title: 'Upload releases',
+            text: 'Hub team or companies upload PR releases to the platform with title, tags, images, and documents.',
+            icon: 'upload'
           },
           {
-            title: '2. View release',
-            text: 'All releases are visible directly in the list with title, date, tags, and links to download materials.'
+            title: 'View release',
+            text: 'All releases are visible directly in the list with title, date, tags, and links to download materials.',
+            icon: 'eye'
           },
           {
-            title: '3. Download materials',
-            text: 'Download documents and ZIP archives with images directly from the platform or use the sharing function.'
+            title: 'Download materials',
+            text: 'Download documents and ZIP archives with images directly from the platform or use the sharing function.',
+            icon: 'download'
           },
           {
-            title: '4. Share links',
-            text: 'Use the share icon to copy a unique link. Anyone who clicks on the link automatically gets a download of all materials.'
+            title: 'Share links',
+            text: 'Use the share icon to copy a unique link. Anyone who clicks on the link automatically gets a download of all materials.',
+            icon: 'share'
           }
         ]
       }
@@ -344,16 +354,29 @@ export default function OPRPlatformiPage() {
               {currentContent.hubSteps.title}
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {currentContent.hubSteps.steps.map((step, index) => (
-                <div key={index} className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
-                  <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="text-[#1d1d1f] text-gray-700">
-                    {step.text}
-                  </p>
-                </div>
-              ))}
+              {currentContent.hubSteps.steps.map((step: any, index: number) => {
+                const icons: Record<string, React.ReactNode> = {
+                  upload: <Upload size={20} className="text-[#1d1d1f]" />,
+                  eye: <Eye size={20} className="text-[#1d1d1f]" />,
+                  download: <Download size={20} className="text-[#1d1d1f]" />,
+                  share: <Share2 size={20} className="text-[#1d1d1f]" />
+                }
+                const IconComponent = icons[step.icon] || icons.upload
+                
+                return (
+                  <div key={index} className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
+                    <div className="flex items-center gap-3 mb-3">
+                      {IconComponent}
+                      <h3 className="text-xl font-bold text-[#1d1d1f]">
+                        {step.title}
+                      </h3>
+                    </div>
+                    <p className="text-[#1d1d1f] text-gray-700">
+                      {step.text}
+                    </p>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>

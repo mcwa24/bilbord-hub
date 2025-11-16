@@ -221,6 +221,19 @@ export async function POST(request: NextRequest) {
       throw error
     }
 
+    // Pošalji newsletter emailove u pozadini (ne čekaj)
+    if (data && data.published_at) {
+      // Pozovi newsletter send endpoint u pozadini
+      fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/newsletter/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ releaseId: data.id }),
+      }).catch((err) => {
+        console.error('Error sending newsletter emails:', err)
+        // Ne baci grešku - newsletter slanje ne sme da blokira kreiranje saopštenja
+      })
+    }
+
     return NextResponse.json({ release: data })
   } catch (error: any) {
     console.error('POST error:', error)

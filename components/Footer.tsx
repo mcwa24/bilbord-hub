@@ -30,6 +30,9 @@ export default function Footer() {
                         <Link href="/o-pr-platformi" className="text-gray-600 hover:text-gray-800">
                             O PR Platformi
                         </Link>
+                        <Link href="https://bilbord.rs/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-800">
+                            Bilbord Portal
+                        </Link>
                         <Link href="/cookie-policy" className="text-gray-600 hover:text-gray-800">
                             Cookie Policy
                         </Link>
@@ -44,6 +47,12 @@ export default function Footer() {
                         </Link>
                         <Link href="https://bilbord.rs/kontakt/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-800">
                             Kontakt
+                        </Link>
+                        <Link href="/newsletter/prijava" className="text-gray-600 hover:text-gray-800">
+                            Newsletter Prijava
+                        </Link>
+                        <Link href="/newsletter/upravljanje" className="text-gray-600 hover:text-gray-800">
+                            Newsletter Upravljanje
                         </Link>
                     </div>
 

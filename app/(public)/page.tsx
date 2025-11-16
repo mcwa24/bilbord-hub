@@ -6,13 +6,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from "next/link";
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Search, Upload, Eye, Download, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PRReleaseList from "@/components/PRReleaseList";
 import RSSFeedList from "@/components/RSSFeedList";
 import LogoGrid from "@/components/LogoGrid";
+import NewsletterSubscribe from "@/components/NewsletterSubscribe";
 import { isAdmin } from '@/lib/admin';
 import toast from 'react-hot-toast';
 
@@ -457,37 +458,69 @@ export default function Home() {
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
-                  1. Upload saopštenja
-                </h3>
+                <div className="flex items-center gap-3 mb-3">
+                  <Upload size={20} className="text-[#1d1d1f]" />
+                  <h3 className="text-xl font-bold text-[#1d1d1f]">
+                    Upload saopštenja
+                  </h3>
+                </div>
                 <p className="text-[#1d1d1f] text-gray-700">
                   Hub team ili firme upload-uju PR saopštenja na platformu sa naslovom, tagovima, slikama i dokumentima.
                 </p>
               </div>
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
-                  2. Pregled saopštenja
-                </h3>
+                <div className="flex items-center gap-3 mb-3">
+                  <Eye size={20} className="text-[#1d1d1f]" />
+                  <h3 className="text-xl font-bold text-[#1d1d1f]">
+                    Pregled saopštenja
+                  </h3>
+                </div>
                 <p className="text-[#1d1d1f] text-gray-700">
                   Sva saopštenja su vidljiva direktno u listi sa naslovom, datumom, tagovima i linkovima za preuzimanje materijala.
                 </p>
               </div>
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
-                  3. Preuzimanje materijala
-                </h3>
+                <div className="flex items-center gap-3 mb-3">
+                  <Download size={20} className="text-[#1d1d1f]" />
+                  <h3 className="text-xl font-bold text-[#1d1d1f]">
+                    Preuzimanje materijala
+                  </h3>
+                </div>
                 <p className="text-[#1d1d1f] text-gray-700">
                   Preuzmite dokumente i ZIP arhive sa slikama direktno sa platforme ili koristite funkciju deljenja.
                 </p>
               </div>
               <div className="bg-white border-2 border-gray-200 p-6 rounded-xl hover:shadow-lg transition-shadow">
-                <h3 className="text-xl font-bold text-[#1d1d1f] mb-3">
-                  4. Deljenje linkova
-                </h3>
+                <div className="flex items-center gap-3 mb-3">
+                  <Share2 size={20} className="text-[#1d1d1f]" />
+                  <h3 className="text-xl font-bold text-[#1d1d1f]">
+                    Deljenje linkova
+                  </h3>
+                </div>
                 <p className="text-[#1d1d1f] text-gray-700">
                   Koristite ikonu deljenja da kopirate jedinstveni link. Svako ko klikne na link automatski dobija download svih materijala.
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Newsletter prijava */}
+          <div className="border-t-2 border-gray-200 pt-12 mt-12">
+            <div className="bg-gradient-to-r from-[#f9c344] to-[#f0b830] rounded-2xl p-8 md:p-12 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4">
+                Prijavite se na newsletter
+              </h2>
+              <p className="text-[#1d1d1f] text-lg mb-6 max-w-2xl mx-auto">
+                Budite u toku sa najnovijim PR saopštenjima. Primate email obaveštenja kada se objavi novo saopštenje.
+              </p>
+              <div className="max-w-md mx-auto">
+                <NewsletterSubscribe />
+              </div>
+              <p className="text-sm text-[#1d1d1f] mt-4">
+                <a href="/newsletter/upravljanje" className="underline hover:no-underline">
+                  Upravljajte svojom pretplatom
+                </a>
+              </p>
             </div>
           </div>
         </div>

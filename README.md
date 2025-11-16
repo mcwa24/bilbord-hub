@@ -39,6 +39,8 @@ npm install
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+RESEND_API_KEY=your_resend_api_key
+RESEND_FROM_EMAIL=Bilbord Hub <noreply@bilbord.rs>
 ```
 
 3. Kreiraj Supabase tabele:
@@ -98,7 +100,18 @@ CREATE POLICY "Anyone can insert download stats" ON download_stats
   FOR INSERT WITH CHECK (true);
 ```
 
-4. Pokreni development server:
+4. Kreiraj newsletter subscriptions tabelu:
+```sql
+-- Pokreni SQL iz supabase-newsletter-schema.sql u Supabase SQL Editor-u
+```
+
+5. Konfiguriši Resend API:
+   - Registruj se na https://resend.com
+   - Kreiraj API key
+   - Dodaj `RESEND_API_KEY` u `.env.local`
+   - Opciono: Dodaj `RESEND_FROM_EMAIL` sa vašim email domenom
+
+6. Pokreni development server:
 ```bash
 npm run dev
 ```
