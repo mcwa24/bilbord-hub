@@ -38,13 +38,16 @@ export default function RegisterPage() {
     try {
       const supabase = createClient()
       
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
+      // Koristi produkcijski URL za email redirect, ne localhost
+      const siteUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+        ? 'https://hub.bilbord.rs'
+        : (process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs')
       
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${siteUrl}/auth/callback`,
+          emailRedirectTo: `${siteUrl.replace(/\/$/, '')}/auth/callback`,
         },
       })
 
