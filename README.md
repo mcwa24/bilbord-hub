@@ -39,8 +39,14 @@ npm install
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+RESEND_FROM_EMAIL=Bilbord Hub <noreply@mail.hub.bilbord.rs>
+# SMTP Configuration (Resend SMTP)
+SMTP_HOST=smtp.resend.com
+SMTP_PORT=465
+SMTP_USER=resend
+SMTP_PASSWORD=your_resend_api_key
+# Ili koristi RESEND_API_KEY kao fallback za SMTP_PASSWORD
 RESEND_API_KEY=your_resend_api_key
-RESEND_FROM_EMAIL=Bilbord Hub <noreply@bilbord.rs>
 ```
 
 3. Kreiraj Supabase tabele:
