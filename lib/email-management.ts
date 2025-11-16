@@ -38,15 +38,22 @@ export async function sendManagementLinkEmail(
             </div>
           </body>
         </html>
-      `,
+      `
+
+    const result = await sendEmailSMTP({
+      to: email,
+      subject: 'Link za upravljanje pretplatom - Bilbord Hub',
+      html: html,
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
     })
 
-    if (error) {
-      console.error('Resend error:', error)
-      return { error: error.message }
+    if (result.error) {
+      console.error('SMTP error sending management link email:', result.error)
+      return { error: result.error }
     }
 
-    return { success: true, data }
+    console.log('Management link email sent successfully via SMTP')
+    return { success: true, data: result }
   } catch (error: any) {
     console.error('Email send error:', error)
     return { error: error.message || 'Greška pri slanju emaila' }
