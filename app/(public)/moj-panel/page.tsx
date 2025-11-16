@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mail, Settings, LogOut, CheckCircle } from 'lucide-react'
+import { Mail, Settings, CheckCircle } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import toast from 'react-hot-toast'
@@ -188,22 +188,13 @@ export default function MyPanelPage() {
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-2">
-              Moj Panel
-            </h1>
-            <p className="text-gray-600">
-              Email: <strong>{user?.email}</strong>
-            </p>
-          </div>
-          <Button
-            onClick={handleLogout}
-            className="bg-gray-200 text-gray-700 hover:bg-gray-300"
-          >
-            <LogOut size={18} className="mr-2" />
-            Odjavi se
-          </Button>
+        <div className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-2">
+            Moj Panel
+          </h1>
+          <p className="text-gray-600">
+            Email: <strong>{user?.email}</strong>
+          </p>
         </div>
 
         <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8 mb-8">
