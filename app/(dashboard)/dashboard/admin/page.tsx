@@ -50,11 +50,6 @@ export default function AdminPage() {
     // Proveri admin status na client side
     const adminStatus = isAdmin()
     setIsAuthorized(adminStatus)
-    
-    if (!adminStatus) {
-      // Ako nije admin, prikaži 404
-      notFound()
-    }
   }, [])
 
   const handleDocumentUpload = async (files: File[]) => {
