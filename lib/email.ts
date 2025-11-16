@@ -60,7 +60,6 @@ export async function sendNewsletterEmail(
                 Ovaj email ste primili jer ste se prijavili na email obaveštenja Bilbord Hub platforme.
                 <br>
                 <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'}/newsletter/odjava?email=${encodeURIComponent(email)}${unsubscribeToken ? `&token=${unsubscribeToken}` : ''}" style="color: #999;">Odjavite se</a>
-                ${unsubscribeToken ? ` | <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'}/newsletter/upravljanje?email=${encodeURIComponent(email)}&token=${unsubscribeToken}" style="color: #999;">Upravljajte pretplatom</a>` : ''}
               </p>
             </div>
           </body>

@@ -51,41 +51,6 @@ function LoginForm() {
         return
       }
 
-      // Ako nije admin, pokušaj user login (Supabase)
-      if (email.includes('@')) {
-        const supabase = createClient()
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
-        if (error) {
-          // Ako je admin lockout, prikaži to
-          if (adminData.locked) {
-            setLocked(true)
-            const timeMatch = adminData.error.match(/(\d+)\s+minuta/)
-            if (timeMatch) {
-              setLockoutTime(parseInt(timeMatch[1]))
-            }
-            toast.error(adminData.error)
-          } else {
-            toast.error(error.message || 'Pogrešno korisničko ime ili lozinka')
-          }
-        } else if (data.user) {
-          // User login uspešan - poveži subscription sa user_id ako postoji
-          try {
-            await fetch('/api/newsletter/link-user-subscription', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-            })
-          } catch (err) {
-            // Ignoriši grešku - nije kritično
-            console.error('Error linking subscription:', err)
-          }
-          
-          toast.success('Uspešno ste se prijavili!')
-          router.push('/moj-panel')
-        }
       } else {
         // Ako nije email format i admin login nije uspeo
         if (adminData.locked) {
@@ -103,7 +68,7 @@ function LoginForm() {
             toast.error(adminData.error)
           }
         } else {
-          toast.error('Unesite validan email za korisnički nalog ili admin credentials')
+          toast.error('Pogrešno korisničko ime ili lozinka')
         }
       }
     } catch (error: any) {
@@ -141,14 +106,14 @@ function LoginForm() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-[#1d1d1f] mb-2">
-                Email ili korisničko ime
+                Korisničko ime
               </label>
               <Input
                 type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email ili korisničko ime"
+                placeholder="Korisničko ime"
                 className="w-full bg-gray-100 rounded-lg border-none"
               />
             </div>
@@ -188,19 +153,6 @@ function LoginForm() {
             </Button>
           </form>
 
-          <div className="mt-6 space-y-3 text-center">
-            <p className="text-sm text-gray-600">
-              Nemate nalog?{' '}
-              <a href="/registracija" className="text-[#f9c344] hover:underline font-medium">
-                Registrujte se
-              </a>
-            </p>
-            <p className="text-sm text-gray-600">
-              <a href="/zaboravljena-lozinka" className="text-[#f9c344] hover:underline">
-                Zaboravili ste lozinku?
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </div>
