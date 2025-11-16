@@ -69,35 +69,36 @@ export async function GET(request: NextRequest) {
     let totalUsers = 0
     try {
       const adminSupabase = createAdminClient()
-      // Prvo probajmo da dobijemo sve subscriptions da vidimo šta imamo
+      // Uzmi sve subscriptions i filtriraj na frontendu
       const { data: allSubs, error: allSubsError } = await adminSupabase
         .from('newsletter_subscriptions')
         .select('*')
       
-      console.log('All subscriptions:', allSubs?.length, allSubsError)
-      
-      // Sada probajmo sa count
-      const { count, error: usersError } = await adminSupabase
-        .from('newsletter_subscriptions')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_verified', true)
-        .eq('is_active', true)
-
-      console.log('Users count query result:', { count, error: usersError })
-
-      if (usersError) {
-        console.error('Error fetching users count:', usersError)
-        // Fallback: koristi dužinu array-a ako count ne radi
-        if (allSubs) {
-          totalUsers = allSubs.filter((sub: any) => sub.is_verified === true && sub.is_active === true).length
-          console.log('Using fallback count:', totalUsers)
-        }
-      } else {
-        totalUsers = count || 0
-        console.log('Using count result:', totalUsers)
+      if (allSubsError) {
+        console.error('Error fetching all subscriptions:', allSubsError)
+      } else if (allSubs) {
+        // Filtriraj verifikovane i aktivne subscriptions
+        totalUsers = allSubs.filter((sub: any) => 
+          sub.is_verified === true && sub.is_active === true
+        ).length
+        console.log(`Found ${totalUsers} verified and active users out of ${allSubs.length} total subscriptions`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating admin client for users count:', error)
+      // Fallback: probaj sa običnim client-om
+      try {
+        const { data: fallbackSubs, error: fallbackError } = await supabase
+          .from('newsletter_subscriptions')
+          .select('*')
+        
+        if (!fallbackError && fallbackSubs) {
+          totalUsers = fallbackSubs.filter((sub: any) => 
+            sub.is_verified === true && sub.is_active === true
+          ).length
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback query also failed:', fallbackErr)
+      }
     }
 
     return NextResponse.json({
