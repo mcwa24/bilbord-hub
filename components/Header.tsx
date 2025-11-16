@@ -16,6 +16,12 @@ export default function Header() {
 
   const isDashboard = pathname?.startsWith('/dashboard');
   const isLoginPage = pathname === '/dashboard/login';
+  const isPrijavaPage = pathname === '/prijava';
+
+  // Sakrij header na prijava stranici
+  if (isPrijavaPage) {
+    return null;
+  }
 
   useEffect(() => {
     setAdminLoggedIn(isAdmin());
