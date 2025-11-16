@@ -14,11 +14,12 @@ function NewsletterConfirmationContent() {
   const email = searchParams.get('email')
   const pending = searchParams.get('pending') === 'true'
   const token = searchParams.get('token')
+  const alreadyVerified = searchParams.get('alreadyVerified') === 'true'
   const [verifying, setVerifying] = useState(false)
 
   // Ako ima token i email ali nema success/error, pozovi verify API
   useEffect(() => {
-    if (token && email && !success && !error && !pending) {
+    if (token && email && !success && !error && !pending && !alreadyVerified) {
       setVerifying(true)
       fetch(`/api/newsletter/verify?token=${token}&email=${encodeURIComponent(email)}`)
         .then((res) => res.json())
@@ -41,7 +42,7 @@ function NewsletterConfirmationContent() {
           setVerifying(false)
         })
     }
-  }, [token, email, success, error, pending, router])
+  }, [token, email, success, error, pending, alreadyVerified, router])
 
   if (verifying) {
     return (
@@ -108,7 +109,27 @@ function NewsletterConfirmationContent() {
           </div>
         )}
 
-        {error && !pending && (
+        {alreadyVerified && !pending && (
+          <div className="bg-white border-2 border-blue-200 rounded-xl p-8 md:p-12 text-center">
+            <CheckCircle className="mx-auto mb-4 text-blue-600" size={64} />
+            <h1 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4">
+              Već ste registrovan!
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Vaša email adresa <strong>{email}</strong> je već verifikovana i aktivna.
+            </p>
+            <p className="text-gray-600 mb-8">
+              Već primate email obaveštenja za nova PR saopštenja.
+            </p>
+            <div className="space-y-4">
+              <Link href="/">
+                <Button>Vrati se na početnu</Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {error && !pending && !alreadyVerified && (
           <div className="bg-white border-2 border-red-200 rounded-xl p-8 md:p-12 text-center">
             <XCircle className="mx-auto mb-4 text-red-600" size={64} />
             <h1 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4">

@@ -25,10 +25,7 @@ export async function POST(request: NextRequest) {
     // Koristi admin klijent za bypass RLS politika
     const supabase = createAdminClient()
 
-    // Generiši verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex')
-
-    // Proveri da li već postoji subscription
+    // PRVO proveri da li već postoji subscription PRE nego što se generiše token i pošalje email
     let existing = null
     try {
       const { data, error } = await supabase
@@ -45,23 +42,24 @@ export async function POST(request: NextRequest) {
       console.error('Error checking existing subscription:', error)
     }
 
+    // Ako već postoji i već je verifikovan i aktivan, ne šalji email
+    if (existing && existing.is_verified && existing.is_active) {
+      return NextResponse.json({
+        success: true,
+        message: 'Već ste prijavljeni na email obaveštenja!',
+        subscription: existing,
+        emailSent: false,
+      })
+    }
+
+    // Generiši verification token samo ako treba da se pošalje email
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+
     let subscription
-    let shouldSendEmail = false
 
     try {
       if (existing) {
-        // Ako je već verifikovan i aktivan, ne šalji email
-        if (existing.is_verified && existing.is_active) {
-          return NextResponse.json({
-            success: true,
-            message: 'Već ste prijavljeni na email obaveštenja!',
-            subscription: existing,
-            emailSent: false,
-          })
-        }
-
-        // Ako postoji ali nije verifikovan ili nije aktivan, ažuriraj i pošalji email
-        shouldSendEmail = true
+        // Ako postoji ali nije verifikovan ili nije aktivan, ažuriraj
         const { data, error } = await supabase
           .from('newsletter_subscriptions')
           .update({
@@ -82,8 +80,7 @@ export async function POST(request: NextRequest) {
         }
         subscription = data
       } else {
-        // Kreiraj novu subscription i pošalji email
-        shouldSendEmail = true
+        // Kreiraj novu subscription
         const { data, error } = await supabase
           .from('newsletter_subscriptions')
           .insert({
@@ -112,25 +109,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Pošalji confirmation email samo ako treba
+    // Pošalji confirmation email
     let emailSent = false
-    if (shouldSendEmail) {
-      const emailResult = await sendConfirmationEmail(
-        email.toLowerCase(),
-        verificationToken
-      )
+    const emailResult = await sendConfirmationEmail(
+      email.toLowerCase(),
+      verificationToken
+    )
 
-      if (emailResult.error) {
-        console.error('Error sending confirmation email:', emailResult.error)
-        // Ne baci grešku - subscription je kreiran, samo email nije poslat
-      } else {
-        emailSent = true
-      }
+    if (emailResult.error) {
+      console.error('Error sending confirmation email:', emailResult.error)
+      // Ne baci grešku - subscription je kreiran, samo email nije poslat
+    } else {
+      emailSent = true
     }
 
     return NextResponse.json({
       success: true,
-      message: shouldSendEmail ? 'Proverite vaš email za potvrdu prijave' : 'Već ste prijavljeni na email obaveštenja!',
+      message: 'Proverite vaš email za potvrdu prijave',
       subscription: subscription,
       emailSent: emailSent,
     })
