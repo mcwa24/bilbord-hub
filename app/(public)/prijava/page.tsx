@@ -51,25 +51,23 @@ function LoginForm() {
         return
       }
 
-      } else {
-        // Ako nije email format i admin login nije uspeo
-        if (adminData.locked) {
-          setLocked(true)
-          const timeMatch = adminData.error.match(/(\d+)\s+minuta/)
-          if (timeMatch) {
-            setLockoutTime(parseInt(timeMatch[1]))
-          }
-          toast.error(adminData.error)
-        } else if (adminData.remainingAttempts !== undefined) {
-          setRemainingAttempts(adminData.remainingAttempts)
-          if (adminData.remainingAttempts > 0) {
-            toast.error(`${adminData.error}. Preostalo pokušaja: ${adminData.remainingAttempts}`)
-          } else {
-            toast.error(adminData.error)
-          }
-        } else {
-          toast.error('Pogrešno korisničko ime ili lozinka')
+      // Admin login nije uspeo
+      if (adminData.locked) {
+        setLocked(true)
+        const timeMatch = adminData.error.match(/(\d+)\s+minuta/)
+        if (timeMatch) {
+          setLockoutTime(parseInt(timeMatch[1]))
         }
+        toast.error(adminData.error)
+      } else if (adminData.remainingAttempts !== undefined) {
+        setRemainingAttempts(adminData.remainingAttempts)
+        if (adminData.remainingAttempts > 0) {
+          toast.error(`${adminData.error}. Preostalo pokušaja: ${adminData.remainingAttempts}`)
+        } else {
+          toast.error(adminData.error)
+        }
+      } else {
+        toast.error('Pogrešno korisničko ime ili lozinka')
       }
     } catch (error: any) {
       toast.error(error.message || 'Greška pri prijavljivanju')
