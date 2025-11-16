@@ -3,8 +3,17 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCallback } from 'react'
+import { usePathname } from 'next/navigation'
 
 export default function Footer() {
+    const pathname = usePathname()
+    const isPrijavaPage = pathname === '/prijava'
+
+    // Sakrij footer na prijava stranici
+    if (isPrijavaPage) {
+        return null
+    }
+
     const handleScrollTop = useCallback(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }, [])
