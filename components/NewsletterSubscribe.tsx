@@ -1,44 +1,63 @@
 'use client'
 
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState } from 'react'
+import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
+import toast from 'react-hot-toast'
 
 export default function NewsletterSubscribe() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    checkAuth()
-  }, [])
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  const checkAuth = async () => {
+    if (!email || !email.includes('@')) {
+      toast.error('Unesite validan email')
+      return
+    }
+
+    setLoading(true)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setIsLoggedIn(!!user)
-    } catch (error) {
-      setIsLoggedIn(false)
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok && data.success) {
+        toast.success('Proverite vaš email za potvrdu prijave!')
+        setEmail('')
+      } else {
+        throw new Error(data.error || 'Greška pri prijavi')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Greška pri prijavi na email obaveštenja')
+    } finally {
+      setLoading(false)
     }
   }
 
-  if (isLoggedIn) {
-    return (
-      <Link 
-        href="/moj-panel"
-        className="inline-block px-8 md:px-10 py-3 md:py-4 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg shadow-md"
-      >
-        Moj Panel
-      </Link>
-    )
-  }
-
   return (
-    <Link 
-      href="/registracija"
-      className="inline-block px-8 md:px-10 py-3 md:py-4 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg shadow-md"
-    >
-      Prijavi se na email obaveštenja
-    </Link>
+    <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto">
+      <Input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Unesite vašu email adresu"
+        className="flex-1"
+        required
+        disabled={loading}
+      />
+      <Button
+        type="submit"
+        disabled={loading}
+        className="px-8 py-3 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-semibold rounded-full whitespace-nowrap shadow-md"
+      >
+        {loading ? 'Prijava...' : 'Prijavi se'}
+      </Button>
+    </form>
   )
 }
-

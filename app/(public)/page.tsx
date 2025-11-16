@@ -522,14 +522,9 @@ export default function Home() {
                   <p className="text-[#1d1d1f] text-base md:text-lg mb-6 max-w-2xl mx-auto">
                     Budite u toku sa najnovijim PR saopštenjima. Primate email obaveštenja kada se objavi novo saopštenje.
                   </p>
-                  <div className="max-w-md mx-auto mb-4">
+                  <div className="max-w-md mx-auto">
                     <NewsletterSubscribe />
                   </div>
-                  <p className="text-sm text-gray-600 mt-4">
-                    <a href="/prijava" className="text-[#1d1d1f] hover:underline font-medium">
-                      Već imate nalog? Prijavite se
-                    </a>
-                  </p>
                 </div>
               </div>
             </div>
