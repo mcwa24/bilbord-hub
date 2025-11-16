@@ -26,41 +26,33 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
 
     // PRVO proveri da li već postoji subscription PRE nego što se generiše token i pošalje email
-    let existing = null
-    try {
-      const { data, error } = await supabase
-        .from('newsletter_subscriptions')
-        .select('*')
-        .eq('email', email.toLowerCase())
-        .single()
-      
-      if (error) {
-        // Ako je greška "PGRST116" (not found), to je OK - korisnik ne postoji
-        if (error.code !== 'PGRST116') {
-          console.error('Error checking existing subscription:', error)
-        }
-      } else if (data) {
-        existing = data
-        console.log('Existing subscription found:', {
-          email: existing.email,
-          is_verified: existing.is_verified,
-          is_active: existing.is_active
-        })
-      }
-    } catch (error) {
-      console.error('Error checking existing subscription:', error)
+    // Koristimo maybeSingle() umesto single() da ne baca grešku ako ne postoji
+    const { data: existingData, error: existingError } = await supabase
+      .from('newsletter_subscriptions')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .maybeSingle()
+    
+    if (existingError && existingError.code !== 'PGRST116') {
+      console.error('Error checking existing subscription:', existingError)
     }
-
+    
     // Ako već postoji i već je verifikovan i aktivan, ne šalji email
-    if (existing && existing.is_verified === true && existing.is_active === true) {
-      console.log('User already verified and active - skipping email')
+    if (existingData && existingData.is_verified === true && existingData.is_active === true) {
+      console.log('User already verified and active - skipping email', {
+        email: existingData.email,
+        is_verified: existingData.is_verified,
+        is_active: existingData.is_active
+      })
       return NextResponse.json({
         success: true,
         message: 'Već ste prijavljeni na email obaveštenja!',
-        subscription: existing,
+        subscription: existingData,
         emailSent: false,
       })
     }
+    
+    const existing = existingData
 
     // Generiši verification token samo ako treba da se pošalje email
     const verificationToken = crypto.randomBytes(32).toString('hex')
