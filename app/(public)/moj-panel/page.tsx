@@ -33,7 +33,9 @@ export default function MyPanelPage() {
       }
 
       setUser(user)
-      loadSubscription(user.email)
+      if (user?.email) {
+        loadSubscription(user.email)
+      }
     } catch (error) {
       console.error('Error checking user:', error)
       router.push('/prijava')
