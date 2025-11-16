@@ -239,10 +239,10 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                         e.stopPropagation()
                         handleShare()
                       }}
-                      className="inline hover:opacity-80 transition cursor-pointer bg-[#f9c344] rounded-full p-2 border-none no-underline flex-shrink-0 flex items-center justify-center"
+                      className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
                       title="Kopiraj link za deljenje"
                     >
-                      <Share2 size={16} className="text-[#1d1d1f]" />
+                      <Share2 size={16} className="text-gray-600" />
                     </button>
                     {showEdit && (
                       <>
@@ -340,10 +340,10 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                         e.stopPropagation()
                         handleShare()
                       }}
-                      className="inline hover:opacity-80 transition cursor-pointer bg-[#f9c344] rounded-full p-2 border-none no-underline flex-shrink-0 flex items-center justify-center"
+                      className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
                       title="Kopiraj link za deljenje"
                     >
-                      <Share2 size={16} className="text-[#1d1d1f]" />
+                      <Share2 size={16} className="text-gray-600" />
                     </button>
                     {showEdit && (
                       <>
