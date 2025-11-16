@@ -76,6 +76,31 @@ export default function NewsletterUnsubscribePage() {
     )
   }
 
+  // Ako nema tokena, prikaži poruku
+  if (!tokenParam && !emailParam) {
+    return (
+      <div className="min-h-screen bg-white pt-32 pb-16">
+        <div className="container-custom max-w-4xl">
+          <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-8">
+            Odjava sa email obaveštenja
+          </h1>
+
+          <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8">
+            <p className="text-gray-600 mb-6">
+              Za odjavu sa email obaveštenja, koristite link iz emaila koji ste primili. Link sadrži sigurnosni token koji je potreban za odjavu.
+            </p>
+            <p className="text-gray-600 mb-6">
+              Ako nemate link, možete zatražiti novi link za upravljanje pretplatom na{' '}
+              <a href="/newsletter/upravljanje" className="text-[#f9c344] hover:underline font-medium">
+                stranici za upravljanje
+              </a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-white pt-32 pb-16">
       <div className="container-custom max-w-4xl">
@@ -84,26 +109,16 @@ export default function NewsletterUnsubscribePage() {
         </h1>
 
         <div className="bg-white border-2 border-gray-200 rounded-xl p-6 md:p-8">
-          <p className="text-gray-600 mb-6">
-            Unesite vašu email adresu da biste se odjavili sa email obaveštenja.
-          </p>
-          
-          <div className="flex gap-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="unesite@email.com"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f9c344]"
-              required
-            />
-            <Button
-              onClick={handleUnsubscribe}
-              disabled={loading}
-            >
-              {loading ? 'Odjava...' : 'Odjavi se'}
-            </Button>
-          </div>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#f9c344] mb-4"></div>
+              <p className="text-gray-600 text-lg font-medium">Odjavljivanje...</p>
+            </div>
+          ) : (
+            <p className="text-gray-600 mb-6">
+              Odjavljivanje u toku...
+            </p>
+          )}
         </div>
       </div>
     </div>
