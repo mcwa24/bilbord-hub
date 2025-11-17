@@ -158,8 +158,8 @@ export default function NewsletterSubscribePage() {
                           onClick={() => toggleTag(tag)}
                           className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                             selectedTags.includes(tag)
-                              ? 'bg-[#f9c344] text-[#1d1d1f]'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              ? 'bg-black text-white'
+                              : 'bg-gray-100 text-black hover:bg-gray-200'
                           }`}
                         >
                           {selectedTags.includes(tag) && <CheckCircle size={14} className="inline mr-1" />}

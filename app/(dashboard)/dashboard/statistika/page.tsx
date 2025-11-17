@@ -260,7 +260,7 @@ export default function StatistikaPage() {
                     <span className="font-semibold">Tagovi: </span>
                     <span className="flex flex-wrap gap-1 mt-1">
                       {selectedRelease.tags.map((tag) => (
-                        <span key={tag} className="px-2 py-1 bg-[#f9c344] text-[#1d1d1f] rounded-full text-xs">
+                        <span key={tag} className="px-2 py-1 bg-black text-white rounded-full text-xs">
                           {tag}
                         </span>
                       ))}

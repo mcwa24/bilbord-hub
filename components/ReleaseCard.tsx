@@ -36,7 +36,7 @@ export default function ReleaseCard({ release }: ReleaseCardProps) {
             {release.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
+                className="px-2 py-1 text-xs bg-black text-white rounded"
               >
                 {tag}
               </span>

@@ -105,7 +105,7 @@ export default function SaopstenjePage() {
               {release.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full"
+                  className="px-3 py-1 text-sm bg-black text-white rounded-full"
                 >
                   {tag}
                 </span>

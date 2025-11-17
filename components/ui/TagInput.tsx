@@ -94,7 +94,7 @@ export default function TagInput({ tags, onChange, placeholder = 'Dodaj tag...' 
           {tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-[#f9c344] text-[#1d1d1f] rounded-full text-sm font-medium"
+              className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full text-sm font-medium"
             >
               {tag}
               <button
@@ -123,8 +123,8 @@ export default function TagInput({ tags, onChange, placeholder = 'Dodaj tag...' 
                   onClick={() => toggleTag(tag)}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                     isSelected
-                      ? 'bg-[#f9c344] text-[#1d1d1f]'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-black text-white'
+                      : 'bg-gray-200 text-black hover:bg-gray-300'
                   }`}
                 >
                   {tag}
