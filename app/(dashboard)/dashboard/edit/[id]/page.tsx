@@ -254,7 +254,7 @@ export default function EditPage() {
 
       if (res.ok) {
         toast.success('Saopštenje ažurirano!')
-        router.push('/sva-saopstenja')
+        router.push('/')
       } else {
         console.error('API error:', responseData)
         throw new Error(responseData.error || 'Greška pri ažuriranju saopštenja')
