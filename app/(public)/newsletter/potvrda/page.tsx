@@ -21,9 +21,14 @@ function NewsletterConfirmationContent() {
   useEffect(() => {
     if (token && email && !success && !error && !pending && !alreadyVerified) {
       setVerifying(true)
-      fetch(`/api/newsletter/verify?token=${token}&email=${encodeURIComponent(email)}`)
+      // Token već dolazi enkodovan iz URL-a, ali treba ga još jednom enkodovati za fetch
+      const encodedToken = encodeURIComponent(token)
+      const encodedEmail = encodeURIComponent(email)
+      console.log('Calling verify API with token:', token.substring(0, 30) + '...')
+      fetch(`/api/newsletter/verify?token=${encodedToken}&email=${encodedEmail}`)
         .then((res) => res.json())
         .then((data) => {
+          console.log('Verify API response:', data)
           if (data.success && data.redirectUrl) {
             // Redirect na success stranicu
             window.location.href = data.redirectUrl

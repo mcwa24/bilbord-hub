@@ -4,15 +4,31 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function sendConfirmationEmail(
   email: string,
-  verificationToken: string
+  verificationToken: string,
+  requestHost?: string
 ) {
   if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY nije postavljen')
-    return { error: 'Email servis nije konfigurisan' }
+    console.error('RESEND_API_KEY nije postavljen u environment varijablama')
+    console.error('Proverite da li je RESEND_API_KEY postavljen u .env.local fajlu')
+    return { error: 'Email servis nije konfigurisan - RESEND_API_KEY nedostaje' }
   }
+  
+  console.log('Sending confirmation email to:', email)
+  console.log('Using RESEND_API_KEY:', process.env.RESEND_API_KEY ? 'EXISTS' : 'MISSING')
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
-  const confirmationUrl = `${siteUrl}/newsletter/potvrda?token=${verificationToken}&email=${encodeURIComponent(email)}`
+  // Koristi request host ako je dostupan (za localhost), inače koristi NEXT_PUBLIC_SITE_URL
+  let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
+  if (requestHost) {
+    // Ako je localhost, koristi http:// umesto https://
+    const protocol = requestHost.includes('localhost') ? 'http' : 'https'
+    siteUrl = `${protocol}://${requestHost}`
+  }
+  console.log('Using site URL:', siteUrl)
+  
+  // Enkoduj token za URL (tačka u token-u može biti problem)
+  const encodedToken = encodeURIComponent(verificationToken)
+  const confirmationUrl = `${siteUrl}/newsletter/potvrda?token=${encodedToken}&email=${encodeURIComponent(email)}`
+  console.log('Confirmation URL:', confirmationUrl.substring(0, 100) + '...')
   const currentYear = new Date().getFullYear()
 
   try {
