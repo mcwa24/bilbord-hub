@@ -266,81 +266,82 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                     )}
                   </div>
                   
-                  {/* Drugi red: Naslov (KB) */}
-                  <div className="min-w-0 w-full">
-                    {documents.length > 0 ? (
-                      <a
-                        href={documents[0].url}
-                        download={documents[0].label || release.title}
-                        className="text-[#1d1d1f] hover:underline inline-flex items-start gap-1 min-w-0 flex-1 break-words"
-                      >
-                        <Download size={14} className="flex-shrink-0 mt-0.5" />
-                        <span className="font-semibold">
+                  {/* Drugi red: Naslov, Slike i Share dugme - wrap ako ne stane */}
+                  <div className="flex flex-wrap items-start gap-2 w-full">
+                    {/* Naslov (KB) - puna širina, bez skraćivanja */}
+                    <div className="w-full min-w-0">
+                      {documents.length > 0 ? (
+                        <a
+                          href={documents[0].url}
+                          download={documents[0].label || release.title}
+                          className="text-[#1d1d1f] hover:underline inline-flex items-start gap-1 w-full break-words"
+                        >
+                          <Download size={14} className="flex-shrink-0 mt-0.5" />
+                          <span className="font-semibold break-words">
+                            {highlightSearchTerm(release.title, searchQuery)}
+                          </span>
+                          <span className="text-gray-500 font-normal whitespace-nowrap flex-shrink-0">
+                            {sizes.doc > 0 ? `(${formatFileSize(sizes.doc, 'KB')})` : '(---)'}
+                          </span>
+                        </a>
+                      ) : (
+                        <span className="text-[#1d1d1f] font-semibold break-words block w-full" title={release.title}>
                           {highlightSearchTerm(release.title, searchQuery)}
                         </span>
-                        <span className="text-gray-500 font-normal whitespace-nowrap flex-shrink-0">
-                          {sizes.doc > 0 ? `(${formatFileSize(sizes.doc, 'KB')})` : '(---)'}
-                        </span>
-                      </a>
-                    ) : (
-                      <span className="text-[#1d1d1f] font-semibold break-words block" title={release.title}>
-                        {highlightSearchTerm(release.title, searchQuery)}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Treći red: Slike (MB) */}
-                  {zipFiles.length > 0 && (
-                    <div className="whitespace-nowrap">
-                      <a
-                        href={zipFiles[0].url}
-                        download={zipFiles[0].label === 'Slike' ? `slike-${release.id}.zip` : zipFiles[0].label}
-                        className="text-[#1d1d1f] hover:underline inline-flex items-center gap-1"
-                      >
-                        <Download size={14} className="flex-shrink-0" />
-                        <span>Slike</span>
-                        <span className="text-gray-500">
-                          {sizes.zip > 0 ? `(${formatFileSize(sizes.zip, 'MB')})` : '(---)'}
-                        </span>
-                      </a>
+                      )}
                     </div>
-                  )}
-                  
-                  {/* Share, Edit i Delete ikone - Mobile */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleShare()
-                      }}
-                      className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
-                      title="Kopiraj link za deljenje"
-                    >
-                      <Share2 size={16} className="text-gray-600" />
-                    </button>
-                    {showEdit && (
-                      <>
-                        <Link
-                          href={`/dashboard/edit/${release.id}`}
-                          className="inline hover:opacity-70 transition cursor-pointer no-underline flex-shrink-0"
-                          title="Izmeni saopštenje"
+                    
+                    {/* Slike (MB) i Share dugme - u istom redu ako stane, inače wrap */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {zipFiles.length > 0 && (
+                        <a
+                          href={zipFiles[0].url}
+                          download={zipFiles[0].label === 'Slike' ? `slike-${release.id}.zip` : zipFiles[0].label}
+                          className="text-[#1d1d1f] hover:underline inline-flex items-center gap-1 whitespace-nowrap"
                         >
-                          📝
-                        </Link>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            handleDelete()
-                          }}
-                          className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
-                          title="Obriši saopštenje"
-                        >
-                          🗑️
-                        </button>
-                      </>
-                    )}
+                          <Download size={14} className="flex-shrink-0" />
+                          <span>Slike</span>
+                          <span className="text-gray-500">
+                            {sizes.zip > 0 ? `(${formatFileSize(sizes.zip, 'MB')})` : '(---)'}
+                          </span>
+                        </a>
+                      )}
+                      
+                      {/* Share, Edit i Delete ikone */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleShare()
+                        }}
+                        className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
+                        title="Kopiraj link za deljenje"
+                      >
+                        <Share2 size={16} className="text-gray-600" />
+                      </button>
+                      {showEdit && (
+                        <>
+                          <Link
+                            href={`/dashboard/edit/${release.id}`}
+                            className="inline hover:opacity-70 transition cursor-pointer no-underline flex-shrink-0"
+                            title="Izmeni saopštenje"
+                          >
+                            📝
+                          </Link>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleDelete()
+                            }}
+                            className="inline hover:opacity-70 transition cursor-pointer bg-transparent border-none p-0 no-underline flex-shrink-0"
+                            title="Obriši saopštenje"
+                          >
+                            🗑️
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

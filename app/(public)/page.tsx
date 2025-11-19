@@ -283,7 +283,7 @@ export default function Home() {
           </motion.div>
           
           {/* Hero logoi */}
-          <div className="mt-12">
+          <div className="mt-12 hidden md:block">
             <LogoGrid />
           </div>
         </div>
@@ -340,7 +340,7 @@ export default function Home() {
           </div>
               {loading && releases.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f9c344]"></div>
                   <p className="text-gray-600 mt-4">Učitavanje...</p>
                 </div>
               ) : releases.length > 0 ? (
@@ -402,28 +402,54 @@ export default function Home() {
         <div className="container-custom">
           {/* Promo baner */}
           <div className="mb-12">
-            <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden mb-6">
-              <Image
-                src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
-                alt="Bilbord Portal"
-                fill
-                className="object-cover rounded-3xl"
-                priority
-              />
-              <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
-                <div className="bg-white rounded-2xl p-5 md:p-7 max-w-2xl w-full text-left">
-                  <h3 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] mb-4 md:mb-5 leading-tight">
-                    Postanite naš korisnik
-                  </h3>
-                  <p className="text-base md:text-lg font-medium text-[#1d1d1f]">
-                    Distribuirajte vaša PR saopštenja na jednom mestu
-                  </p>
+            {/* Mobile: Tekst ispod slike */}
+            <div className="block md:hidden">
+              <div className="relative h-40 rounded-xl overflow-hidden">
+                <Image
+                  src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
+                  alt="Bilbord Portal"
+                  fill
+                  className="object-cover rounded-xl"
+                  priority
+                />
+              </div>
+              <div className="bg-white rounded-xl p-5 border border-gray-100">
+                <h3 className="text-3xl font-bold text-[#1d1d1f] mb-3 leading-tight">
+                  Postanite naš korisnik
+                </h3>
+                <p className="text-base font-medium text-[#1d1d1f] leading-relaxed">
+                  Distribuirajte vaša PR saopštenja na jednom mestu
+                </p>
+              </div>
+            </div>
+            
+            {/* Desktop: Tekst preko slike */}
+            <div className="hidden md:block">
+              <div className="relative h-80 rounded-3xl overflow-hidden">
+                <Image
+                  src="/vanilla-bear-films-JEwNQerg3Hs-unsplash_Bilbord_Portal.jpg"
+                  alt="Bilbord Portal"
+                  fill
+                  className="object-cover rounded-3xl"
+                  priority
+                />
+                {/* Overlay za bolji kontrast */}
+                <div className="absolute inset-0 bg-black/10"></div>
+                <div className="absolute inset-0 flex items-center justify-center p-6">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-7 max-w-2xl w-full text-left">
+                    <h3 className="text-4xl lg:text-5xl font-bold text-[#1d1d1f] mb-4 lg:mb-5 leading-tight">
+                      Postanite naš korisnik
+                    </h3>
+                    <p className="text-base lg:text-lg font-medium text-[#1d1d1f] leading-relaxed">
+                      Distribuirajte vaša PR saopštenja na jednom mestu
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
             <div className="bg-white rounded-3xl p-6 md:p-8">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div className="grid md:grid-cols-2 gap-3 md:gap-4 flex-1">
+              <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+                <div className="grid md:grid-cols-2 gap-2 md:gap-3 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
                     <span className="text-[#1d1d1f] text-sm md:text-base">Povećajte vidljivost vaših saopštenja</span>
@@ -506,26 +532,79 @@ export default function Home() {
 
           {/* Email obaveštenja prijava */}
           <div className="border-t-2 border-gray-200 pt-12 mt-12">
-            <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden mb-6">
-              <Image
-                src="/maxim-ilyahov-0aRycsfH57A-unsplash_Bilbord_Portal.jpg"
-                alt="Bilbord Portal"
-                fill
-                className="object-cover rounded-3xl"
-                priority
-              />
-              <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
-                <div className="bg-white rounded-2xl p-6 md:p-8 max-w-3xl w-full text-center">
-                  <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-4">
-                    Prijavite se na email obaveštenja
-                  </h2>
-                  <p className="text-[#1d1d1f] text-base md:text-lg mb-6 max-w-2xl mx-auto">
-                    Budite u toku sa najnovijim PR saopštenjima. Primate email obaveštenja kada se objavi novo saopštenje.
-                  </p>
-                  <div className="max-w-md mx-auto">
-                    <NewsletterSubscribe />
+            {/* Mobile: Tekst ispod slike */}
+            <div className="block md:hidden">
+              <div className="relative h-40 rounded-xl overflow-hidden">
+                <Image
+                  src="/maxim-ilyahov-0aRycsfH57A-unsplash_Bilbord_Portal.jpg"
+                  alt="Bilbord Portal"
+                  fill
+                  className="object-cover rounded-xl"
+                  priority
+                />
+              </div>
+              <div className="bg-white rounded-xl p-5 border border-gray-100">
+                <h3 className="text-3xl font-bold text-[#1d1d1f] mb-3 leading-tight">
+                  Prijavite se na email obaveštenja
+                </h3>
+                <p className="text-base font-medium text-[#1d1d1f] leading-relaxed">
+                  Primate email obaveštenja kada se objavi novo saopštenje.
+                </p>
+              </div>
+            </div>
+            
+            {/* Desktop: Tekst preko slike */}
+            <div className="hidden md:block">
+              <div className="relative h-80 rounded-3xl overflow-hidden">
+                <Image
+                  src="/maxim-ilyahov-0aRycsfH57A-unsplash_Bilbord_Portal.jpg"
+                  alt="Bilbord Portal"
+                  fill
+                  className="object-cover rounded-3xl"
+                  priority
+                />
+                {/* Overlay za bolji kontrast */}
+                <div className="absolute inset-0 bg-black/10"></div>
+                <div className="absolute inset-0 flex items-center justify-center p-6">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-7 max-w-2xl w-full text-left">
+                    <h3 className="text-4xl lg:text-5xl font-bold text-[#1d1d1f] mb-4 lg:mb-5 leading-tight">
+                      Prijavite se na email obaveštenja
+                    </h3>
+                    <p className="text-base lg:text-lg font-medium text-[#1d1d1f] leading-relaxed">
+                      Primate email obaveštenja kada se objavi novo saopštenje.
+                    </p>
                   </div>
                 </div>
+              </div>
+            </div>
+            
+            {/* Features i dugme */}
+            <div className="bg-white rounded-3xl p-6 md:p-8">
+              <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+                <div className="grid md:grid-cols-2 gap-2 md:gap-3 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Obaveštenja u realnom vremenu</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Filtriranje po tagovima</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Prilagođene pretplate</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">Lako upravljanje pretplatom</span>
+                  </div>
+                </div>
+                <Link
+                  href="/newsletter/prijava"
+                  className="px-6 md:px-8 py-2.5 md:py-3 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg shadow-md"
+                >
+                  Prijavi se
+                </Link>
               </div>
             </div>
           </div>
