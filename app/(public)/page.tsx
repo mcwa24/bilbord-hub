@@ -478,7 +478,7 @@ export default function Home() {
           </div>
 
           {/* Kako funkcioniše PR Hub platforma */}
-          <div className="border-t-2 border-gray-200 pt-12 mt-12">
+          <div className="pt-12 mt-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] mb-8 text-center">
               Kako funkcioniše PR Hub platforma
             </h2>
@@ -531,7 +531,7 @@ export default function Home() {
           </div>
 
           {/* Email obaveštenja prijava */}
-          <div className="border-t-2 border-gray-200 pt-12 mt-12">
+          <div className="pt-12 mt-12">
             {/* Mobile: Tekst ispod slike */}
             <div className="block md:hidden">
               <div className="relative h-40 rounded-xl overflow-hidden">
