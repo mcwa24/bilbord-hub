@@ -263,7 +263,7 @@ export default function Home() {
             className="inline-block"
           >
             <Button 
-              className="shadow-xl hover:shadow-2xl transition-all duration-300"
+              className="transition-all duration-300"
               onClick={(e) => {
                 e.preventDefault()
                 const section = document.getElementById('najnovija-saopstenja')
@@ -310,7 +310,7 @@ export default function Home() {
               {(selectedTag || searchQuery) && (
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] rounded-full transition font-medium whitespace-nowrap w-full h-10 shadow-md"
+                  className="px-5 py-3 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] rounded-full transition font-medium whitespace-nowrap w-full h-12 text-base"
                 >
                   Resetuj
                 </button>
@@ -331,7 +331,7 @@ export default function Home() {
               {(selectedTag || searchQuery) && (
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] rounded-full transition font-medium whitespace-nowrap h-10 shadow-md"
+                  className="px-4 py-2 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] rounded-full transition font-medium whitespace-nowrap h-10"
                 >
                   Resetuj
                 </button>
@@ -469,7 +469,7 @@ export default function Home() {
                 </div>
                 <Link
                   href="/o-pr-platformi"
-                  className="px-6 md:px-8 py-2.5 md:py-3 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg shadow-md"
+                  className="px-8 md:px-10 py-3 md:py-4 bg-[#f9c344] text-[#1d1d1f] font-medium rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg"
                 >
                   Saznajte više
                 </Link>
@@ -599,12 +599,15 @@ export default function Home() {
                     <span className="text-[#1d1d1f] text-sm md:text-base">Lako upravljanje pretplatom</span>
                   </div>
                 </div>
-                <Link
-                  href="/newsletter/prijava"
-                  className="px-6 md:px-8 py-2.5 md:py-3 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg shadow-md"
-                >
-                  Prijavi se
-                </Link>
+                <div className="flex flex-col items-center gap-1">
+                  <Link
+                    href="/newsletter/prijava"
+                    className="px-8 md:px-10 py-3 md:py-4 bg-[#f9c344] text-[#1d1d1f] font-medium rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg"
+                  >
+                    Prijavi se
+                  </Link>
+                  <p className="text-xs text-gray-500 text-center">Prijava je besplatna</p>
+                </div>
               </div>
             </div>
           </div>

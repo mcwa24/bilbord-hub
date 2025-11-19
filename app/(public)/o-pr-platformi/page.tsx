@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 import { Upload, Eye, Download, Share2, Mail } from 'lucide-react'
 import NewsletterSubscribe from '@/components/NewsletterSubscribe'
 
@@ -235,9 +237,9 @@ export default function OPRPlatformiPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setLanguage('sr')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              className={`px-10 py-5 rounded-full text-lg font-medium transition ${
                 language === 'sr'
-                  ? 'bg-[#f9c344] text-[#1d1d1f]'
+                  ? 'bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]'
                   : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               }`}
             >
@@ -245,9 +247,9 @@ export default function OPRPlatformiPage() {
             </button>
             <button
               onClick={() => setLanguage('en')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              className={`px-10 py-5 rounded-full text-lg font-medium transition ${
                 language === 'en'
-                  ? 'bg-[#f9c344] text-[#1d1d1f]'
+                  ? 'bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f]'
                   : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               }`}
             >
@@ -339,22 +341,98 @@ export default function OPRPlatformiPage() {
             </div>
           </div>
 
-          {/* Baner za email obaveštenja */}
-          <div className="bg-gradient-to-r from-[#f9c344] to-[#f0b830] p-8 md:p-12 rounded-2xl mb-8 shadow-lg relative overflow-hidden">
-            <div className="relative z-10">
-              <div className="flex items-center gap-4 mb-4">
-                <Mail size={32} className="text-[#1d1d1f]" />
-                <h2 className="text-3xl md:text-4xl font-bold text-[#1d1d1f]">
-                  {language === 'sr' ? 'Prijavite se na email obaveštenja' : 'Subscribe to email notifications'}
-                </h2>
+          {/* Email obaveštenja prijava */}
+          <div className="pt-12 mt-12 mb-8">
+            {/* Mobile: Tekst ispod slike */}
+            <div className="block md:hidden">
+              <div className="relative h-40 rounded-xl overflow-hidden">
+                <Image
+                  src="/maxim-ilyahov-0aRycsfH57A-unsplash_Bilbord_Portal.jpg"
+                  alt="Bilbord Portal"
+                  fill
+                  className="object-cover rounded-xl"
+                  priority
+                />
               </div>
-              <p className="text-[#1d1d1f] text-lg mb-6 leading-relaxed">
-                {language === 'sr' 
-                  ? 'Mediji mogu da se prijave na email obaveštenja i dobijaju obaveštenja čim stigne PR saopštenje sa tagovima koje pratite. Budite uvek u toku sa najnovijim PR saopštenjima iz vaših oblasti interesovanja.'
-                  : 'Media can subscribe to email notifications and receive alerts as soon as a PR release arrives with tags they follow. Stay up to date with the latest PR releases from your areas of interest.'}
-              </p>
-              <div className="bg-white/90 backdrop-blur-sm p-6 rounded-xl">
-                <NewsletterSubscribe />
+              <div className="bg-white rounded-xl p-5 border border-gray-100">
+                <h3 className="text-3xl font-bold text-[#1d1d1f] mb-3 leading-tight">
+                  {language === 'sr' ? 'Prijavite se na email obaveštenja' : 'Subscribe to email notifications'}
+                </h3>
+                <p className="text-base font-medium text-[#1d1d1f] leading-relaxed">
+                  {language === 'sr' 
+                    ? 'Primate email obaveštenja kada se objavi novo saopštenje.'
+                    : 'Receive email notifications when a new release is published.'}
+                </p>
+              </div>
+            </div>
+            
+            {/* Desktop: Tekst preko slike */}
+            <div className="hidden md:block">
+              <div className="relative h-80 rounded-3xl overflow-hidden">
+                <Image
+                  src="/maxim-ilyahov-0aRycsfH57A-unsplash_Bilbord_Portal.jpg"
+                  alt="Bilbord Portal"
+                  fill
+                  className="object-cover rounded-3xl"
+                  priority
+                />
+                {/* Overlay za bolji kontrast */}
+                <div className="absolute inset-0 bg-black/10"></div>
+                <div className="absolute inset-0 flex items-center justify-center p-6">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-7 max-w-2xl w-full text-left">
+                    <h3 className="text-4xl lg:text-5xl font-bold text-[#1d1d1f] mb-4 lg:mb-5 leading-tight">
+                      {language === 'sr' ? 'Prijavite se na email obaveštenja' : 'Subscribe to email notifications'}
+                    </h3>
+                    <p className="text-base lg:text-lg font-medium text-[#1d1d1f] leading-relaxed">
+                      {language === 'sr' 
+                        ? 'Primate email obaveštenja kada se objavi novo saopštenje.'
+                        : 'Receive email notifications when a new release is published.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Features i dugme */}
+            <div className="bg-white rounded-3xl p-6 md:p-8">
+              <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+                <div className="grid md:grid-cols-2 gap-2 md:gap-3 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">
+                      {language === 'sr' ? 'Obaveštenja u realnom vremenu' : 'Real-time notifications'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">
+                      {language === 'sr' ? 'Filtriranje po tagovima' : 'Filter by tags'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">
+                      {language === 'sr' ? 'Prilagođene pretplate' : 'Custom subscriptions'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#1d1d1f] font-bold text-lg">✓</span>
+                    <span className="text-[#1d1d1f] text-sm md:text-base">
+                      {language === 'sr' ? 'Lako upravljanje pretplatom' : 'Easy subscription management'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Link
+                    href="/newsletter/prijava"
+                    className="px-8 md:px-10 py-3 md:py-4 bg-[#f9c344] text-[#1d1d1f] font-medium rounded-full hover:bg-[#f0b830] transition-colors whitespace-nowrap text-base md:text-lg"
+                  >
+                    {language === 'sr' ? 'Prijavi se' : 'Subscribe'}
+                  </Link>
+                  <p className="text-xs text-gray-500 text-center">
+                    {language === 'sr' ? 'Prijava je besplatna' : 'Free subscription'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -367,7 +445,7 @@ export default function OPRPlatformiPage() {
             href={currentContent.subscription.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-[#f9c344] text-[#1d1d1f] font-semibold rounded-lg hover:bg-[#f0b830] transition-colors mb-12"
+            className="inline-block px-10 py-5 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-medium rounded-full transition-colors mb-12 text-lg"
           >
             {currentContent.subscription.linkText}
           </a>

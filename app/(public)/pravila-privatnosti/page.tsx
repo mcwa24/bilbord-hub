@@ -132,7 +132,7 @@ export default function PrivacyPolicyPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setLanguage('sr')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              className={`px-6 py-3 rounded-lg text-base font-medium transition ${
                 language === 'sr'
                   ? 'bg-[#f9c344] text-[#1d1d1f]'
                   : 'bg-gray-200 text-gray-600 hover:bg-gray-300'

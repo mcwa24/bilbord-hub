@@ -58,7 +58,7 @@ export default function NewsletterSubscribe() {
       <Button
         type="submit"
         disabled={loading}
-        className="px-8 py-3 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-semibold rounded-full whitespace-nowrap shadow-md"
+        className="px-10 py-4 bg-[#f9c344] hover:bg-[#f0b830] text-[#1d1d1f] font-semibold rounded-full whitespace-nowrap text-lg"
       >
         {loading ? 'Prijava...' : 'Prijavi se'}
       </Button>

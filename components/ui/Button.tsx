@@ -17,7 +17,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          'px-8 py-4 rounded-full text-base font-medium transition',
+          'px-10 py-5 rounded-full text-lg font-medium transition',
           variants[variant],
           className
         )}

@@ -73,7 +73,7 @@ export default function PretragaPage() {
           {selectedTag && (
             <button
               onClick={handleReset}
-              className="px-6 py-2 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium"
+              className="px-8 py-3 bg-gray-200 text-[#1d1d1f] rounded-lg hover:bg-gray-300 transition font-medium text-base"
             >
               Resetuj
             </button>
