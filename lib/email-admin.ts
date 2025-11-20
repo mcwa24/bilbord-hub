@@ -4,7 +4,6 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function sendAdminNotificationEmail(userEmail: string) {
   if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY nije postavljen')
     return { error: 'Email servis nije konfigurisan' }
   }
 
@@ -91,14 +90,11 @@ export async function sendAdminNotificationEmail(userEmail: string) {
     })
 
     if (error) {
-      console.error('Resend API error:', error)
       return { error: error.message }
     }
 
-    console.log('Admin notification email sent successfully:', data)
     return { success: true, data }
   } catch (error: any) {
-    console.error('Email send error:', error)
     return { error: error.message || 'Greška pri slanju emaila' }
   }
 }

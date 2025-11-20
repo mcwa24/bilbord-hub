@@ -36,9 +36,6 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
     
     if (existingVerified) {
-      console.log('User already verified and active - skipping email', {
-        email: existingVerified.email,
-      })
       return NextResponse.json({
         success: true,
         message: 'Već ste prijavljeni na email obaveštenja!',
@@ -61,17 +58,12 @@ export async function POST(request: NextRequest) {
       .replace(/=/g, '')
     const randomPart = crypto.randomBytes(16).toString('hex')
     const verificationToken = `${encodedPayload}.${randomPart}`
-    console.log('Generated token:', verificationToken.substring(0, 50) + '...')
-    console.log('Token payload:', payload)
 
     // Pošalji confirmation email korisniku
     let emailSent = false
-    console.log('Attempting to send confirmation email to:', email.toLowerCase())
-    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY)
     
     // Detektuj host iz request-a za localhost development
     const host = request.headers.get('host') || undefined
-    console.log('Request host:', host)
     
     const emailResult = await sendConfirmationEmail(
       email.toLowerCase(),
@@ -80,12 +72,10 @@ export async function POST(request: NextRequest) {
     )
 
     if (emailResult.error) {
-      console.error('Error sending confirmation email:', emailResult.error)
       // Ne baci grešku - subscription je kreiran, samo email nije poslat
       // Ali vrati informaciju o grešci u response
     } else {
       emailSent = true
-      console.log('Confirmation email sent successfully')
     }
 
     // Admin notification email će biti poslat tek kada korisnik klikne na link (u verify ruti)

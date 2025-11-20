@@ -51,7 +51,6 @@ export async function POST(request: NextRequest) {
     )
 
     if (emailResult.error) {
-      console.error('Error sending management link email:', emailResult.error)
       // Ne baci grešku - ne otkrivaj da li email postoji
     }
 
@@ -60,7 +59,6 @@ export async function POST(request: NextRequest) {
       message: 'Ako email postoji, poslat će vam se link za upravljanje.',
     })
   } catch (error: any) {
-    console.error('Send management link error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri slanju linka za upravljanje' },
       { status: 500 }

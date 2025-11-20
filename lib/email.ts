@@ -17,7 +17,6 @@ export async function sendNewsletterEmail(
   isAdditionalEmail?: boolean
 ) {
   if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY nije postavljen')
     return { error: 'Email servis nije konfigurisan' }
   }
 
@@ -255,14 +254,11 @@ export async function sendNewsletterEmail(
     })
 
     if (error) {
-      console.error('Resend API error:', error)
       return { error: error.message }
     }
 
-    console.log('Newsletter email sent successfully:', data)
     return { success: true, data }
   } catch (error: any) {
-    console.error('Email send error:', error)
     return { error: error.message || 'Greška pri slanju emaila' }
   }
 }

@@ -24,11 +24,9 @@ function NewsletterConfirmationContent() {
       // Token već dolazi enkodovan iz URL-a, ali treba ga još jednom enkodovati za fetch
       const encodedToken = encodeURIComponent(token)
       const encodedEmail = encodeURIComponent(email)
-      console.log('Calling verify API with token:', token.substring(0, 30) + '...')
       fetch(`/api/newsletter/verify?token=${encodedToken}&email=${encodedEmail}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log('Verify API response:', data)
           if (data.success && data.redirectUrl) {
             // Redirect na success stranicu
             window.location.href = data.redirectUrl
@@ -40,7 +38,6 @@ function NewsletterConfirmationContent() {
           }
         })
         .catch((err) => {
-          console.error('Verification error:', err)
           router.push(`/newsletter/potvrda?error=${encodeURIComponent(err.message || 'Greška pri verifikaciji')}`)
         })
         .finally(() => {

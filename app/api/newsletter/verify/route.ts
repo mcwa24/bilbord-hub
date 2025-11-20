@@ -28,9 +28,6 @@ export async function GET(request: NextRequest) {
     const encodedToken = searchParams.get('token')
     const email = searchParams.get('email')
 
-    console.log('Verify request - encoded token:', encodedToken ? `${encodedToken.substring(0, 30)}...` : 'MISSING')
-    console.log('Verify request - email:', email)
-
     if (!encodedToken || !email) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
       const redirectUrl = `${siteUrl}/newsletter/potvrda?error=${encodeURIComponent('Token i email su obavezni')}`
@@ -47,10 +44,7 @@ export async function GET(request: NextRequest) {
     let token: string
     try {
       token = decodeURIComponent(encodedToken)
-      console.log('Decoded token (first 50 chars):', token.substring(0, 50))
-      console.log('Token length:', token.length)
     } catch (decodeError: any) {
-      console.error('Error decoding URI component:', decodeError)
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
       const redirectUrl = `${siteUrl}/newsletter/potvrda?error=${encodeURIComponent('Nevažeći token format')}`
       return NextResponse.json(
@@ -67,14 +61,10 @@ export async function GET(request: NextRequest) {
     try {
       // Token format: base64payload.randomhex
       const parts = token.split('.')
-      console.log('Token parts count:', parts.length)
       if (parts.length < 2) {
-        console.error('Invalid token format - parts:', parts)
         throw new Error('Invalid token format - expected format: base64payload.randomhex')
       }
       const encodedPayload = parts[0]
-      console.log('Encoded payload (first 30 chars):', encodedPayload.substring(0, 30))
-      console.log('Encoded payload length:', encodedPayload.length)
       
       // Konvertuj URL-safe base64 nazad u standardni base64
       const standardBase64 = encodedPayload
@@ -84,19 +74,11 @@ export async function GET(request: NextRequest) {
       // Dodaj padding ako je potrebno
       const padding = (4 - standardBase64.length % 4) % 4
       const paddedPayload = standardBase64 + '='.repeat(padding)
-      console.log('Padded payload (first 30 chars):', paddedPayload.substring(0, 30))
       
       const decodedPayload = Buffer.from(paddedPayload, 'base64').toString('utf-8')
-      console.log('Decoded payload:', decodedPayload)
       
       subscriptionData = JSON.parse(decodedPayload)
-      console.log('Subscription data parsed:', subscriptionData)
     } catch (decodeError: any) {
-      console.error('Error decoding token:', decodeError)
-      console.error('Error name:', decodeError.name)
-      console.error('Error message:', decodeError.message)
-      console.error('Error stack:', decodeError.stack)
-      console.error('Token that failed (first 100 chars):', token.substring(0, 100))
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
       const errorMessage = decodeError.message || 'Greška pri dekodovanju tokena'
       const redirectUrl = `${siteUrl}/newsletter/potvrda?error=${encodeURIComponent('Nevažeći token: ' + errorMessage)}`
@@ -112,9 +94,7 @@ export async function GET(request: NextRequest) {
         // Proveri da li email iz token-a odgovara email-u iz URL-a
         const tokenEmail = subscriptionData.email.toLowerCase().trim()
         const urlEmail = email.toLowerCase().trim()
-        console.log('Comparing emails - token email:', tokenEmail, 'URL email:', urlEmail)
         if (tokenEmail !== urlEmail) {
-          console.error('Email mismatch! Token email:', tokenEmail, 'URL email:', urlEmail)
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
           const redirectUrl = `${siteUrl}/newsletter/potvrda?error=${encodeURIComponent('Email se ne poklapa sa tokenom')}`
           return NextResponse.json(
@@ -202,10 +182,7 @@ export async function GET(request: NextRequest) {
     const { sendAdminNotificationEmail } = await import('@/lib/email-admin')
     const adminEmailResult = await sendAdminNotificationEmail(subscriptionData.email.toLowerCase())
     if (adminEmailResult.error) {
-      console.error('Error sending admin notification email:', adminEmailResult.error)
       // Ne baci grešku - admin email nije kritičan
-    } else {
-      console.log('Admin notification email sent successfully')
     }
 
     // Vrati JSON response sa redirect URL-om
@@ -223,7 +200,6 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error: any) {
-    console.error('Newsletter verify error:', error)
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
     const redirectUrl = `${siteUrl}/newsletter/potvrda?error=${encodeURIComponent(error.message || 'Greška pri verifikaciji')}`
     return NextResponse.json({ 

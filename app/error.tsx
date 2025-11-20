@@ -10,9 +10,6 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  useEffect(() => {
-    console.error('Error:', error)
-  }, [error])
 
   return (
     <div className="min-h-screen bg-white pt-32 pb-16 flex items-center justify-center">

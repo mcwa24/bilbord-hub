@@ -70,7 +70,6 @@ export async function POST(
       errors: errors.length > 0 ? errors : undefined,
     })
   } catch (error: any) {
-    console.error('Send additional emails error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri slanju dodatnih emailova' },
       { status: 500 }

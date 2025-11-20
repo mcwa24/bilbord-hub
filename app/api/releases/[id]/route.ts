@@ -104,9 +104,7 @@ export async function DELETE(
                   .remove([filePath])
                 
                 if (deleteError) {
-                  console.error(`Error deleting file ${filePath} from bucket ${bucket}:`, deleteError)
-                } else {
-                  console.log(`Successfully deleted file ${filePath} from bucket ${bucket}`)
+                  // Ignoriši greške pri brisanju fajlova
                 }
               }
             }

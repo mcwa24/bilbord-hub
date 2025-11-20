@@ -218,7 +218,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Supabase error:', error)
       throw error
     }
 
@@ -229,8 +228,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ releaseId: data.id }),
-      }).catch((err) => {
-        console.error('Error sending newsletter emails:', err)
+      }).catch(() => {
         // Ne baci grešku - newsletter slanje ne sme da blokira kreiranje saopštenja
       })
 
@@ -251,19 +249,18 @@ export async function POST(request: NextRequest) {
               tags: data.tags || [],
               published_at: data.published_at,
               downloadUrl,
-            }, undefined, true).catch((err) => {
-              console.error(`Error sending email to ${email}:`, err)
+            }, undefined, true).catch(() => {
+              // Ignoriši greške pri slanju dodatnih emailova
             })
           )
-        ).catch((err) => {
-          console.error('Error sending additional emails:', err)
+        ).catch(() => {
+          // Ignoriši greške pri slanju dodatnih emailova
         })
       }
     }
 
     return NextResponse.json({ release: data })
   } catch (error: any) {
-    console.error('POST error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri kreiranju saopštenja' },
       { status: 500 }

@@ -69,7 +69,6 @@ export default function AdminPage() {
     try {
       const { data, error } = await uploadDocument(storagePath, file)
       if (error) {
-        console.error('Upload error:', error)
         throw new Error(error.message || 'Greška pri upload-u dokumenta')
       }
 
@@ -83,7 +82,6 @@ export default function AdminPage() {
       setUploadedDocument(uploaded)
       toast.success('Dokument upload-ovan!')
     } catch (error: any) {
-      console.error('Upload error:', error)
       toast.error(error.message || 'Greška pri upload-u dokumenta')
     }
   }
@@ -111,7 +109,6 @@ export default function AdminPage() {
           const { data: imageData, error: imageError } = await uploadImage(imagePath, file)
           
           if (imageError) {
-            console.error(`Error uploading image ${i} (${fileName}):`, imageError)
             uploadErrors.push(`${fileName}: ${imageError.message || 'Upload failed'}`)
             continue
           }
@@ -121,7 +118,6 @@ export default function AdminPage() {
             uploadedImages.push(imageUrl)
           }
         } catch (err: any) {
-          console.error(`Exception uploading image ${i} (${fileName}):`, err)
           uploadErrors.push(`${fileName}: ${err.message || 'Upload failed'}`)
         }
       }
@@ -159,13 +155,11 @@ export default function AdminPage() {
         const { data, error } = await uploadImage(storagePath, zipFile)
         
         if (error) {
-          console.error('ZIP upload error:', error)
           // Nastavi čak i ako ZIP upload ne uspe - korisnik može da download-uje pojedinačne slike
         } else if (data) {
           zipUrl = getImageUrl(data.path)
         }
       } catch (zipError: any) {
-        console.error('ZIP creation/upload error:', zipError)
         // Nastavi čak i ako ZIP ne uspe
       }
 
@@ -275,11 +269,9 @@ export default function AdminPage() {
         // Redirect na naslovnu stranicu u sekciju "Poslednja saopštenja"
         window.location.href = '/#najnovija-saopstenja'
       } else {
-        console.error('API error:', responseData)
         throw new Error(responseData.error || 'Greška pri kreiranju saopštenja')
       }
     } catch (error: any) {
-      console.error('Error saving release:', error)
       toast.error(error.message || 'Greška pri kreiranju saopštenja')
     } finally {
       setUploading(false)

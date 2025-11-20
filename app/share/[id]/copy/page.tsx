@@ -48,7 +48,7 @@ export default function CopyShareLinkPage() {
             }, 1500)
           }
         } catch (copyErr) {
-          console.error('Failed to copy:', copyErr)
+          // Ignoriši greške pri kopiranju
         }
         document.body.removeChild(textArea)
       }

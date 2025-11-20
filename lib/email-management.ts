@@ -7,7 +7,6 @@ export async function sendManagementLinkEmail(
   managementToken: string
 ) {
   if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY nije postavljen')
     return { error: 'Email servis nije konfigurisan' }
   }
 
@@ -53,13 +52,11 @@ export async function sendManagementLinkEmail(
     })
 
     if (error) {
-      console.error('Resend error:', error)
       return { error: error.message }
     }
 
     return { success: true, data }
   } catch (error: any) {
-    console.error('Email send error:', error)
     return { error: error.message || 'Greška pri slanju emaila' }
   }
 }

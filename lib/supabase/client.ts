@@ -17,7 +17,6 @@ export function createClient() {
       },
     })
   } catch (error: any) {
-    console.error('Error creating Supabase client:', error)
     // Return a mock client that won't crash
     return createBrowserClient('https://placeholder.supabase.co', 'placeholder-key')
   }

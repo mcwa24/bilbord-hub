@@ -75,13 +75,11 @@ export async function GET(request: NextRequest) {
         .select('*')
       
       if (allSubsError) {
-        console.error('Error fetching all subscriptions:', allSubsError)
       } else if (allSubs) {
         // Filtriraj verifikovane i aktivne subscriptions
         totalUsers = allSubs.filter((sub: any) => 
           sub.is_verified === true && sub.is_active === true
         ).length
-        console.log(`Found ${totalUsers} verified and active users out of ${allSubs.length} total subscriptions`)
       }
     } catch (error: any) {
       console.error('Error creating admin client for users count:', error)
@@ -97,7 +95,6 @@ export async function GET(request: NextRequest) {
           ).length
         }
       } catch (fallbackErr) {
-        console.error('Fallback query also failed:', fallbackErr)
       }
     }
 

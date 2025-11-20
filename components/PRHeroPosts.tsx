@@ -108,7 +108,6 @@ export default function PRHeroPosts({ items }: PRHeroPostsProps) {
     <div className="grid md:grid-cols-3 gap-6 mb-8">
       {items.slice(0, 6).map((item) => {
         const imageUrl = getImageUrl(item)
-        console.log('PR Release:', item.title, 'Image URL:', imageUrl, 'Thumbnail:', item.thumbnail_url, 'Alt texts:', item.alt_texts)
         return (
           <div
             key={item.id}

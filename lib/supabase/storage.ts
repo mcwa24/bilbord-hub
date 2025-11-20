@@ -25,7 +25,6 @@ export async function uploadFile(
 
     return { data, error }
   } catch (error: any) {
-    console.error('Storage upload error:', error)
     return {
       data: null,
       error: { message: error.message || 'Greška pri upload-u fajla' }
@@ -58,7 +57,6 @@ export function getPublicUrl(bucket: string, path: string): string {
     const { data } = supabase.storage.from(bucket).getPublicUrl(path)
     return data?.publicUrl || ''
   } catch (error: any) {
-    console.error('Storage getPublicUrl error:', error)
     return ''
   }
 }
@@ -85,7 +83,6 @@ export async function deleteFile(
     const { error } = await supabase.storage.from(bucket).remove([path])
     return { error }
   } catch (error: any) {
-    console.error('Storage delete error:', error)
     return { error: { message: error.message || 'Greška pri brisanju fajla' } }
   }
 }

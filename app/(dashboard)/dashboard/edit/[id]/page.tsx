@@ -268,21 +268,17 @@ export default function EditPage() {
             const emailData = await emailRes.json()
             if (emailRes.ok) {
               toast.success(`Email obaveštenja poslata na ${emailData.sent}/${emailData.total} adresa`)
-            } else {
-              console.error('Error sending emails:', emailData)
             }
           } catch (err) {
-            console.error('Error sending additional emails:', err)
+            // Ignoriši greške pri slanju emailova
           }
         }
         
         router.push('/')
       } else {
-        console.error('API error:', responseData)
         throw new Error(responseData.error || 'Greška pri ažuriranju saopštenja')
       }
     } catch (error: any) {
-      console.error('Error saving release:', error)
       toast.error(error.message || 'Greška pri ažuriranju saopštenja')
     } finally {
       setSaving(false)
