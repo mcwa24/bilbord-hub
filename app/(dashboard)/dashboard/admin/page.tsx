@@ -45,6 +45,7 @@ export default function AdminPage() {
   const [uploadedDocument, setUploadedDocument] = useState<UploadedFile | null>(null)
   const [uploadedZip, setUploadedZip] = useState<UploadedFile | null>(null)
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
+  const [additionalEmails, setAdditionalEmails] = useState<string[]>([])
 
   useEffect(() => {
     // Proveri admin status na client side
@@ -252,7 +253,10 @@ export default function AdminPage() {
       const res = await fetch('/api/releases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(releaseData),
+        body: JSON.stringify({
+          ...releaseData,
+          additional_emails: additionalEmails,
+        }),
       })
 
       const responseData = await res.json()
@@ -267,6 +271,7 @@ export default function AdminPage() {
         setImageFiles([])
         setUploadedDocument(null)
         setUploadedZip(null)
+        setAdditionalEmails([])
         // Redirect na naslovnu stranicu u sekciju "Poslednja saopštenja"
         window.location.href = '/#najnovija-saopstenja'
       } else {
@@ -372,6 +377,75 @@ export default function AdminPage() {
               Tagovi
             </label>
             <TagInput tags={tags} onChange={setTags} />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-3">
+              Dodatna email obaveštenja
+            </label>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  const email = 'jasmina@propr.rs'
+                  if (additionalEmails.includes(email)) {
+                    setAdditionalEmails(additionalEmails.filter(e => e !== email))
+                  } else {
+                    setAdditionalEmails([...additionalEmails, email])
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  additionalEmails.includes('jasmina@propr.rs')
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-gray-300'
+                }`}
+              >
+                {additionalEmails.includes('jasmina@propr.rs') && '✓ '}
+                Pro PR
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const email = 'mokahusar@gmail.com'
+                  if (additionalEmails.includes(email)) {
+                    setAdditionalEmails(additionalEmails.filter(e => e !== email))
+                  } else {
+                    setAdditionalEmails([...additionalEmails, email])
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  additionalEmails.includes('mokahusar@gmail.com')
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-gray-300'
+                }`}
+              >
+                {additionalEmails.includes('mokahusar@gmail.com') && '✓ '}
+                KomunikArt
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const email = 'imarcetic@gmail.com'
+                  if (additionalEmails.includes(email)) {
+                    setAdditionalEmails(additionalEmails.filter(e => e !== email))
+                  } else {
+                    setAdditionalEmails([...additionalEmails, email])
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  additionalEmails.includes('imarcetic@gmail.com')
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-gray-300'
+                }`}
+              >
+                {additionalEmails.includes('imarcetic@gmail.com') && '✓ '}
+                Ivan
+              </button>
+            </div>
+            {additionalEmails.length > 0 && (
+              <p className="text-sm text-gray-600 mt-2">
+                Email obaveštenje će biti poslato na: {additionalEmails.join(', ')}
+              </p>
+            )}
           </div>
           <div className="pt-4 border-t border-gray-200">
             <p className="text-xs text-gray-600">

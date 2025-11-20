@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { FilterParams } from '@/types'
+import { sendNewsletterEmail } from '@/lib/email'
 
 async function getFileSize(url: string): Promise<number> {
   try {
@@ -223,7 +224,7 @@ export async function POST(request: NextRequest) {
 
     // Pošalji newsletter emailove u pozadini (ne čekaj)
     if (data && data.published_at) {
-      // Pozovi newsletter send endpoint u pozadini
+      // Pozovi newsletter send endpoint u pozadini (za sve pretplatnike)
       fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/newsletter/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -232,6 +233,32 @@ export async function POST(request: NextRequest) {
         console.error('Error sending newsletter emails:', err)
         // Ne baci grešku - newsletter slanje ne sme da blokira kreiranje saopštenja
       })
+
+      // Pošalji emailove dodatnim primaocima ako su navedeni
+      const additionalEmails = body.additional_emails || []
+      if (additionalEmails.length > 0) {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
+        const downloadUrl = `${siteUrl}/download/${data.id}`
+
+        // Pošalji emailove u pozadini (ne čekaj)
+        Promise.all(
+          additionalEmails.map((email: string) =>
+            sendNewsletterEmail(email, {
+              id: data.id,
+              title: data.title,
+              description: data.description,
+              content: data.content,
+              tags: data.tags || [],
+              published_at: data.published_at,
+              downloadUrl,
+            }, undefined, true).catch((err) => {
+              console.error(`Error sending email to ${email}:`, err)
+            })
+          )
+        ).catch((err) => {
+          console.error('Error sending additional emails:', err)
+        })
+      }
     }
 
     return NextResponse.json({ release: data })

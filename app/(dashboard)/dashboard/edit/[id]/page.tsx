@@ -35,6 +35,7 @@ export default function EditPage() {
   const [uploadedZip, setUploadedZip] = useState<UploadedFile | null>(null)
   const [existingDocument, setExistingDocument] = useState<UploadedFile | null>(null)
   const [existingZip, setExistingZip] = useState<UploadedFile | null>(null)
+  const [additionalEmails, setAdditionalEmails] = useState<string[]>([])
 
   useEffect(() => {
     if (!isAdmin()) {
@@ -254,6 +255,27 @@ export default function EditPage() {
 
       if (res.ok) {
         toast.success('Saopštenje ažurirano!')
+        
+        // Pošalji emailove dodatnim primaocima ako su navedeni
+        if (additionalEmails.length > 0) {
+          try {
+            const emailRes = await fetch(`/api/releases/${params.id}/send-additional-emails`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ additional_emails: additionalEmails }),
+            })
+            
+            const emailData = await emailRes.json()
+            if (emailRes.ok) {
+              toast.success(`Email obaveštenja poslata na ${emailData.sent}/${emailData.total} adresa`)
+            } else {
+              console.error('Error sending emails:', emailData)
+            }
+          } catch (err) {
+            console.error('Error sending additional emails:', err)
+          }
+        }
+        
         router.push('/')
       } else {
         console.error('API error:', responseData)
@@ -319,11 +341,80 @@ export default function EditPage() {
               required
             />
           </div>
-          <div>
+          <div className="mb-4">
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
               Tagovi
             </label>
             <TagInput tags={tags} onChange={setTags} />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-3">
+              Dodatna email obaveštenja
+            </label>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  const email = 'jasmina@propr.rs'
+                  if (additionalEmails.includes(email)) {
+                    setAdditionalEmails(additionalEmails.filter(e => e !== email))
+                  } else {
+                    setAdditionalEmails([...additionalEmails, email])
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  additionalEmails.includes('jasmina@propr.rs')
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-gray-300'
+                }`}
+              >
+                {additionalEmails.includes('jasmina@propr.rs') && '✓ '}
+                Pro PR
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const email = 'mokahusar@gmail.com'
+                  if (additionalEmails.includes(email)) {
+                    setAdditionalEmails(additionalEmails.filter(e => e !== email))
+                  } else {
+                    setAdditionalEmails([...additionalEmails, email])
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  additionalEmails.includes('mokahusar@gmail.com')
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-gray-300'
+                }`}
+              >
+                {additionalEmails.includes('mokahusar@gmail.com') && '✓ '}
+                KomunikArt
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const email = 'imarcetic@gmail.com'
+                  if (additionalEmails.includes(email)) {
+                    setAdditionalEmails(additionalEmails.filter(e => e !== email))
+                  } else {
+                    setAdditionalEmails([...additionalEmails, email])
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  additionalEmails.includes('imarcetic@gmail.com')
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-black hover:bg-gray-200 border border-gray-300'
+                }`}
+              >
+                {additionalEmails.includes('imarcetic@gmail.com') && '✓ '}
+                Ivan
+              </button>
+            </div>
+            {additionalEmails.length > 0 && (
+              <p className="text-sm text-gray-600 mt-2">
+                Email obaveštenje će biti poslato na: {additionalEmails.join(', ')}
+              </p>
+            )}
           </div>
         </Card>
 
