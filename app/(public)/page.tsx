@@ -359,29 +359,6 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Prikaz tagova iz trenutnih saopštenja */}
-          {availableTags.length > 0 && (
-            <div className="mb-6 pb-4 border-b border-gray-200">
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-sm font-medium text-gray-700 mr-2">Filtriraj po tagovima:</span>
-                {availableTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => handleTagClick(tag)}
-                    className={`px-3 py-1 text-xs font-medium rounded-full transition ${
-                      selectedTag === tag
-                        ? 'bg-[#f9c344] text-[#1d1d1f]'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                    title={`Klikni da filtriraš saopštenja sa tagom "${tag}"`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          
               {loading && releases.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f9c344]"></div>
