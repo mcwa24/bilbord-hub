@@ -27,9 +27,10 @@ export async function GET(request: NextRequest) {
       tags: searchParams.get('tags')?.split(',') || undefined,
     }
 
+
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
-    const itemsPerPage = limit || 10
+    const itemsPerPage = limit || 20 // Default 20 po stranici
     const from = (page - 1) * itemsPerPage
     const to = from + itemsPerPage - 1
 
@@ -59,6 +60,143 @@ export async function GET(request: NextRequest) {
       countQuery = countQuery.lte('published_at', filters.date_to)
     }
 
+    // Ako ima tag filter, koristimo Supabase contains direktno sa paginacijom
+    if (filters.tags && filters.tags.length > 0) {
+      
+      // Prvo dobijamo ukupan broj za paginaciju
+      let countQuery = supabase
+        .from('pr_releases')
+        .select('*', { count: 'exact', head: true })
+        .not('published_at', 'is', null)
+
+      // Za svaki tag koristimo contains - filter za TEXT[] polje
+      // Ako ima više tagova, koristimo OR logiku
+      // Koristimo PostgREST sintaksu `cs` (contains) za array polje
+      if (filters.tags.length === 1) {
+        const tag = filters.tags[0].trim()
+        countQuery = countQuery.or(`tags.cs.{${tag}}`)
+      } else {
+        // Za više tagova, koristimo OR logiku sa PostgREST sintaksom
+        const orConditions = filters.tags.map(tag => `tags.cs.{${tag.trim()}}`).join(',')
+        countQuery = countQuery.or(orConditions)
+      }
+
+      if (filters.search) {
+        countQuery = countQuery.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
+      }
+
+      if (filters.company) {
+        countQuery = countQuery.ilike('company_name', `%${filters.company}%`)
+      }
+
+      if (filters.industry) {
+        countQuery = countQuery.ilike('industry', `%${filters.industry}%`)
+      }
+
+      if (filters.date_from) {
+        countQuery = countQuery.gte('published_at', filters.date_from)
+      }
+
+      if (filters.date_to) {
+        countQuery = countQuery.lte('published_at', filters.date_to)
+      }
+
+      const { count } = await countQuery
+
+      // Sada uzimamo saopštenja sa paginacijom
+      let query = supabase
+        .from('pr_releases')
+        .select('*')
+        .not('published_at', 'is', null)
+        .order('published_at', { ascending: false })
+        .range(from, to)
+
+      // Za svaki tag koristimo contains
+      // Ako ima više tagova, koristimo OR logiku
+      // Koristimo PostgREST sintaksu `cs` (contains) za array polje
+      if (filters.tags.length === 1) {
+        const tag = filters.tags[0].trim()
+        query = query.or(`tags.cs.{${tag}}`)
+      } else {
+        // Za više tagova, koristimo OR logiku sa PostgREST sintaksom
+        const orConditions = filters.tags.map(tag => `tags.cs.{${tag.trim()}}`).join(',')
+        query = query.or(orConditions)
+      }
+
+      if (filters.search) {
+        query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
+      }
+
+      if (filters.company) {
+        query = query.ilike('company_name', `%${filters.company}%`)
+      }
+
+      if (filters.industry) {
+        query = query.ilike('industry', `%${filters.industry}%`)
+      }
+
+      if (filters.date_from) {
+        query = query.gte('published_at', filters.date_from)
+      }
+
+      if (filters.date_to) {
+        query = query.lte('published_at', filters.date_to)
+      }
+
+      const { data, error } = await query
+      
+      if (error) {
+        throw error
+      }
+
+      const filteredCount = count || 0
+      const releases = data || []
+      const totalPages = Math.ceil(filteredCount / itemsPerPage)
+
+      // Optimizovano: koristimo veličine fajlova iz material_links (sačuvane prilikom upload-a)
+      const releasesWithSizes = await Promise.all(
+        releases.map(async (release: any) => {
+          const zipFiles = release.material_links?.filter(
+            (link: any) => link.url?.toLowerCase().endsWith('.zip') || link.label === 'Slike'
+          ) || []
+          const documents = release.material_links?.filter(
+            (link: any) => !link.url?.toLowerCase().endsWith('.zip') && link.label !== 'Slike'
+          ) || []
+
+          const docSize = documents.length > 0 && documents[0].size 
+            ? documents[0].size 
+            : documents.length > 0 ? await getFileSize(documents[0].url) : 0
+          
+          const zipSize = zipFiles.length > 0 && zipFiles[0].size 
+            ? zipFiles[0].size 
+            : zipFiles.length > 0 ? await getFileSize(zipFiles[0].url) : 0
+
+          return {
+            ...release,
+            fileSizes: {
+              doc: docSize,
+              zip: zipSize
+            }
+          }
+        })
+      )
+
+      const response = NextResponse.json({ 
+        releases: releasesWithSizes,
+        pagination: {
+          page,
+          totalPages,
+          totalItems: filteredCount,
+          itemsPerPage
+        }
+      })
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+      response.headers.set('Pragma', 'no-cache')
+      response.headers.set('Expires', '0')
+      return response
+    }
+
+    // Ako nema tag filtera, koristimo standardnu paginaciju u bazi
     const { count } = await countQuery
 
     let query = supabase
@@ -92,43 +230,8 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
-    // Filter by tags if provided (tags se filtriraju nakon što dobijemo podatke jer su u JSON polju)
     let releases = data || []
     let filteredCount = count || 0
-    
-    if (filters.tags && filters.tags.length > 0) {
-      // Prvo filtriramo podatke
-      releases = releases.filter((release: any) =>
-        filters.tags!.some((tag) => release.tags?.includes(tag))
-      )
-      
-      // Zatim dobijamo tačan count za tag filtrirane rezultate
-      const allReleasesQuery = supabase
-        .from('pr_releases')
-        .select('*')
-        .not('published_at', 'is', null)
-      
-      if (filters.search) {
-        allReleasesQuery.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`)
-      }
-      if (filters.company) {
-        allReleasesQuery.ilike('company_name', `%${filters.company}%`)
-      }
-      if (filters.industry) {
-        allReleasesQuery.ilike('industry', `%${filters.industry}%`)
-      }
-      if (filters.date_from) {
-        allReleasesQuery.gte('published_at', filters.date_from)
-      }
-      if (filters.date_to) {
-        allReleasesQuery.lte('published_at', filters.date_to)
-      }
-      
-      const { data: allData } = await allReleasesQuery
-      filteredCount = (allData || []).filter((release: any) =>
-        filters.tags!.some((tag) => release.tags?.includes(tag))
-      ).length
-    }
 
     const totalPages = Math.ceil((filteredCount || 0) / itemsPerPage)
 

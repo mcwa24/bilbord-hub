@@ -58,6 +58,7 @@ export default function Home() {
   const [totalItems, setTotalItems] = useState(0)
   const [rssItems, setRssItems] = useState<RSSItem[]>([])
   const [heroItems, setHeroItems] = useState<RSSItem[]>([])
+  const [availableTags, setAvailableTags] = useState<string[]>([])
 
   const fetchRSSFeed = async () => {
     try {
@@ -78,21 +79,39 @@ export default function Home() {
         setHeroItems(shuffled.slice(0, 6))
       }
     } catch (error) {
-      console.error('Error fetching RSS feed:', error)
+      // Error fetching RSS feed
     }
   }
+
+  // Učitaj sve tagove iz baze
+  useEffect(() => {
+    const fetchAllTags = async () => {
+      try {
+        const res = await fetch('/api/tags')
+        const data = await res.json()
+        if (data.tags) {
+          setAvailableTags(data.tags)
+        }
+      } catch (error) {
+        // Error fetching tags
+      }
+    }
+    fetchAllTags()
+  }, [])
 
   const fetchReleases = useCallback(async () => {
     setLoading(true) // Loading samo za listu saopštenja
     
     try {
-      let url = `/api/releases?limit=20&page=${currentPage}`
-      if (selectedTag) {
-        url += `&tags=${encodeURIComponent(selectedTag)}`
-      }
-      if (searchQuery.trim()) {
+      // Kada ima tag filter, ne koristimo paginaciju - uzimamo sva saopštenja sa tim tagom
+      let url = selectedTag 
+        ? `/api/releases?tags=${encodeURIComponent(selectedTag)}`
+        : `/api/releases?limit=20&page=${currentPage}`
+      
+      if (!selectedTag && searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
+      
       // Bez timestamp query parametra - već imamo no-cache headers
       const res = await fetch(url, {
         cache: 'no-store', // Real-time update - bez cache-a
@@ -106,7 +125,7 @@ export default function Home() {
       setTotalPages(data.pagination?.totalPages || 1)
       setTotalItems(data.pagination?.totalItems || 0)
     } catch (error) {
-      console.error('Error fetching releases:', error)
+      // Error fetching releases
     } finally {
       setLoading(false)
     }
@@ -163,6 +182,7 @@ export default function Home() {
 
 
   const handleTagClick = (tag: string) => {
+    setCurrentPage(1) // Resetuj stranicu na 1 kada se klikne na tag
     setSelectedTag(tag)
   }
 
@@ -338,6 +358,30 @@ export default function Home() {
               )}
             </div>
           </div>
+          
+          {/* Prikaz tagova iz trenutnih saopštenja */}
+          {availableTags.length > 0 && (
+            <div className="mb-6 pb-4 border-b border-gray-200">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm font-medium text-gray-700 mr-2">Filtriraj po tagovima:</span>
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagClick(tag)}
+                    className={`px-3 py-1 text-xs font-medium rounded-full transition ${
+                      selectedTag === tag
+                        ? 'bg-[#f9c344] text-[#1d1d1f]'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                    title={`Klikni da filtriraš saopštenja sa tagom "${tag}"`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
               {loading && releases.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f9c344]"></div>

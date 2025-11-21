@@ -35,6 +35,9 @@ CREATE INDEX IF NOT EXISTS idx_pr_releases_industry ON pr_releases(industry);
 CREATE INDEX IF NOT EXISTS idx_pr_releases_created_by ON pr_releases(created_by);
 CREATE INDEX IF NOT EXISTS idx_download_stats_release_id ON download_stats(release_id);
 
+-- GIN index za brže pretrage po tagovima (TEXT[] polje)
+CREATE INDEX IF NOT EXISTS idx_pr_releases_tags ON pr_releases USING GIN(tags);
+
 -- RLS policies
 ALTER TABLE pr_releases ENABLE ROW LEVEL SECURITY;
 ALTER TABLE download_stats ENABLE ROW LEVEL SECURITY;
