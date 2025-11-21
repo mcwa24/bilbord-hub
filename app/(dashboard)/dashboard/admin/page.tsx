@@ -46,6 +46,7 @@ export default function AdminPage() {
   const [uploadedZip, setUploadedZip] = useState<UploadedFile | null>(null)
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
   const [additionalEmails, setAdditionalEmails] = useState<string[]>([])
+  const [customEmail, setCustomEmail] = useState('')
 
   useEffect(() => {
     // Proveri admin status na client side
@@ -433,10 +434,76 @@ export default function AdminPage() {
                 Ivan
               </button>
             </div>
+            
+            {/* Custom email input */}
+            <div className="mt-4 flex gap-2">
+              <Input
+                type="email"
+                value={customEmail}
+                onChange={(e) => setCustomEmail(e.target.value)}
+                placeholder="Unesite email adresu"
+                className="flex-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    if (customEmail.trim()) {
+                      const email = customEmail.trim().toLowerCase()
+                      if (!additionalEmails.includes(email)) {
+                        setAdditionalEmails([...additionalEmails, email])
+                        setCustomEmail('')
+                      } else {
+                        toast.error('Email adresa je već dodata')
+                      }
+                    }
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                onClick={() => {
+                  if (customEmail.trim()) {
+                    const email = customEmail.trim().toLowerCase()
+                    if (!additionalEmails.includes(email)) {
+                      setAdditionalEmails([...additionalEmails, email])
+                      setCustomEmail('')
+                    } else {
+                      toast.error('Email adresa je već dodata')
+                    }
+                  }
+                }}
+                variant="outline"
+              >
+                Dodaj
+              </Button>
+            </div>
+
+            {/* Lista dodatnih email adresa */}
             {additionalEmails.length > 0 && (
-              <p className="text-sm text-gray-600 mt-2">
-                Email obaveštenje će biti poslato na: {additionalEmails.join(', ')}
-              </p>
+              <div className="mt-4">
+                <p className="text-sm font-semibold text-[#1d1d1f] mb-2">
+                  Email obaveštenje će biti poslato na:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {additionalEmails.map((email) => (
+                    <div
+                      key={email}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg text-sm"
+                    >
+                      <span className="text-gray-800">{email}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAdditionalEmails(additionalEmails.filter(e => e !== email))
+                        }}
+                        className="text-gray-500 hover:text-gray-800 transition"
+                        aria-label={`Ukloni ${email}`}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
           <div className="pt-4 border-t border-gray-200">
