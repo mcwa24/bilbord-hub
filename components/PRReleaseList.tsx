@@ -133,7 +133,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
         return (
           <div
             key={release.id}
-            className="bg-white rounded-full px-4 py-3 mb-3 shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all duration-200 cursor-pointer"
+            className="bg-white rounded-lg md:rounded-full px-4 py-3 mb-3 shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all duration-200 cursor-pointer"
           >
             <div className="flex flex-col md:flex-row items-start justify-between gap-4">
               <div className="flex-1 min-w-0 w-full">
