@@ -206,10 +206,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Izdvoji additional_emails iz body objekta jer ne treba da se čuva u bazi
+    const { additional_emails, ...releaseData } = body
+
     const { data, error } = await supabase
       .from('pr_releases')
       .insert({
-        ...body,
+        ...releaseData,
         created_by: '00000000-0000-0000-0000-000000000000', // Placeholder user ID
         view_count: 0,
         download_count: 0,
@@ -233,7 +236,7 @@ export async function POST(request: NextRequest) {
       })
 
       // Pošalji emailove dodatnim primaocima ako su navedeni
-      const additionalEmails = body.additional_emails || []
+      const additionalEmails = additional_emails || []
       if (additionalEmails.length > 0) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
         const downloadUrl = `${siteUrl}/download/${data.id}`
