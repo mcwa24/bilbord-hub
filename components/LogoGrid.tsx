@@ -84,11 +84,11 @@ function GifFirstFrame({ logo, index }: { logo: string; index: number }) {
 
 export default function LogoGrid() {
   return (
-    <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+    <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-10 gap-0">
       {logos.map((logo, index) => (
         <div
           key={logo}
-          className="flex items-center justify-center p-4 bg-white rounded-lg pointer-events-none"
+          className="flex items-center justify-center p-2 bg-white rounded-lg pointer-events-none"
           style={{ 
             height: '120px',
             width: '100%'
