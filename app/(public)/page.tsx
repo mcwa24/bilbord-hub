@@ -435,12 +435,9 @@ export default function Home() {
                 />
               </div>
               <div className="bg-white rounded-xl p-5 border border-gray-100">
-                <h3 className="text-3xl font-bold text-[#1d1d1f] mb-3 leading-tight">
+                <h3 className="text-3xl font-bold text-[#1d1d1f] leading-tight">
                   Postanite naš korisnik
                 </h3>
-                <p className="text-base font-medium text-[#1d1d1f] leading-relaxed">
-                  Distribuirajte vaša PR saopštenja na jednom mestu
-                </p>
               </div>
             </div>
             
@@ -456,19 +453,16 @@ export default function Home() {
                 />
                 {/* Overlay za bolji kontrast */}
                 <div className="absolute inset-0 bg-black/10"></div>
-                <div className="absolute inset-0 flex items-center justify-center p-6">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-7 max-w-2xl w-full text-left">
-                    <h3 className="text-4xl lg:text-5xl font-bold text-[#1d1d1f] mb-4 lg:mb-5 leading-tight">
+                <div className="absolute inset-0 flex items-end justify-start p-4">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-7 max-w-2xl text-left">
+                    <h3 className="text-4xl lg:text-5xl font-bold text-[#1d1d1f] leading-tight">
                       Postanite naš korisnik
                     </h3>
-                    <p className="text-base lg:text-lg font-medium text-[#1d1d1f] leading-relaxed">
-                      Distribuirajte vaša PR saopštenja na jednom mestu
-                    </p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-3xl p-6 md:p-8">
+            <div className="bg-white rounded-3xl py-6 md:py-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col md:flex-row items-start justify-between gap-6">
                 <div className="grid md:grid-cols-2 gap-2 md:gap-3 flex-1">
                   <div className="flex items-center gap-2">
@@ -565,12 +559,9 @@ export default function Home() {
                 />
               </div>
               <div className="bg-white rounded-xl p-5 border border-gray-100">
-                <h3 className="text-3xl font-bold text-[#1d1d1f] mb-3 leading-tight">
+                <h3 className="text-3xl font-bold text-[#1d1d1f] leading-tight">
                   Prijavite se na email obaveštenja
                 </h3>
-                <p className="text-base font-medium text-[#1d1d1f] leading-relaxed">
-                  Primate email obaveštenja kada se objavi novo saopštenje.
-                </p>
               </div>
             </div>
             
@@ -586,21 +577,18 @@ export default function Home() {
                 />
                 {/* Overlay za bolji kontrast */}
                 <div className="absolute inset-0 bg-black/10"></div>
-                <div className="absolute inset-0 flex items-center justify-center p-6">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-7 max-w-2xl w-full text-left">
-                    <h3 className="text-4xl lg:text-5xl font-bold text-[#1d1d1f] mb-4 lg:mb-5 leading-tight">
+                <div className="absolute inset-0 flex items-end justify-start p-4">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-7 max-w-2xl text-left">
+                    <h3 className="text-4xl lg:text-5xl font-bold text-[#1d1d1f] leading-tight">
                       Prijavite se na email obaveštenja
                     </h3>
-                    <p className="text-base lg:text-lg font-medium text-[#1d1d1f] leading-relaxed">
-                      Primate email obaveštenja kada se objavi novo saopštenje.
-                    </p>
                   </div>
                 </div>
               </div>
             </div>
             
             {/* Features i dugme */}
-            <div className="bg-white rounded-3xl p-6 md:p-8">
+            <div className="bg-white rounded-3xl py-6 md:py-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col md:flex-row items-start justify-between gap-6">
                 <div className="grid md:grid-cols-2 gap-2 md:gap-3 flex-1">
                   <div className="flex items-center gap-2">
