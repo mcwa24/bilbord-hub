@@ -26,7 +26,7 @@ export default function TagInput({ tags, onChange, placeholder = 'Dodaj tag...' 
         setAllTags(data.tags)
       }
     } catch (error) {
-      console.error('Error fetching tags:', error)
+      // Error fetching tags
     }
   }
 
@@ -53,7 +53,7 @@ export default function TagInput({ tags, onChange, placeholder = 'Dodaj tag...' 
           setAllTags([...allTags, tag])
         }
       } catch (error) {
-        console.error('Error creating tag:', error)
+        // Error creating tag
       }
     }
 

@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
       }
     } catch (error) {
       // Ignore auth errors - user might not be logged in
-      console.error('Auth error (ignored):', error)
     }
 
     if (!user) {

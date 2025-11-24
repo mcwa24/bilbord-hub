@@ -25,7 +25,6 @@ export default function DashboardPage() {
       const data = await res.json()
       setReleases(data.releases || [])
     } catch (error) {
-      console.error('Error fetching releases:', error)
       toast.error('Greška pri učitavanju saopštenja')
     } finally {
       setLoading(false)

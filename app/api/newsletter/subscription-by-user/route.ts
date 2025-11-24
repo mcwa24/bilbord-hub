@@ -50,7 +50,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ subscription: data })
   } catch (error: any) {
-    console.error('Newsletter subscription get error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri učitavanju subscriptiona' },
       { status: 500 }

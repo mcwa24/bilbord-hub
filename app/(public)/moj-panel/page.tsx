@@ -33,7 +33,6 @@ export default function MyPanelPage() {
         loadSubscription(user.email)
       }
     } catch (error) {
-      console.error('Error checking user:', error)
       router.push('/prijava')
     } finally {
       setLoading(false)
@@ -54,7 +53,6 @@ export default function MyPanelPage() {
         setSubscription(null)
       }
     } catch (error) {
-      console.error('Error loading subscription:', error)
       setSubscription(null)
     }
   }
@@ -84,7 +82,6 @@ export default function MyPanelPage() {
         throw new Error(data.error || 'Greška pri aktivaciji email obaveštenja')
       }
     } catch (error: any) {
-      console.error('Error creating subscription:', error)
       toast.error(error.message || 'Greška pri aktivaciji email obaveštenja')
     } finally {
       setCreatingSubscription(false)

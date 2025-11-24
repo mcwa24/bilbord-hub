@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
       message: 'Subscription već postoji ili nije pronađen',
     })
   } catch (error: any) {
-    console.error('Link user subscription error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri povezivanju subscriptiona' },
       { status: 500 }

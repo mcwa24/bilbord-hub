@@ -43,7 +43,6 @@ export default function PRHeroPosts({ items }: PRHeroPostsProps) {
       // Mala pauza između download-ovanja
       await new Promise(resolve => setTimeout(resolve, 300))
     } catch (error) {
-      console.error(`Error downloading ${filename}:`, error)
       throw error
     }
   }
@@ -79,10 +78,10 @@ export default function PRHeroPosts({ items }: PRHeroPostsProps) {
       try {
         await fetch(`/api/releases/${release.id}/download`, { method: 'POST' })
       } catch (error) {
-        console.error('Error tracking download:', error)
+        // Error tracking download
       }
     } catch (error) {
-      console.error('Error downloading files:', error)
+      // Error downloading files
     } finally {
       setDownloading(null)
     }
@@ -123,7 +122,6 @@ export default function PRHeroPosts({ items }: PRHeroPostsProps) {
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
-                      console.error('Image load error:', imageUrl)
                       e.currentTarget.style.display = 'none'
                     }}
                   />

@@ -49,13 +49,11 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Supabase error:', error)
       throw error
     }
 
     return NextResponse.json({ release: data })
   } catch (error: any) {
-    console.error('PUT error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri ažuriranju saopštenja' },
       { status: 500 }
@@ -109,7 +107,7 @@ export async function DELETE(
               }
             }
           } catch (error) {
-            console.error('Error parsing URL for deletion:', error)
+            // Error parsing URL for deletion
           }
         }
       }
@@ -125,7 +123,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('DELETE error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri brisanju saopštenja' },
       { status: 500 }

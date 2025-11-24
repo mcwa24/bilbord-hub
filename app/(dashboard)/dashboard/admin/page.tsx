@@ -180,7 +180,6 @@ export default function AdminPage() {
         toast.success(`Upload-ovano ${uploadedImages.length} slika!`)
       }
     } catch (error: any) {
-      console.error('Upload error:', error)
       toast.error(error.message || 'Greška pri upload-u slika')
       setImageFiles([])
       setUploadedZip(null)

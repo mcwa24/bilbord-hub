@@ -82,7 +82,6 @@ export async function GET(request: NextRequest) {
         ).length
       }
     } catch (error: any) {
-      console.error('Error creating admin client for users count:', error)
       // Fallback: probaj sa običnim client-om
       try {
         const { data: fallbackSubs, error: fallbackError } = await supabase

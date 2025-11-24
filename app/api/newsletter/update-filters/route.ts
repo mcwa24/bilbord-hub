@@ -62,7 +62,6 @@ export async function POST(request: NextRequest) {
       subscription: data,
     })
   } catch (error: any) {
-    console.error('Newsletter update filters error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri ažuriranju filtera' },
       { status: 500 }

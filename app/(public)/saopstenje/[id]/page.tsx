@@ -35,7 +35,6 @@ export default function SaopstenjePage() {
       const data = await res.json()
       setRelease(data.release)
     } catch (error) {
-      console.error('Error fetching release:', error)
       toast.error('Greška pri učitavanju saopštenja')
     } finally {
       setLoading(false)
@@ -46,7 +45,7 @@ export default function SaopstenjePage() {
     try {
       await fetch(`/api/releases/${params.id}/view`, { method: 'POST' })
     } catch (error) {
-      console.error('Error tracking view:', error)
+      // Error tracking view
     }
   }
 
@@ -64,7 +63,7 @@ export default function SaopstenjePage() {
       await fetch(`/api/releases/${params.id}/download`, { method: 'POST' })
       toast.success('Preuzimanje zabeleženo')
     } catch (error) {
-      console.error('Error tracking download:', error)
+      // Error tracking download
     }
   }
 

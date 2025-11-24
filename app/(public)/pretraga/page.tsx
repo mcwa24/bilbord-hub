@@ -34,11 +34,12 @@ export default function PretragaPage() {
         params.append('tags', filters.tags.join(','))
       }
 
+      // Koristi browser cache za brže učitavanje (API ima cache headere)
       const res = await fetch(`/api/releases?${params.toString()}`)
       const data = await res.json()
       setReleases(data.releases || [])
     } catch (error) {
-      console.error('Error fetching releases:', error)
+      // Error fetching releases
     } finally {
       setLoading(false)
     }

@@ -122,7 +122,6 @@ export default function EditPage() {
     try {
       const { data, error } = await uploadDocument(storagePath, file)
       if (error) {
-        console.error('Upload error:', error)
         throw new Error(error.message || 'Greška pri upload-u dokumenta')
       }
 
@@ -137,7 +136,6 @@ export default function EditPage() {
       setExistingDocument(null)
       toast.success('Dokument upload-ovan!')
     } catch (error: any) {
-      console.error('Upload error:', error)
       toast.error(error.message || 'Greška pri upload-u dokumenta')
     }
   }
@@ -176,7 +174,6 @@ export default function EditPage() {
       const { data, error } = await uploadImage(storagePath, zipFile)
 
       if (error) {
-        console.error('Upload error:', error)
         throw new Error(error.message || 'Greška pri upload-u ZIP arhive')
       }
 
@@ -191,7 +188,6 @@ export default function EditPage() {
       setExistingZip(null)
       toast.success(`Upload-ovano ${files.length} slika u ZIP arhivi!`)
     } catch (error: any) {
-      console.error('Upload error:', error)
       toast.error(error.message || 'Greška pri upload-u slika')
     }
   }

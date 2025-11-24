@@ -36,7 +36,7 @@ export default function NewsletterManagementPage() {
         setAllTags(data.tags)
       }
     } catch (error) {
-      console.error('Error loading tags:', error)
+      // Error loading tags
     }
   }
 
@@ -57,7 +57,6 @@ export default function NewsletterManagementPage() {
         toast.error(data.error || 'Nevažeći token ili email')
       }
     } catch (error) {
-      console.error('Error loading subscription:', error)
       toast.error('Greška pri učitavanju pretplate')
     } finally {
       setLoading(false)

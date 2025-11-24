@@ -222,6 +222,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                       <>
                         <Link
                           href={`/dashboard/edit/${release.id}`}
+                          prefetch={true}
                           className="inline hover:opacity-70 transition cursor-pointer no-underline flex-shrink-0"
                           title="Izmeni saopštenje"
                         >
@@ -323,6 +324,7 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
                         <>
                           <Link
                             href={`/dashboard/edit/${release.id}`}
+                            prefetch={true}
                             className="inline hover:opacity-70 transition cursor-pointer no-underline flex-shrink-0"
                             title="Izmeni saopštenje"
                           >

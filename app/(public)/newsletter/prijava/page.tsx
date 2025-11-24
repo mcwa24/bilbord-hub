@@ -27,7 +27,7 @@ export default function NewsletterSubscribePage() {
         setAllTags(data.tags)
       }
     } catch (error) {
-      console.error('Error loading tags:', error)
+      // Error loading tags
     }
   }
 

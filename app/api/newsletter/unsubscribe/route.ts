@@ -54,7 +54,6 @@ export async function POST(request: NextRequest) {
       )
     }
   } catch (error: any) {
-    console.error('Newsletter unsubscribe error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri odjavi sa newslettera' },
       { status: 500 }

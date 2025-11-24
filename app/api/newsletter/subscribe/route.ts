@@ -89,7 +89,6 @@ export async function POST(request: NextRequest) {
       emailError: emailResult?.error || null,
     })
   } catch (error: any) {
-    console.error('Newsletter subscribe error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri prijavi na newsletter' },
       { status: 500 }

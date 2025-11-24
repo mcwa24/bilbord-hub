@@ -106,7 +106,6 @@ export async function GET(request: Request) {
     nextResponse.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
     return nextResponse
   } catch (error: any) {
-    console.error('Error fetching RSS feed:', error)
     const errorResponse = NextResponse.json(
       { error: 'Failed to fetch RSS feed', message: error.message },
       { status: 500 }

@@ -99,27 +99,22 @@ export default function Home() {
     fetchAllTags()
   }, [])
 
-  const fetchReleases = useCallback(async () => {
+  const fetchReleases = useCallback(async (pageNum?: number) => {
+    const pageToFetch = pageNum ?? currentPage
     setLoading(true) // Loading samo za listu saopštenja
     
     try {
       // Kada ima tag filter, ne koristimo paginaciju - uzimamo sva saopštenja sa tim tagom
       let url = selectedTag 
         ? `/api/releases?tags=${encodeURIComponent(selectedTag)}`
-        : `/api/releases?limit=20&page=${currentPage}`
+        : `/api/releases?limit=20&page=${pageToFetch}`
       
       if (!selectedTag && searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
       
-      // Bez timestamp query parametra - već imamo no-cache headers
-      const res = await fetch(url, {
-        cache: 'no-store', // Real-time update - bez cache-a
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
-          'Pragma': 'no-cache'
-        }
-      })
+      // Koristi browser cache za brže učitavanje (API ima cache headere)
+      const res = await fetch(url)
       const data = await res.json()
       setReleases(data.releases || [])
       setTotalPages(data.pagination?.totalPages || 1)
@@ -130,6 +125,15 @@ export default function Home() {
       setLoading(false)
     }
   }, [currentPage, selectedTag, searchQuery])
+
+  // Prefetch sledeću stranicu tek kada korisnik promeni stranicu (ne odmah pri učitavanju)
+  useEffect(() => {
+    // Prefetch samo ako nije prva stranica (znači korisnik je već promenio stranicu)
+    if (currentPage > 1 && currentPage < totalPages && !selectedTag && !searchQuery.trim()) {
+      // Prefetch sledeću stranicu u pozadini (koristi browser cache)
+      fetch(`/api/releases?limit=20&page=${currentPage + 1}`).catch(() => {})
+    }
+  }, [currentPage, totalPages, selectedTag, searchQuery])
 
 
   // Učitaj podatke odmah pri inicijalizaciji
@@ -180,6 +184,31 @@ export default function Home() {
     fetchReleases()
   }, [fetchReleases])
 
+  // Prefetch sledeću stranicu tek kada se sekcija sa saopštenjima učita (vidljiva je)
+  useEffect(() => {
+    const section = document.getElementById('najnovija-saopstenja')
+    if (!section) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Tek kada je sekcija vidljiva, prefetchuj sledeću stranicu
+          if (entry.isIntersecting && currentPage < totalPages && !selectedTag && !searchQuery.trim()) {
+            fetch(`/api/releases?limit=20&page=${currentPage + 1}`).catch(() => {})
+            observer.disconnect() // Prefetch samo jednom
+          }
+        })
+      },
+      { threshold: 0.1 } // Prefetch kada je 10% sekcije vidljivo
+    )
+
+    observer.observe(section)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [currentPage, totalPages, selectedTag, searchQuery])
+
 
   const handleTagClick = (tag: string) => {
     setCurrentPage(1) // Resetuj stranicu na 1 kada se klikne na tag
@@ -193,6 +222,7 @@ export default function Home() {
   }
 
   const handlePageChange = (page: number) => {
+    // Optimistic UI update - postavi stranicu odmah
     setCurrentPage(page)
     // Scrolluj na vrh sekcije sa saopštenjima umesto na vrh stranice
     const section = document.getElementById('najnovija-saopstenja')
@@ -201,6 +231,8 @@ export default function Home() {
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
+    // Fetch podatke za novu stranicu
+    fetchReleases(page)
   }
 
   const getVisiblePages = () => {
@@ -379,19 +411,28 @@ export default function Home() {
                         </button>
                       )}
                       
-                      {getVisiblePages().map((pageNum, index) => (
-                        <button
-                          key={index}
-                          onClick={() => typeof pageNum === 'number' && handlePageChange(pageNum)}
-                          className={`transition-all duration-300 ${
-                            currentPage === pageNum
-                              ? 'text-[#1d1d1f] font-bold'
-                              : 'text-gray-600 hover:text-[#1d1d1f]'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      ))}
+                      {getVisiblePages().map((pageNum, index) => {
+                        const pageNumber = typeof pageNum === 'number' ? pageNum : null
+                        return (
+                          <button
+                            key={index}
+                            onClick={() => pageNumber && handlePageChange(pageNumber)}
+                            onMouseEnter={() => {
+                              // Prefetch stranicu kada korisnik hover-uje preko dugmeta (koristi browser cache)
+                              if (pageNumber && pageNumber !== currentPage && !selectedTag && !searchQuery.trim()) {
+                                fetch(`/api/releases?limit=20&page=${pageNumber}`).catch(() => {})
+                              }
+                            }}
+                            className={`transition-all duration-300 ${
+                              currentPage === pageNum
+                                ? 'text-[#1d1d1f] font-bold'
+                                : 'text-gray-600 hover:text-[#1d1d1f]'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        )
+                      })}
                       
                       {currentPage < totalPages ? (
                         <button

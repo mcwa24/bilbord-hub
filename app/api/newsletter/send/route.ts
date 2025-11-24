@@ -99,7 +99,6 @@ export async function POST(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     })
   } catch (error: any) {
-    console.error('Newsletter send error:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri slanju newslettera' },
       { status: 500 }

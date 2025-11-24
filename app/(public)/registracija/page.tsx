@@ -62,7 +62,6 @@ export default function RegisterPage() {
           })
         } catch (err) {
           // Ignoriši grešku - nije kritično
-          console.error('Error linking subscription:', err)
         }
         
         setRegistrationSuccess(true)
