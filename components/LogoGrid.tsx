@@ -4,28 +4,42 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 const logos = [
+  // Prvi red - 10 logoa
   'aik bank.png',
+  'avokado.png',
   'bambi-logo-old-min.png',
+  'beldocs.jpg',
   'beogradski trkacki klub.svg',
   'bor hotel.png',
   'Cineplexx-logo.webp',
   'Cinestar_logo.svg',
   'coca-cola-hbc.png',
   'diopta.png',
+  // Drugi red - 10 logoa
+  'dom_omladine.jpg',
   'fashion company.jpg',
   'fashion-and-friends.png',
+  'fest.png',
   'fondacija novak djokovic.png',
   'Gorenje_logo.jpg',
   'HBO_logo.svg',
   'hisense-logo.png',
   'huawei-logo-picture-4.png',
+  'italija.png',
+  // Treći red - 10 logoa
   'jysk.png',
+  'kcb-logo-bw.png',
+  'kominik_art.jpeg',
   'Mascom-800-450-SAMO-HERMES_1497345915.jpg',
   'Mastercard-logo.svg.png',
   'MediGroup-logo.png',
   'mts dvorana.png',
   'muzej savremen umetnosti.png',
   'OTP_banka_Srbija.svg.png',
+  'palic.jpg',
+  // Četvrti red - 10 logoa
+  'pro_pr.jpeg',
+  'sarajevo.png',
   'Samsung-emblem.png',
   'TLC_Logo.svg.png',
   'UNICEF-logo.png',
