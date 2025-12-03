@@ -41,14 +41,43 @@ export async function PUT(
     // Za sada ne proveravamo autentikaciju - samo testno
     const body = await request.json()
 
+    // Pripremi update data - dodaj valid_until samo ako je postavljen
+    const { valid_until, ...restBody } = body
+    const updateData: any = { ...restBody }
+    
+    // Dodaj valid_until samo ako je postavljen i nije prazan, inače postavi na null
+    if (valid_until !== undefined) {
+      if (valid_until && valid_until.trim() !== '') {
+        updateData.valid_until = valid_until
+      } else {
+        updateData.valid_until = null
+      }
+    }
+
     const { data, error } = await supabase
       .from('pr_releases')
-      .update(body)
+      .update(updateData)
       .eq('id', params.id)
       .select()
       .single()
 
     if (error) {
+      console.error('Error updating release:', error)
+      // Ako je greška zbog nepostojeće kolone valid_until, ignorisati je i pokušati ponovo bez nje
+      if (error.message && error.message.includes('valid_until')) {
+        delete updateData.valid_until
+        const { data: retryData, error: retryError } = await supabase
+          .from('pr_releases')
+          .update(updateData)
+          .eq('id', params.id)
+          .select()
+          .single()
+        
+        if (retryError) {
+          throw retryError
+        }
+        return NextResponse.json({ release: retryData })
+      }
       throw error
     }
 

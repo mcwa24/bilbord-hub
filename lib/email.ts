@@ -78,10 +78,10 @@ export async function sendNewsletterEmail(
       <td style="padding:0 24px 24px 24px; text-align:left;">
         <div style="padding:20px; margin-top:8px;">
           <p style="margin:0 0 12px 0; font-size:18px; line-height:1.4; color:#111827; font-weight:700;">
-            Vaše PR saopštenje je objavljeno! 🎉
+            Vaše PR saopštenje je postavljeno! 🎉
           </p>
           <p style="margin:0; font-size:15px; line-height:1.6; color:#374151;">
-            Vaše PR saopštenje "<strong>${release.title}</strong>" je uspešno objavljeno na <strong>PR Hubu</strong>.
+            Vaše PR saopštenje "<strong>${release.title}</strong>" je uspešno postavljeno na <strong>Bilbord Hub Platformu</strong>.
           </p>
         </div>
       </td>
@@ -90,7 +90,7 @@ export async function sendNewsletterEmail(
 
   try {
     const emailSubject = isAdditionalEmail 
-      ? `🌈 Vaše PR saopštenje je uspešno objavljeno`
+      ? `🌈 Vaše PR saopštenje je uspešno postavljeno na Bilbord Hub Platformu`
       : `👐 Novo PR saopštenje: ${release.title}`
     
     const { data, error } = await resend.emails.send({
@@ -246,7 +246,7 @@ export async function sendNewsletterEmail(
                       ${isAdditionalEmail ? `
                         <div style="text-align:center;">
                           <p style="margin:0 0 8px 0; font-size:12px; line-height:1.6; color:#6b7280;">
-                            Ovaj email je automatski poslat kao obaveštenje o objavi vašeg PR saopštenja na Bilbord Hub platformi.
+                            Ovaj email je automatski poslat kao obaveštenje o postavljanju vašeg PR saopštenja na Bilbord Hub Platformu.
                           </p>
                           <p style="margin:0; font-size:12px; line-height:1.6; color:#9ca3af;">
                             Molimo vas da ne odgovarate na ovaj email jer je automatski generisan.

@@ -305,20 +305,44 @@ export async function POST(request: NextRequest) {
     }
 
     // Izdvoji additional_emails iz body objekta jer ne treba da se čuva u bazi
-    const { additional_emails, ...releaseData } = body
+    const { additional_emails, valid_until, ...releaseData } = body
+
+    // Pripremi valid_until - ako je prazan string ili null, ne dodaj ga u insert
+    // Ako kolona ne postoji u bazi, neće izazvati grešku
+    const insertData: any = {
+      ...releaseData,
+      created_by: '00000000-0000-0000-0000-000000000000', // Placeholder user ID
+      view_count: 0,
+      download_count: 0,
+    }
+    
+    // Dodaj valid_until samo ako je postavljen i nije prazan
+    if (valid_until && valid_until.trim() !== '') {
+      insertData.valid_until = valid_until
+    }
 
     const { data, error } = await supabase
       .from('pr_releases')
-      .insert({
-        ...releaseData,
-        created_by: '00000000-0000-0000-0000-000000000000', // Placeholder user ID
-        view_count: 0,
-        download_count: 0,
-      })
+      .insert(insertData)
       .select()
       .single()
 
     if (error) {
+      console.error('Error inserting release:', error)
+      // Ako je greška zbog nepostojeće kolone valid_until, ignorisati je i pokušati ponovo bez nje
+      if (error.message && error.message.includes('valid_until')) {
+        delete insertData.valid_until
+        const { data: retryData, error: retryError } = await supabase
+          .from('pr_releases')
+          .insert(insertData)
+          .select()
+          .single()
+        
+        if (retryError) {
+          throw retryError
+        }
+        return NextResponse.json({ release: retryData })
+      }
       throw error
     }
 
