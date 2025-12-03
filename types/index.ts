@@ -19,6 +19,7 @@ export interface PRRelease {
   }[];
   seo_meta_description: string;
   published_at: string | null;
+  valid_until: string | null; // Datum do kada je vest aktuelna (opciono)
   created_at: string;
   updated_at: string;
   created_by: string;

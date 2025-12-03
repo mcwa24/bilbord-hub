@@ -39,6 +39,7 @@ export default function AdminPage() {
   const [releaseName, setReleaseName] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [publishedDate, setPublishedDate] = useState<string>(getTodayDate())
+  const [validUntilDate, setValidUntilDate] = useState<string>('')
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
@@ -230,7 +231,7 @@ export default function AdminPage() {
         alt_text: `${releaseName} - Slika ${index + 1}`
       })) || []
 
-      const releaseData = {
+      const releaseData: any = {
         title: releaseName,
         description: releaseName,
         content: `<p>${releaseName}</p>`,
@@ -242,6 +243,11 @@ export default function AdminPage() {
         thumbnail_url: null, // Ne koristimo thumbnail
         seo_meta_description: releaseName,
         published_at: publishedAt,
+      }
+
+      // Dodaj valid_until samo ako je unesen
+      if (validUntilDate) {
+        releaseData.valid_until = new Date(validUntilDate + 'T23:59:59').toISOString()
       }
 
       const res = await fetch('/api/releases', {
@@ -261,6 +267,7 @@ export default function AdminPage() {
         setReleaseName('')
         setTags([])
         setPublishedDate(getTodayDate())
+        setValidUntilDate('')
         setDocumentFile(null)
         setImageFiles([])
         setUploadedDocument(null)
@@ -363,6 +370,28 @@ export default function AdminPage() {
               }}
               required
             />
+          </div>
+          <div className="mb-4">
+            <label 
+              htmlFor="valid-until-date"
+              className="block text-sm font-semibold text-[#1d1d1f] mb-2 cursor-pointer"
+            >
+              Vest aktuelna do (opciono)
+            </label>
+            <Input
+              id="valid-until-date"
+              type="date"
+              value={validUntilDate}
+              onChange={(e) => setValidUntilDate(e.target.value)}
+              onClick={(e) => {
+                // Otvori kalendar kada se klikne na polje
+                const input = e.target as HTMLInputElement
+                input.showPicker?.()
+              }}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Ako unesete datum, vest će biti označena zelenom bojom dok je aktuelna, a narandžastom nakon što prođe.
+            </p>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">

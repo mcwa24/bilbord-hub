@@ -19,6 +19,7 @@ export default function NovoPage() {
     tags: '',
     thumbnail_url: '',
     seo_meta_description: '',
+    valid_until: '',
     material_links: [{ type: 'google_drive' as const, url: '', label: '' }],
     alt_texts: [{ image_url: '', alt_text: '' }],
   })
@@ -39,16 +40,23 @@ export default function NovoPage() {
       const materialLinks = formData.material_links.filter(l => l.url && l.label)
       const altTexts = formData.alt_texts.filter(a => a.image_url && a.alt_text)
 
+      const releaseData: any = {
+        ...formData,
+        tags,
+        material_links: materialLinks,
+        alt_texts: altTexts,
+        published_at: new Date().toISOString(),
+      }
+      
+      // Dodaj valid_until samo ako je unesen
+      if (formData.valid_until) {
+        releaseData.valid_until = new Date(formData.valid_until + 'T23:59:59').toISOString()
+      }
+
       const res = await fetch('/api/releases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          tags,
-          material_links: materialLinks,
-          alt_texts: altTexts,
-          published_at: new Date().toISOString(),
-        }),
+        body: JSON.stringify(releaseData),
       })
 
       if (res.ok) {
@@ -207,6 +215,21 @@ export default function NovoPage() {
               onChange={(e) => setFormData({ ...formData, seo_meta_description: e.target.value })}
               placeholder="SEO opis za pretraživače"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
+              Vest aktuelna do (opciono)
+            </label>
+            <Input
+              type="date"
+              value={formData.valid_until}
+              onChange={(e) => setFormData({ ...formData, valid_until: e.target.value })}
+              placeholder="Datum do kada je vest aktuelna"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Ako unesete datum, vest će biti označena zelenom bojom dok je aktuelna, a narandžastom nakon što prođe.
+            </p>
           </div>
 
           <div>

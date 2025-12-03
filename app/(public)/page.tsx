@@ -22,6 +22,7 @@ interface PRRelease {
   title: string
   company_name: string
   published_at: string | null
+  valid_until: string | null
   created_at: string
   tags?: string[]
   material_links: Array<{

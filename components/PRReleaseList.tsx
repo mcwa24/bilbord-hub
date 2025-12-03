@@ -11,6 +11,7 @@ interface PRRelease {
   title: string
   company_name: string
   published_at: string | null
+  valid_until: string | null
   created_at: string
   tags?: string[]
   material_links: Array<{
@@ -55,6 +56,27 @@ function highlightSearchTerm(text: string, searchQuery: string): React.ReactNode
 function getTagColor(tag: string): string {
   // Crna boja za sve tagove
   return 'text-black'
+}
+
+function getReleaseStatusColor(validUntil: string | null | undefined): string {
+  if (!validUntil) {
+    // Ako nema valid_until, normalna boja
+    return ''
+  }
+  
+  const now = new Date()
+  const validUntilDate = new Date(validUntil)
+  // Poredi samo datume (bez vremena) - ako je valid_until veći ili jednak današnjem datumu, još je aktuelno
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const validDate = new Date(validUntilDate.getFullYear(), validUntilDate.getMonth(), validUntilDate.getDate())
+  
+  if (validDate >= today) {
+    // Još aktuelno - zelena boja
+    return 'bg-green-50 border-green-200'
+  } else {
+    // Prošlo - narandžasta boja
+    return 'bg-orange-50 border-orange-200'
+  }
 }
 
 function formatFileSize(bytes: number, unit: 'KB' | 'MB' = 'KB'): string {
@@ -130,10 +152,14 @@ export default function PRReleaseList({ releases, showAll = false, onTagClick, s
           }
         }
 
+        const statusColor = getReleaseStatusColor(release.valid_until)
+
         return (
           <div
             key={release.id}
-            className="bg-white rounded-lg md:rounded-full px-4 py-3 mb-3 border-[0.5px] border-black/10 hover:border-black/20 transition-all duration-200 cursor-pointer"
+            className={`rounded-lg md:rounded-full px-4 py-3 mb-3 border-[0.5px] transition-all duration-200 cursor-pointer ${
+              statusColor || 'bg-white border-black/10 hover:border-black/20'
+            } ${statusColor ? 'hover:opacity-90' : ''}`}
           >
             <div className="flex flex-col md:flex-row items-start justify-between gap-4">
               <div className="flex-1 min-w-0 w-full">

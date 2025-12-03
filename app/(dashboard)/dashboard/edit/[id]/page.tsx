@@ -29,6 +29,7 @@ export default function EditPage() {
   const [releaseName, setReleaseName] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [publishedDate, setPublishedDate] = useState<string>('')
+  const [validUntilDate, setValidUntilDate] = useState<string>('')
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [uploadedDocument, setUploadedDocument] = useState<UploadedFile | null>(null)
@@ -68,6 +69,15 @@ export default function EditPage() {
         const month = String(date.getMonth() + 1).padStart(2, '0')
         const day = String(date.getDate()).padStart(2, '0')
         setPublishedDate(`${year}-${month}-${day}`)
+      }
+
+      // Učitaj valid_until datum ako postoji
+      if (release.valid_until) {
+        const date = new Date(release.valid_until)
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        setValidUntilDate(`${year}-${month}-${day}`)
       }
 
       // Učitaj postojeće fajlove
@@ -229,7 +239,7 @@ export default function EditPage() {
         ? new Date(publishedDate + 'T00:00:00').toISOString()
         : new Date().toISOString()
 
-      const releaseData = {
+      const releaseData: any = {
         title: releaseName,
         description: releaseName,
         content: `<p>${releaseName}</p>`,
@@ -240,6 +250,14 @@ export default function EditPage() {
         alt_texts: [],
         seo_meta_description: releaseName,
         published_at: publishedAt,
+      }
+
+      // Dodaj valid_until samo ako je unesen
+      if (validUntilDate) {
+        releaseData.valid_until = new Date(validUntilDate + 'T23:59:59').toISOString()
+      } else {
+        // Ako je polje prazno, postavi na null da se obriše postojeći datum
+        releaseData.valid_until = null
       }
 
       const res = await fetch(`/api/releases/${params.id}`, {
@@ -333,6 +351,19 @@ export default function EditPage() {
               onChange={(e) => setPublishedDate(e.target.value)}
               required
             />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">
+              Vest aktuelna do (opciono)
+            </label>
+            <Input
+              type="date"
+              value={validUntilDate}
+              onChange={(e) => setValidUntilDate(e.target.value)}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Ako unesete datum, vest će biti označena zelenom bojom dok je aktuelna, a narandžastom nakon što prođe.
+            </p>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-semibold text-[#1d1d1f] mb-2">

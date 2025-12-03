@@ -55,7 +55,7 @@ export async function sendNewsletterEmail(
             Vaše PR saopštenje je objavljeno! 🎉
           </p>
           <p style="margin:0; font-size:15px; line-height:1.6; color:#374151;">
-            Vaše PR saopštenje "<strong>${release.title}</strong>" je uspešno objavljeno na <strong>Bilbord Portalu</strong> i postavljeno na <strong>Bilbord Hub</strong> platformu.
+            Vaše PR saopštenje "<strong>${release.title}</strong>" je uspešno objavljeno na <strong>PR Hubu</strong>.
           </p>
         </div>
       </td>
