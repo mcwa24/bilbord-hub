@@ -150,7 +150,24 @@ export async function GET(request: NextRequest) {
       }
 
       const filteredCount = count || 0
-      const releases = data || []
+      let releases = data || []
+      
+      // Sortiraj po published_at (opadajuće), a zatim po created_at (opadajuće) za isti datum
+      // Ovo osigurava da najnovija saopštenja uvek budu na vrhu
+      releases.sort((a: any, b: any) => {
+        const dateA = new Date(a.published_at || a.created_at).getTime()
+        const dateB = new Date(b.published_at || b.created_at).getTime()
+        
+        if (dateB !== dateA) {
+          return dateB - dateA // Opadajući redosled po datumu
+        }
+        
+        // Ako su datumi isti, sortiraj po created_at
+        const createdA = new Date(a.created_at).getTime()
+        const createdB = new Date(b.created_at).getTime()
+        return createdB - createdA // Opadajući redosled po created_at
+      })
+      
       const totalPages = Math.ceil(filteredCount / itemsPerPage)
 
       // Optimizovano: koristimo veličine fajlova iz material_links (sačuvane prilikom upload-a)
@@ -231,6 +248,22 @@ export async function GET(request: NextRequest) {
 
     let releases = data || []
     let filteredCount = count || 0
+    
+    // Sortiraj po published_at (opadajuće), a zatim po created_at (opadajuće) za isti datum
+    // Ovo osigurava da najnovija saopštenja uvek budu na vrhu
+    releases.sort((a: any, b: any) => {
+      const dateA = new Date(a.published_at || a.created_at).getTime()
+      const dateB = new Date(b.published_at || b.created_at).getTime()
+      
+      if (dateB !== dateA) {
+        return dateB - dateA // Opadajući redosled po datumu
+      }
+      
+      // Ako su datumi isti, sortiraj po created_at
+      const createdA = new Date(a.created_at).getTime()
+      const createdB = new Date(b.created_at).getTime()
+      return createdB - createdA // Opadajući redosled po created_at
+    })
 
     const totalPages = Math.ceil((filteredCount || 0) / itemsPerPage)
 
