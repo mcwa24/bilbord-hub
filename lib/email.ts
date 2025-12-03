@@ -39,9 +39,35 @@ export async function sendNewsletterEmail(
   let contentText = release.description || ''
   if (release.content) {
     // Ukloni HTML tagove za čist tekst
-    contentText = release.content.replace(/<[^>]*>/g, '').trim()
-    if (contentText && contentText !== release.description) {
-      contentText = release.description + '\n\n' + contentText
+    const cleanContent = release.content.replace(/<[^>]*>/g, '').trim()
+    if (cleanContent && cleanContent !== release.description) {
+      contentText = release.description + '\n\n' + cleanContent
+    }
+  }
+  
+  // Ukloni naslov iz početka contentText-a ako postoji (jer se već prikazuje posebno kao boldovan naslov)
+  if (contentText && release.title) {
+    const title = release.title.trim()
+    const titleEscaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    
+    // Ukloni naslov sa početka (sa ili bez razmaka, novih redova, separatora)
+    // Regex traži naslov na početku, praćen razmacima, novim redovima, separatorima (===, ---, itd.)
+    const titleRegex = new RegExp(`^\\s*${titleEscaped}\\s*[\\n\\r\\-=\\s]*`, 'i')
+    contentText = contentText.replace(titleRegex, '').trim()
+    
+    // Takođe proveri da li description ili content počinje sa naslovom
+    if (release.description) {
+      const descTrimmed = release.description.trim()
+      if (descTrimmed.toLowerCase() === title.toLowerCase() || descTrimmed.toLowerCase().startsWith(title.toLowerCase())) {
+        // Ako je description samo naslov ili počinje sa naslovom, ukloni ga
+        if (release.content) {
+          const cleanContent = release.content.replace(/<[^>]*>/g, '').trim()
+          const contentWithoutTitle = cleanContent.replace(new RegExp(`^\\s*${titleEscaped}\\s*[\\n\\r\\-=\\s]*`, 'i'), '').trim()
+          contentText = contentWithoutTitle
+        } else {
+          contentText = ''
+        }
+      }
     }
   }
 
