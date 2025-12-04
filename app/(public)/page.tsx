@@ -3,7 +3,7 @@
 // Keširanje je uklonjeno - sajt je potpuno dinamičan
 // Force dynamic rendering (client components ne podržavaju sve opcije)
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from "next/link";
 import Image from "next/image";
 import { Search, Upload, Eye, Download, Share2 } from "lucide-react";
@@ -126,6 +126,12 @@ export default function Home() {
       setLoading(false)
     }
   }, [currentPage, selectedTag, searchQuery])
+  
+  // Ref za čuvanje trenutne stranice u intervalu i visibility handler-u
+  const currentPageRef = useRef(currentPage)
+  useEffect(() => {
+    currentPageRef.current = currentPage
+  }, [currentPage])
 
   // Prefetch sledeću stranicu tek kada korisnik promeni stranicu (ne odmah pri učitavanju)
   useEffect(() => {
@@ -155,7 +161,8 @@ export default function Home() {
     const refreshInterval = setInterval(() => {
       if (mounted) {
         fetchRSSFeed()
-        fetchReleases()
+        // Koristi trenutnu stranicu iz ref-a da ne resetuje paginaciju
+        fetchReleases(currentPageRef.current)
       }
     }, 30 * 1000) // 30 sekundi
 
@@ -163,7 +170,8 @@ export default function Home() {
     const handleVisibilityChange = () => {
       if (!document.hidden && mounted) {
         fetchRSSFeed()
-        fetchReleases()
+        // Koristi trenutnu stranicu iz ref-a da ne resetuje paginaciju
+        fetchReleases(currentPageRef.current)
       }
     }
     document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -181,9 +189,11 @@ export default function Home() {
     setCurrentPage(1) // Resetuj stranicu kada se promeni filter ili pretraga
   }, [selectedTag, searchQuery])
 
+  // Fetch releases kada se promeni currentPage, selectedTag ili searchQuery
   useEffect(() => {
-    fetchReleases()
-  }, [fetchReleases])
+    fetchReleases(currentPage)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, selectedTag, searchQuery])
 
   // Prefetch sledeću stranicu tek kada se sekcija sa saopštenjima učita (vidljiva je)
   useEffect(() => {
