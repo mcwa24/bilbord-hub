@@ -28,7 +28,7 @@ export async function sendNewsletterEmail(
   let formattedDate = ''
   if (release.published_at) {
     const date = new Date(release.published_at)
-    formattedDate = date.toLocaleDateString('sr-RS', {
+    formattedDate = date.toLocaleDateString('sr-Latn-RS', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
