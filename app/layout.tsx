@@ -79,8 +79,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <Script
           defer
-          src="https://indigo-slug.pikapod.net/script.js"
-          data-website-id="f1273d31-c664-463e-8c72-b16f85911138"
+          src="https://cinnamon-bloodhound.pikapod.net/script.js"
+          data-website-id="ee3ce941-ec38-4af8-ae47-080442c22382"
           strategy="afterInteractive"
         />
         <Header />

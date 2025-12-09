@@ -39,11 +39,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://indigo-slug.pikapod.net",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cinnamon-bloodhound.pikapod.net",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://*.supabase.co https://api.resend.com https://indigo-slug.pikapod.net",
+              "connect-src 'self' https://*.supabase.co https://api.resend.com https://cinnamon-bloodhound.pikapod.net",
               "frame-src 'none'",
               "object-src 'none'",
               "base-uri 'self'",
