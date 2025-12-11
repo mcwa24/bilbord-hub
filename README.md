@@ -40,7 +40,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 RESEND_API_KEY=your_resend_api_key
-RESEND_FROM_EMAIL=Bilbord Hub <noreply@bilbord.rs>
+RESEND_FROM_EMAIL=Bilbord Hub <noreply@mail.hub.bilbord.rs>
 ```
 
 3. Kreiraj Supabase tabele:

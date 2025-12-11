@@ -15,7 +15,7 @@ export async function sendManagementLinkEmail(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@bilbord.rs>',
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
       to: email,
       subject: 'Link za upravljanje pretplatom - Bilbord Hub',
       html: `

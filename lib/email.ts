@@ -94,7 +94,7 @@ export async function sendNewsletterEmail(
       : `👐 Novo PR saopštenje: ${release.title}`
     
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@bilbord.rs>',
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
       to: email,
       subject: emailSubject,
       html: `

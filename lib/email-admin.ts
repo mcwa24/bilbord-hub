@@ -7,12 +7,12 @@ export async function sendAdminNotificationEmail(userEmail: string) {
     return { error: 'Email servis nije konfigurisan' }
   }
 
-  const adminEmail = 'office@bilbord.rs'
+  const adminEmail = 'office@hub.bilbord.rs'
   const currentYear = new Date().getFullYear()
 
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@bilbord.rs>',
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
       to: adminEmail,
       subject: 'Novi korisnik se prijavio na newsletter',
       html: `
