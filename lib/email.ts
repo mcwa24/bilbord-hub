@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function sendNewsletterEmail(
   email: string,
   release: {
@@ -20,6 +18,9 @@ export async function sendNewsletterEmail(
     console.error('RESEND_API_KEY nije podešen')
     return { error: 'Email servis nije konfigurisan' }
   }
+
+  // Kreiraj Resend klijent sa najnovijim API ključem
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
   const currentYear = new Date().getFullYear()

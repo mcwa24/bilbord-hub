@@ -1,11 +1,12 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function sendAdminNotificationEmail(userEmail: string) {
   if (!process.env.RESEND_API_KEY) {
     return { error: 'Email servis nije konfigurisan' }
   }
+
+  // Kreiraj Resend klijent sa najnovijim API ključem
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   const adminEmail = 'office@hub.bilbord.rs'
   const currentYear = new Date().getFullYear()

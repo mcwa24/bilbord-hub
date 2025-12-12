@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function sendManagementLinkEmail(
   email: string,
   managementToken: string
@@ -9,6 +7,9 @@ export async function sendManagementLinkEmail(
   if (!process.env.RESEND_API_KEY) {
     return { error: 'Email servis nije konfigurisan' }
   }
+
+  // Kreiraj Resend klijent sa najnovijim API ključem
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
   const managementUrl = `${siteUrl}/newsletter/upravljanje?token=${managementToken}&email=${encodeURIComponent(email)}`

@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function sendConfirmationEmail(
   email: string,
   verificationToken: string,
@@ -10,6 +8,9 @@ export async function sendConfirmationEmail(
   if (!process.env.RESEND_API_KEY) {
     return { error: 'Email servis nije konfigurisan - RESEND_API_KEY nedostaje' }
   }
+
+  // Kreiraj Resend klijent sa najnovijim API ključem
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   // Koristi request host ako je dostupan (za localhost), inače koristi NEXT_PUBLIC_SITE_URL
   let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
