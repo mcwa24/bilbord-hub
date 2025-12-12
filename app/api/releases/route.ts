@@ -407,12 +407,14 @@ export async function POST(request: NextRequest) {
               tags: data.tags || [],
               published_at: data.published_at,
               downloadUrl,
-            }, undefined, true).catch(() => {
-              // Ignoriši greške pri slanju dodatnih emailova
+            }, undefined, true).catch((err) => {
+              // Loguj greške pri slanju dodatnih emailova
+              console.error(`Greška pri slanju emaila na ${email}:`, err)
             })
           )
-        ).catch(() => {
-          // Ignoriši greške pri slanju dodatnih emailova
+        ).catch((err) => {
+          // Loguj greške pri slanju dodatnih emailova
+          console.error('Greška pri slanju dodatnih emailova:', err)
         })
       }
     }

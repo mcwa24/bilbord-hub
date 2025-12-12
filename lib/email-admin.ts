@@ -12,7 +12,7 @@ export async function sendAdminNotificationEmail(userEmail: string) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <hub@bilbord.rs>',
       to: adminEmail,
       subject: 'Novi korisnik se prijavio na newsletter',
       html: `

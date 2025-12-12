@@ -26,7 +26,7 @@ export async function sendConfirmationEmail(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <hub@bilbord.rs>',
       to: email,
       subject: 'Potvrdi svoju registraciju na Bilbord Hub',
               html: `

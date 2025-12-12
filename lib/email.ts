@@ -17,6 +17,7 @@ export async function sendNewsletterEmail(
   isAdditionalEmail?: boolean
 ) {
   if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY nije podešen')
     return { error: 'Email servis nije konfigurisan' }
   }
 
@@ -94,7 +95,7 @@ export async function sendNewsletterEmail(
       : `👐 Novo PR saopštenje: ${release.title}`
     
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <noreply@mail.hub.bilbord.rs>',
+      from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <hub@bilbord.rs>',
       to: email,
       subject: emailSubject,
       html: `
@@ -280,11 +281,14 @@ export async function sendNewsletterEmail(
     })
 
     if (error) {
+      console.error('Resend API greška:', error)
       return { error: error.message }
     }
 
+    console.log(`Email uspešno poslat na ${email}`)
     return { success: true, data }
   } catch (error: any) {
+    console.error('Greška pri slanju emaila:', error)
     return { error: error.message || 'Greška pri slanju emaila' }
   }
 }
