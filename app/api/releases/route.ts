@@ -418,7 +418,7 @@ export async function POST(request: NextRequest) {
         // Pošalji emailove u pozadini (ne čekaj) sa delay-om između slanja
         ;(async () => {
           for (let i = 0; i < uniqueEmails.length; i++) {
-            const email = uniqueEmails[i]
+            const email: string = uniqueEmails[i]
             try {
               console.log(`Slanje emaila ${i + 1}/${uniqueEmails.length} na ${email}`)
               const result = await sendNewsletterEmail(email, {
