@@ -402,12 +402,12 @@ export async function POST(request: NextRequest) {
         return emailRegex.test(trimmed)
       }
       
-      const validEmails = additionalEmailsRaw
+      const validEmails: string[] = additionalEmailsRaw
         .map((email: string) => (typeof email === 'string' ? email.trim().toLowerCase() : ''))
         .filter((email: string) => email && isValidEmail(email))
       
       // Ukloni duplikate
-      const uniqueEmails = [...new Set(validEmails)]
+      const uniqueEmails: string[] = [...new Set(validEmails)]
       
       if (uniqueEmails.length > 0) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
