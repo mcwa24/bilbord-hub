@@ -14,6 +14,21 @@ export async function sendNewsletterEmail(
   unsubscribeToken?: string,
   isAdditionalEmail?: boolean
 ) {
+  // Validiraj email adresu
+  if (!email || typeof email !== 'string') {
+    const errorMsg = 'Email adresa nije validna'
+    console.error(errorMsg, email)
+    return { error: errorMsg }
+  }
+  
+  const trimmedEmail = email.trim().toLowerCase()
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+    const errorMsg = `Email adresa nije u validnom formatu: ${email}`
+    console.error(errorMsg)
+    return { error: errorMsg }
+  }
+
   if (!process.env.RESEND_API_KEY) {
     console.error('RESEND_API_KEY nije podešen')
     return { error: 'Email servis nije konfigurisan' }
@@ -97,7 +112,7 @@ export async function sendNewsletterEmail(
     
     const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'Bilbord Hub <hub@bilbord.rs>',
-      to: email,
+      to: trimmedEmail,
       subject: emailSubject,
       html: `
         <!DOCTYPE html>
@@ -260,7 +275,7 @@ export async function sendNewsletterEmail(
                             Ovaj email ste primili jer ste se prijavili na email obaveštenja Bilbord Hub platforme.
                           </p>
                           <p style="margin:0; font-size:12px; line-height:1.6;">
-                            <a href="${siteUrl}/newsletter/odjava?email=${encodeURIComponent(email)}${unsubscribeToken ? `&token=${unsubscribeToken}` : ''}" style="color:#111827; text-decoration:underline;">Odjavite se</a>
+                            <a href="${siteUrl}/newsletter/odjava?email=${encodeURIComponent(trimmedEmail)}${unsubscribeToken ? `&token=${unsubscribeToken}` : ''}" style="color:#111827; text-decoration:underline;">Odjavite se</a>
                           </p>
                         </div>
                       `}
@@ -282,15 +297,21 @@ export async function sendNewsletterEmail(
     })
 
     if (error) {
-      console.error('Resend API greška:', error)
-      return { error: error.message }
+      console.error(`Resend API greška za ${trimmedEmail}:`, JSON.stringify(error, null, 2))
+      const errorMessage = error.message || JSON.stringify(error) || 'Nepoznata greška Resend API-ja'
+      return { error: errorMessage }
     }
 
-    console.log(`Email uspešno poslat na ${email}`)
+    if (!data || !data.id) {
+      console.warn(`Resend API nije vratio data.id za ${email}, ali nema error. Response:`, JSON.stringify(data, null, 2))
+    }
+
+    console.log(`Email uspešno poslat na ${trimmedEmail}${data?.id ? ` (ID: ${data.id})` : ''}`)
     return { success: true, data }
   } catch (error: any) {
-    console.error('Greška pri slanju emaila:', error)
-    return { error: error.message || 'Greška pri slanju emaila' }
+    console.error(`Greška pri slanju emaila na ${trimmedEmail}:`, error)
+    const errorMessage = error?.message || error?.toString() || 'Nepoznata greška pri slanju emaila'
+    return { error: errorMessage }
   }
 }
 

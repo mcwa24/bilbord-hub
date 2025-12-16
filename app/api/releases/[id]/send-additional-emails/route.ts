@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendNewsletterEmail } from '@/lib/email'
 
+// Funkcija za validaciju email adrese
+function isValidEmail(email: string): boolean {
+  if (!email || typeof email !== 'string') return false
+  const trimmed = email.trim().toLowerCase()
+  if (!trimmed) return false
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(trimmed)
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -16,6 +25,23 @@ export async function POST(
         { status: 400 }
       )
     }
+
+    // Filtriraj i validiraj email adrese
+    const validEmails = additional_emails
+      .map((email: string) => (typeof email === 'string' ? email.trim().toLowerCase() : ''))
+      .filter((email: string) => email && isValidEmail(email))
+    
+    // Ukloni duplikate
+    const uniqueEmails = [...new Set(validEmails)]
+
+    if (uniqueEmails.length === 0) {
+      return NextResponse.json(
+        { error: 'Nema validnih email adresa za slanje' },
+        { status: 400 }
+      )
+    }
+
+    console.log(`Slanje emailova na ${uniqueEmails.length} adresa:`, uniqueEmails)
 
     // Učitaj saopštenje
     const { data: release, error: releaseError } = await supabase
@@ -34,42 +60,66 @@ export async function POST(
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
     const downloadUrl = `${siteUrl}/download/${release.id}`
 
-    // Pošalji emailove dodatnim primaocima
-    const results = await Promise.all(
-      additional_emails.map(async (email: string) => {
-        try {
-          const result = await sendNewsletterEmail(
-            email,
-            {
-              id: release.id,
-              title: release.title,
-              description: release.description || release.title,
-              content: release.content || undefined,
-              tags: release.tags || [],
-              published_at: release.published_at,
-              downloadUrl,
-            },
-            undefined,
-            true
-          )
-          return { email, success: !result.error, error: result.error }
-        } catch (err: any) {
-          return { email, success: false, error: err.message }
+    // Pošalji emailove dodatnim primaocima sa malim delay-om između slanja da se izbegne rate limiting
+    const results = []
+    for (let i = 0; i < uniqueEmails.length; i++) {
+      const email = uniqueEmails[i]
+      try {
+        console.log(`Slanje emaila ${i + 1}/${uniqueEmails.length} na ${email}`)
+        const result = await sendNewsletterEmail(
+          email,
+          {
+            id: release.id,
+            title: release.title,
+            description: release.description || release.title,
+            content: release.content || undefined,
+            tags: release.tags || [],
+            published_at: release.published_at,
+            downloadUrl,
+          },
+          undefined,
+          true
+        )
+        
+        if (result.error) {
+          console.error(`Greška pri slanju emaila na ${email}:`, result.error)
+          results.push({ email, success: false, error: result.error })
+        } else {
+          console.log(`Email uspešno poslat na ${email}`)
+          results.push({ email, success: true, error: undefined })
         }
-      })
-    )
+      } catch (err: any) {
+        console.error(`Izuzetak pri slanju emaila na ${email}:`, err)
+        results.push({ email, success: false, error: err.message || 'Nepoznata greška' })
+      }
+      
+      // Dodaj mali delay između slanja emailova (100ms) da se izbegne rate limiting
+      if (i < uniqueEmails.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+    }
 
     const successCount = results.filter(r => r.success).length
-    const errors = results.filter(r => !r.success).map(r => `${r.email}: ${r.error}`)
+    const failedResults = results.filter(r => !r.success)
+    const errors = failedResults.map(r => `${r.email}: ${r.error || 'Nepoznata greška'}`)
+
+    console.log(`Rezultat slanja: ${successCount}/${uniqueEmails.length} uspešno`)
+    if (errors.length > 0) {
+      console.error('Greške pri slanju:', errors)
+    }
 
     return NextResponse.json({
       success: true,
-      message: `Emailovi poslati: ${successCount}/${additional_emails.length}`,
+      message: `Emailovi poslati: ${successCount}/${uniqueEmails.length}`,
       sent: successCount,
-      total: additional_emails.length,
+      total: uniqueEmails.length,
       errors: errors.length > 0 ? errors : undefined,
+      invalidEmails: additional_emails.length - validEmails.length > 0 
+        ? additional_emails.filter((e: string) => !isValidEmail(e || ''))
+        : undefined,
     })
   } catch (error: any) {
+    console.error('Greška u send-additional-emails endpoint:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri slanju dodatnih emailova' },
       { status: 500 }

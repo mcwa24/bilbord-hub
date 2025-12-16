@@ -391,31 +391,66 @@ export async function POST(request: NextRequest) {
       })
 
       // Pošalji emailove dodatnim primaocima ako su navedeni
-      const additionalEmails = additional_emails || []
-      if (additionalEmails.length > 0) {
+      const additionalEmailsRaw = additional_emails || []
+      
+      // Validiraj i filtriraj email adrese
+      const isValidEmail = (email: string): boolean => {
+        if (!email || typeof email !== 'string') return false
+        const trimmed = email.trim().toLowerCase()
+        if (!trimmed) return false
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return emailRegex.test(trimmed)
+      }
+      
+      const validEmails = additionalEmailsRaw
+        .map((email: string) => (typeof email === 'string' ? email.trim().toLowerCase() : ''))
+        .filter((email: string) => email && isValidEmail(email))
+      
+      // Ukloni duplikate
+      const uniqueEmails = [...new Set(validEmails)]
+      
+      if (uniqueEmails.length > 0) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
         const downloadUrl = `${siteUrl}/download/${data.id}`
 
-        // Pošalji emailove u pozadini (ne čekaj)
-        Promise.all(
-          additionalEmails.map((email: string) =>
-            sendNewsletterEmail(email, {
-              id: data.id,
-              title: data.title,
-              description: data.description,
-              content: data.content,
-              tags: data.tags || [],
-              published_at: data.published_at,
-              downloadUrl,
-            }, undefined, true).catch((err) => {
-              // Loguj greške pri slanju dodatnih emailova
-              console.error(`Greška pri slanju emaila na ${email}:`, err)
-            })
-          )
-        ).catch((err) => {
-          // Loguj greške pri slanju dodatnih emailova
+        console.log(`Slanje dodatnih emailova na ${uniqueEmails.length} adresa:`, uniqueEmails)
+
+        // Pošalji emailove u pozadini (ne čekaj) sa delay-om između slanja
+        ;(async () => {
+          for (let i = 0; i < uniqueEmails.length; i++) {
+            const email = uniqueEmails[i]
+            try {
+              console.log(`Slanje emaila ${i + 1}/${uniqueEmails.length} na ${email}`)
+              const result = await sendNewsletterEmail(email, {
+                id: data.id,
+                title: data.title,
+                description: data.description,
+                content: data.content,
+                tags: data.tags || [],
+                published_at: data.published_at,
+                downloadUrl,
+              }, undefined, true)
+              
+              if (result.error) {
+                console.error(`Greška pri slanju emaila na ${email}:`, result.error)
+              } else {
+                console.log(`Email uspešno poslat na ${email}`)
+              }
+            } catch (err: any) {
+              console.error(`Izuzetak pri slanju emaila na ${email}:`, err)
+            }
+            
+            // Dodaj mali delay između slanja emailova (100ms) da se izbegne rate limiting
+            if (i < uniqueEmails.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 100))
+            }
+          }
+          console.log(`Završeno slanje dodatnih emailova: ${uniqueEmails.length} adresa`)
+        })().catch((err) => {
           console.error('Greška pri slanju dodatnih emailova:', err)
         })
+      } else if (additionalEmailsRaw.length > 0) {
+        console.warn('Nema validnih email adresa za slanje:', additionalEmailsRaw)
       }
     }
 

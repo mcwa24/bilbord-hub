@@ -282,10 +282,25 @@ export default function EditPage() {
             
             const emailData = await emailRes.json()
             if (emailRes.ok) {
-              toast.success(`Email obaveštenja poslata na ${emailData.sent}/${emailData.total} adresa`)
+              if (emailData.sent === emailData.total) {
+                toast.success(`Email obaveštenja poslata na ${emailData.sent} adresa`)
+              } else {
+                toast.success(`Email obaveštenja poslata na ${emailData.sent}/${emailData.total} adresa`)
+                if (emailData.errors && emailData.errors.length > 0) {
+                  console.error('Greške pri slanju emailova:', emailData.errors)
+                  toast.error(`Neke emailove nije moguće poslati. Proverite konzolu za detalje.`)
+                }
+                if (emailData.invalidEmails && emailData.invalidEmails.length > 0) {
+                  console.warn('Nevalidne email adrese:', emailData.invalidEmails)
+                  toast.error(`Neke email adrese nisu validne: ${emailData.invalidEmails.join(', ')}`)
+                }
+              }
+            } else {
+              toast.error(`Greška pri slanju emailova: ${emailData.error || 'Nepoznata greška'}`)
             }
-          } catch (err) {
-            // Ignoriši greške pri slanju emailova
+          } catch (err: any) {
+            console.error('Greška pri slanju emailova:', err)
+            toast.error(`Greška pri slanju emailova: ${err.message || 'Nepoznata greška'}`)
           }
         }
         
