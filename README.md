@@ -120,8 +120,27 @@ npm run dev
 
 1. Push kod na GitHub
 2. Poveži repo sa Vercel
-3. Dodaj environment variables u Vercel dashboard
+3. Dodaj environment variables u Vercel dashboard:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SITE_URL`
+   - `RESEND_API_KEY`
+   - `RESEND_FROM_EMAIL`
+   - `CRON_SECRET` (generiši siguran random string, min. 16 karaktera)
 4. Deploy!
+
+### Automatsko brisanje starih saopštenja
+
+Sistem automatski briše PR saopštenja starija od 60 dana svakodnevno u 2:00 AM (UTC) putem Vercel cron job-a.
+
+**Podešavanje:**
+1. Generiši siguran random string za `CRON_SECRET` (npr. koristeći `openssl rand -hex 32`)
+2. Dodaj `CRON_SECRET` u Vercel environment variables
+3. Cron job je već konfigurisan u `vercel.json` i automatski će se pokretati
+
+**Testiranje:**
+- U development modu, endpoint `/api/releases/cleanup` može se pozvati bez autorizacije
+- U production modu, zahtev mora imati `Authorization: Bearer <CRON_SECRET>` header
 
 ## Struktura projekta
 
