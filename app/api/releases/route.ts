@@ -443,7 +443,6 @@ export async function POST(request: NextRequest) {
           // Ignoriši greške pri slanju dodatnih emailova
         })
       }
-      }
     }
 
     return NextResponse.json({ release: data })
