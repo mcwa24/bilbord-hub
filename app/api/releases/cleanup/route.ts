@@ -64,7 +64,7 @@ async function handleCleanup(request: NextRequest) {
 
     // Filtriraj saopštenja koja su starija od 60 dana
     // Koristimo published_at ako postoji, inače created_at
-    const oldReleases = allReleases.filter((release) => {
+    const oldReleases = allReleases.filter((release: { published_at: string | null; created_at: string | null }) => {
       const dateToCheck = release.published_at || release.created_at
       if (!dateToCheck) return false
       
