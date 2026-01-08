@@ -16,21 +16,16 @@ export async function sendNewsletterEmail(
 ) {
   // Validiraj email adresu
   if (!email || typeof email !== 'string') {
-    const errorMsg = 'Email adresa nije validna'
-    console.error(errorMsg, email)
-    return { error: errorMsg }
+    return { error: 'Email adresa nije validna' }
   }
   
   const trimmedEmail = email.trim().toLowerCase()
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
-    const errorMsg = `Email adresa nije u validnom formatu: ${email}`
-    console.error(errorMsg)
-    return { error: errorMsg }
+    return { error: `Email adresa nije u validnom formatu: ${email}` }
   }
 
   if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY nije podešen')
     return { error: 'Email servis nije konfigurisan' }
   }
 
@@ -297,19 +292,12 @@ export async function sendNewsletterEmail(
     })
 
     if (error) {
-      console.error(`Resend API greška za ${trimmedEmail}:`, JSON.stringify(error, null, 2))
       const errorMessage = error.message || JSON.stringify(error) || 'Nepoznata greška Resend API-ja'
       return { error: errorMessage }
     }
 
-    if (!data || !data.id) {
-      console.warn(`Resend API nije vratio data.id za ${email}, ali nema error. Response:`, JSON.stringify(data, null, 2))
-    }
-
-    console.log(`Email uspešno poslat na ${trimmedEmail}${data?.id ? ` (ID: ${data.id})` : ''}`)
     return { success: true, data }
   } catch (error: any) {
-    console.error(`Greška pri slanju emaila na ${trimmedEmail}:`, error)
     const errorMessage = error?.message || error?.toString() || 'Nepoznata greška pri slanju emaila'
     return { error: errorMessage }
   }

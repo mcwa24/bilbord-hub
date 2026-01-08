@@ -41,8 +41,6 @@ export async function POST(
       )
     }
 
-    console.log(`Slanje emailova na ${uniqueEmails.length} adresa:`, uniqueEmails)
-
     // Učitaj saopštenje
     const { data: release, error: releaseError } = await supabase
       .from('pr_releases')
@@ -65,7 +63,6 @@ export async function POST(
     for (let i = 0; i < uniqueEmails.length; i++) {
       const email = uniqueEmails[i]
       try {
-        console.log(`Slanje emaila ${i + 1}/${uniqueEmails.length} na ${email}`)
         const result = await sendNewsletterEmail(
           email,
           {
@@ -82,14 +79,11 @@ export async function POST(
         )
         
         if (result.error) {
-          console.error(`Greška pri slanju emaila na ${email}:`, result.error)
           results.push({ email, success: false, error: result.error })
         } else {
-          console.log(`Email uspešno poslat na ${email}`)
           results.push({ email, success: true, error: undefined })
         }
       } catch (err: any) {
-        console.error(`Izuzetak pri slanju emaila na ${email}:`, err)
         results.push({ email, success: false, error: err.message || 'Nepoznata greška' })
       }
       
@@ -103,11 +97,6 @@ export async function POST(
     const failedResults = results.filter(r => !r.success)
     const errors = failedResults.map(r => `${r.email}: ${r.error || 'Nepoznata greška'}`)
 
-    console.log(`Rezultat slanja: ${successCount}/${uniqueEmails.length} uspešno`)
-    if (errors.length > 0) {
-      console.error('Greške pri slanju:', errors)
-    }
-
     return NextResponse.json({
       success: true,
       message: `Emailovi poslati: ${successCount}/${uniqueEmails.length}`,
@@ -119,7 +108,6 @@ export async function POST(
         : undefined,
     })
   } catch (error: any) {
-    console.error('Greška u send-additional-emails endpoint:', error)
     return NextResponse.json(
       { error: error.message || 'Greška pri slanju dodatnih emailova' },
       { status: 500 }

@@ -62,7 +62,6 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Error updating release:', error)
       // Ako je greška zbog nepostojeće kolone valid_until, ignorisati je i pokušati ponovo bez nje
       if (error.message && error.message.includes('valid_until')) {
         delete updateData.valid_until

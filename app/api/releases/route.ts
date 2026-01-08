@@ -361,7 +361,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Error inserting release:', error)
       // Ako je greška zbog nepostojeće kolone valid_until, ignorisati je i pokušati ponovo bez nje
       if (error.message && error.message.includes('valid_until')) {
         delete insertData.valid_until
@@ -413,14 +412,11 @@ export async function POST(request: NextRequest) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hub.bilbord.rs'
         const downloadUrl = `${siteUrl}/download/${data.id}`
 
-        console.log(`Slanje dodatnih emailova na ${uniqueEmails.length} adresa:`, uniqueEmails)
-
         // Pošalji emailove u pozadini (ne čekaj) sa delay-om između slanja
         ;(async () => {
           for (let i = 0; i < uniqueEmails.length; i++) {
             const email: string = uniqueEmails[i]
             try {
-              console.log(`Slanje emaila ${i + 1}/${uniqueEmails.length} na ${email}`)
               const result = await sendNewsletterEmail(email, {
                 id: data.id,
                 title: data.title,
@@ -432,12 +428,10 @@ export async function POST(request: NextRequest) {
               }, undefined, true)
               
               if (result.error) {
-                console.error(`Greška pri slanju emaila na ${email}:`, result.error)
-              } else {
-                console.log(`Email uspešno poslat na ${email}`)
+                // Ignoriši greške pri slanju emailova
               }
             } catch (err: any) {
-              console.error(`Izuzetak pri slanju emaila na ${email}:`, err)
+              // Ignoriši greške pri slanju emailova
             }
             
             // Dodaj mali delay između slanja emailova (100ms) da se izbegne rate limiting
@@ -445,12 +439,10 @@ export async function POST(request: NextRequest) {
               await new Promise(resolve => setTimeout(resolve, 100))
             }
           }
-          console.log(`Završeno slanje dodatnih emailova: ${uniqueEmails.length} adresa`)
-        })().catch((err) => {
-          console.error('Greška pri slanju dodatnih emailova:', err)
+        })().catch(() => {
+          // Ignoriši greške pri slanju dodatnih emailova
         })
-      } else if (additionalEmailsRaw.length > 0) {
-        console.warn('Nema validnih email adresa za slanje:', additionalEmailsRaw)
+      }
       }
     }
 

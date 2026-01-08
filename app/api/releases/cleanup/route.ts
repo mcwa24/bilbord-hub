@@ -44,8 +44,6 @@ async function handleCleanup(request: NextRequest) {
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
     const cutoffDate = sixtyDaysAgo.toISOString()
 
-    console.log(`Traženje saopštenja starijih od ${cutoffDate} (60 dana)`)
-
     // Učitaj sva saopštenja koja imaju published_at ili created_at
     // Filtriranje ćemo uraditi u kodu jer Supabase ne podržava kompleksne OR uslove
     const { data: allReleases, error: fetchError } = await supabase
@@ -53,12 +51,10 @@ async function handleCleanup(request: NextRequest) {
       .select('id, material_links, published_at, created_at')
 
     if (fetchError) {
-      console.error('Greška pri učitavanju saopštenja:', fetchError)
       throw fetchError
     }
 
     if (!allReleases || allReleases.length === 0) {
-      console.log('Nema saopštenja u bazi')
       return NextResponse.json({
         success: true,
         message: 'Nema saopštenja za brisanje',
@@ -78,15 +74,12 @@ async function handleCleanup(request: NextRequest) {
     })
 
     if (oldReleases.length === 0) {
-      console.log('Nema saopštenja starijih od 60 dana za brisanje')
       return NextResponse.json({
         success: true,
         message: 'Nema saopštenja za brisanje',
         deleted: 0
       })
     }
-
-    console.log(`Pronađeno ${oldReleases.length} saopštenja za brisanje`)
 
     let deletedCount = 0
     const errors: string[] = []
@@ -117,12 +110,12 @@ async function handleCleanup(request: NextRequest) {
                       .remove([filePath])
                     
                     if (deleteError) {
-                      console.warn(`Greška pri brisanju fajla ${filePath} iz bucket-a ${bucket}:`, deleteError)
+                      // Ignoriši greške pri brisanju fajlova
                     }
                   }
                 }
               } catch (error) {
-                console.warn(`Greška pri parsiranju URL-a za brisanje: ${link.url}`, error)
+                // Ignoriši greške pri parsiranju URL-a
               }
             }
           }
@@ -135,14 +128,11 @@ async function handleCleanup(request: NextRequest) {
           .eq('id', release.id)
 
         if (deleteError) {
-          console.error(`Greška pri brisanju saopštenja ${release.id}:`, deleteError)
           errors.push(`Saopštenje ${release.id}: ${deleteError.message}`)
         } else {
           deletedCount++
-          console.log(`Uspešno obrisano saopštenje ${release.id}`)
         }
       } catch (error: any) {
-        console.error(`Greška pri brisanju saopštenja ${release.id}:`, error)
         errors.push(`Saopštenje ${release.id}: ${error.message || 'Nepoznata greška'}`)
       }
     }
@@ -155,11 +145,8 @@ async function handleCleanup(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined
     }
 
-    console.log('Rezultat cleanup-a:', result)
-
     return NextResponse.json(result)
   } catch (error: any) {
-    console.error('Greška u cleanup endpoint-u:', error)
     return NextResponse.json(
       { 
         error: error.message || 'Greška pri automatskom brisanju saopštenja',
